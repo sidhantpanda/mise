@@ -1,15 +1,22 @@
 import { Router } from "express";
 import { z } from "zod";
 import type { Prisma } from "@prisma/client";
+import { strFromU8, unzipSync } from "fflate";
+import multer from "multer";
 import { prisma } from "../prisma.js";
 import { AppError } from "../lib/AppError.js";
 import { toRecipeDTO } from "../lib/mappers.js";
 import { requireWriteAuth } from "../middleware/auth.js";
 import { routeParam } from "../lib/request.js";
 import { normalizeRecipeInstructions } from "../lib/recipeInstructions.js";
-import { findRecipeJsonLd, isRecord } from "../lib/schemaJson.js";
+import { findRecipeJsonLd, findRecipeJsonLds, isRecord } from "../lib/schemaJson.js";
 
 export const recipesRouter = Router();
+
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 10 * 1024 * 1024 },
+});
 
 const nutritionSchema = z
   .object({
@@ -21,7 +28,9 @@ const nutritionSchema = z
   })
   .nullish();
 
-const optionalString = z.unknown().transform((value) => (typeof value === "string" ? value : undefined));
+const optionalString = z
+  .unknown()
+  .transform((value) => (typeof value === "string" ? value : undefined));
 
 const stringList = z.unknown().transform((value) => {
   if (Array.isArray(value)) return value.filter((item): item is string => typeof item === "string");
@@ -69,11 +78,16 @@ const recipeInput = z.object({
 
 type RecipeInput = z.infer<typeof recipeInput>;
 
+type UploadDocument = {
+  source: string;
+  value: unknown;
+};
+
 function recipeBody(body: unknown) {
   const explicitSchemaJson = isRecord(body) && body.schemaJson ? body.schemaJson : undefined;
   const foundRecipe = findRecipeJsonLd(body);
   const schemaJson = explicitSchemaJson ?? foundRecipe;
-  const source = explicitSchemaJson ? body : foundRecipe ?? body;
+  const source = explicitSchemaJson ? body : (foundRecipe ?? body);
   return { ...(isRecord(source) ? source : {}), schemaJson };
 }
 
@@ -135,8 +149,11 @@ function toColumns(input: RecipeInput): Prisma.RecipeUncheckedUpdateInput {
   if (input.suitableForDiet !== undefined) data.suitableForDiet = input.suitableForDiet;
   if (input.recipeIngredient !== undefined) data.recipeIngredient = input.recipeIngredient;
   if (input.recipeInstructions !== undefined)
-    data.recipeInstructions = normalizeRecipeInstructions(input.recipeInstructions) as Prisma.InputJsonValue;
-  if (input.estimatedCost !== undefined) data.estimatedCost = input.estimatedCost as Prisma.InputJsonValue;
+    data.recipeInstructions = normalizeRecipeInstructions(
+      input.recipeInstructions,
+    ) as Prisma.InputJsonValue;
+  if (input.estimatedCost !== undefined)
+    data.estimatedCost = input.estimatedCost as Prisma.InputJsonValue;
   if (input.supply !== undefined) data.supply = input.supply as Prisma.InputJsonValue;
   if (input.tool !== undefined) data.tool = input.tool as Prisma.InputJsonValue;
   if (input.nutrition !== undefined)
@@ -148,6 +165,39 @@ function toColumns(input: RecipeInput): Prisma.RecipeUncheckedUpdateInput {
     data.ratingCount = input.aggregateRating?.ratingCount ?? null;
   }
   return data;
+}
+
+function parseJsonDocument(source: string, text: string): UploadDocument {
+  try {
+    return { source, value: JSON.parse(text) };
+  } catch {
+    throw new AppError(400, `${source} is not valid JSON`);
+  }
+}
+
+function uploadDocuments(file: Express.Multer.File): UploadDocument[] {
+  const filename = file.originalname.toLowerCase();
+  if (filename.endsWith(".zip")) {
+    let entries: Record<string, Uint8Array>;
+    try {
+      entries = unzipSync(new Uint8Array(file.buffer));
+    } catch {
+      throw new AppError(400, "ZIP file could not be read");
+    }
+
+    return Object.entries(entries)
+      .filter(([name]) => {
+        const lower = name.toLowerCase();
+        return lower.endsWith(".json") || lower.endsWith(".jsonld");
+      })
+      .map(([name, data]) => parseJsonDocument(name, strFromU8(data)));
+  }
+
+  if (!filename.endsWith(".json") && !filename.endsWith(".jsonld")) {
+    throw new AppError(400, "Upload a JSON-LD file or a ZIP of JSON-LD files");
+  }
+
+  return [parseJsonDocument(file.originalname, file.buffer.toString("utf8"))];
 }
 
 // Resolve the author's current display name from their user id for every recipe.
@@ -186,6 +236,61 @@ recipesRouter.post("/", requireWriteAuth, async (req, res) => {
     include: withAuthor,
   });
   res.status(201).json(toRecipeDTO(recipe));
+});
+
+recipesRouter.post("/upload", requireWriteAuth, upload.single("file"), async (req, res) => {
+  if (!req.file) throw new AppError(400, "Recipe upload file is required");
+
+  const documents = uploadDocuments(req.file);
+  const candidates = documents.flatMap((document) =>
+    findRecipeJsonLds(document.value).map((recipe) => ({
+      source: document.source,
+      recipe,
+    })),
+  );
+
+  if (candidates.length === 0) {
+    throw new AppError(400, "No Schema.org Recipe JSON-LD was found in the upload");
+  }
+
+  const created: ReturnType<typeof toRecipeDTO>[] = [];
+  const errors: { source: string; name?: string; error: string }[] = [];
+
+  for (const candidate of candidates) {
+    try {
+      const input = recipeInput.parse(recipeBody(candidate.recipe));
+      if (!input.name) throw new AppError(400, "Recipe name is required");
+      const recipe = await prisma.recipe.create({
+        data: {
+          ...(toColumns(input) as Prisma.RecipeUncheckedCreateInput),
+          householdId: req.user!.householdId,
+          createdById: req.user!.id,
+          datePublished: new Date().toISOString().slice(0, 10),
+          name: input.name,
+        },
+        include: withAuthor,
+      });
+      created.push(toRecipeDTO(recipe));
+    } catch (err) {
+      const error =
+        err instanceof AppError
+          ? err.message
+          : err instanceof z.ZodError
+            ? "Validation failed"
+            : "Recipe could not be imported";
+      errors.push({
+        source: candidate.source,
+        name: typeof candidate.recipe.name === "string" ? candidate.recipe.name : undefined,
+        error,
+      });
+    }
+  }
+
+  if (created.length === 0) {
+    throw new AppError(400, errors[0]?.error ?? "No recipes could be imported");
+  }
+
+  res.status(201).json({ created, errors });
 });
 
 recipesRouter.patch("/:id", requireWriteAuth, async (req, res) => {

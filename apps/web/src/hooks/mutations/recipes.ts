@@ -5,10 +5,27 @@ import { keys } from "../keys";
 
 export type RecipeInput = Partial<Omit<Recipe, "@context" | "@type" | "identifier">>;
 
+export type RecipeUploadResult = {
+  created: Recipe[];
+  errors: { source: string; name?: string; error: string }[];
+};
+
 export function useCreateRecipe() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (input: RecipeInput) => api.post<Recipe>("/recipes", input),
+    onSuccess: () => qc.invalidateQueries({ queryKey: keys.recipes }),
+  });
+}
+
+export function useUploadRecipes() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (file: File) => {
+      const form = new FormData();
+      form.append("file", file);
+      return api.postForm<RecipeUploadResult>("/recipes/upload", form);
+    },
     onSuccess: () => qc.invalidateQueries({ queryKey: keys.recipes }),
   });
 }

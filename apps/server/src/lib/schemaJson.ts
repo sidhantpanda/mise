@@ -26,6 +26,23 @@ export function findRecipeJsonLd(value: unknown): Record<string, unknown> | unde
   return undefined;
 }
 
+export function findRecipeJsonLds(value: unknown): Record<string, unknown>[] {
+  if (isRecipeNode(value)) return [value];
+
+  if (Array.isArray(value)) {
+    return value.flatMap(findRecipeJsonLds);
+  }
+
+  if (!isRecord(value)) return [];
+
+  const graph = value["@graph"];
+  if (Array.isArray(graph)) {
+    return graph.filter(isRecipeNode) as Record<string, unknown>[];
+  }
+
+  return [];
+}
+
 export function compactObject<T extends Record<string, unknown>>(value: T) {
   return Object.fromEntries(
     Object.entries(value).filter(([, entry]) => {

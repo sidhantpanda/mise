@@ -19,6 +19,7 @@ import { Route as HouseholdRouteImport } from './routes/household'
 import { Route as AccessTokensRouteImport } from './routes/access-tokens'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as RecipesIndexRouteImport } from './routes/recipes.index'
+import { Route as RecipesUploadRouteImport } from './routes/recipes.upload'
 import { Route as RecipesNewRouteImport } from './routes/recipes.new'
 import { Route as RecipesIdRouteImport } from './routes/recipes.$id'
 import { Route as RecipesEditIdRouteImport } from './routes/recipes.edit.$id'
@@ -73,6 +74,11 @@ const RecipesIndexRoute = RecipesIndexRouteImport.update({
   path: '/recipes/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RecipesUploadRoute = RecipesUploadRouteImport.update({
+  id: '/recipes/upload',
+  path: '/recipes/upload',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RecipesNewRoute = RecipesNewRouteImport.update({
   id: '/recipes/new',
   path: '/recipes/new',
@@ -101,6 +107,7 @@ export interface FileRoutesByFullPath {
   '/signup': typeof SignupRoute
   '/recipes/$id': typeof RecipesIdRoute
   '/recipes/new': typeof RecipesNewRoute
+  '/recipes/upload': typeof RecipesUploadRoute
   '/recipes/': typeof RecipesIndexRoute
   '/recipes/edit/$id': typeof RecipesEditIdRoute
 }
@@ -116,6 +123,7 @@ export interface FileRoutesByTo {
   '/signup': typeof SignupRoute
   '/recipes/$id': typeof RecipesIdRoute
   '/recipes/new': typeof RecipesNewRoute
+  '/recipes/upload': typeof RecipesUploadRoute
   '/recipes': typeof RecipesIndexRoute
   '/recipes/edit/$id': typeof RecipesEditIdRoute
 }
@@ -132,6 +140,7 @@ export interface FileRoutesById {
   '/signup': typeof SignupRoute
   '/recipes/$id': typeof RecipesIdRoute
   '/recipes/new': typeof RecipesNewRoute
+  '/recipes/upload': typeof RecipesUploadRoute
   '/recipes/': typeof RecipesIndexRoute
   '/recipes/edit/$id': typeof RecipesEditIdRoute
 }
@@ -149,6 +158,7 @@ export interface FileRouteTypes {
     | '/signup'
     | '/recipes/$id'
     | '/recipes/new'
+    | '/recipes/upload'
     | '/recipes/'
     | '/recipes/edit/$id'
   fileRoutesByTo: FileRoutesByTo
@@ -164,6 +174,7 @@ export interface FileRouteTypes {
     | '/signup'
     | '/recipes/$id'
     | '/recipes/new'
+    | '/recipes/upload'
     | '/recipes'
     | '/recipes/edit/$id'
   id:
@@ -179,6 +190,7 @@ export interface FileRouteTypes {
     | '/signup'
     | '/recipes/$id'
     | '/recipes/new'
+    | '/recipes/upload'
     | '/recipes/'
     | '/recipes/edit/$id'
   fileRoutesById: FileRoutesById
@@ -195,6 +207,7 @@ export interface RootRouteChildren {
   SignupRoute: typeof SignupRoute
   RecipesIdRoute: typeof RecipesIdRoute
   RecipesNewRoute: typeof RecipesNewRoute
+  RecipesUploadRoute: typeof RecipesUploadRoute
   RecipesIndexRoute: typeof RecipesIndexRoute
   RecipesEditIdRoute: typeof RecipesEditIdRoute
 }
@@ -271,6 +284,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RecipesIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/recipes/upload': {
+      id: '/recipes/upload'
+      path: '/recipes/upload'
+      fullPath: '/recipes/upload'
+      preLoaderRoute: typeof RecipesUploadRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/recipes/new': {
       id: '/recipes/new'
       path: '/recipes/new'
@@ -307,6 +327,7 @@ const rootRouteChildren: RootRouteChildren = {
   SignupRoute: SignupRoute,
   RecipesIdRoute: RecipesIdRoute,
   RecipesNewRoute: RecipesNewRoute,
+  RecipesUploadRoute: RecipesUploadRoute,
   RecipesIndexRoute: RecipesIndexRoute,
   RecipesEditIdRoute: RecipesEditIdRoute,
 }
