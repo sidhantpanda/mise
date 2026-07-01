@@ -30,6 +30,20 @@ that household.
 └── pnpm-workspace.yaml
 ```
 
+## Screenshots
+
+### Dashboard
+
+![Dashboard](docs/dashboard.png)
+
+### Recipes
+
+![Recipes](docs/recipes.png)
+
+### Meal plan
+
+![Meal plan](docs/meal-plan.png)
+
 ## Prerequisites
 
 - **Node.js** 20+ (developed on 24) — for local development
