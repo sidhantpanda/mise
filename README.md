@@ -5,31 +5,6 @@ plans, pantry, and a shopping list in one place. Recipes are stored in standard
 [Schema.org Recipe](https://schema.org/Recipe) JSON‑LD, so data is portable to and from
 any compliant tool.
 
-It's a pnpm monorepo with two apps that are served on **one port**: the API is the front
-door on `3000`, serves everything under `/api`, and proxies all other requests to the SSR
-frontend.
-
-| App | Stack | Role |
-|-----|-------|------|
-| `apps/server` | Express 5 · Prisma 7 · PostgreSQL · JWT auth | API + front door on `:3000` (serves `/api`, proxies the frontend) |
-| `apps/web` | Vite SSR · React 19 · TanStack Router + Query · Tailwind v4 · shadcn/ui | SSR frontend on `:4000`, reached only through the API |
-
-Auth is a JWT stored in an httpOnly cookie. After signing up, a user is taken through a
-short onboarding flow to create a **household** or **restaurant**; all data is scoped to
-that household.
-
-```
-.
-├── apps/
-│   ├── web/      # Vite SSR frontend (:4000, proxied through the API)
-│   └── server/   # Express + Prisma API + front door (:3000)
-├── Dockerfile          # multi-stage build for the bundled app (API + frontend)
-├── compose.yml         # full production stack: app + Postgres + migrate + Adminer
-├── compose.dev.yml     # local Postgres + Adminer for development
-├── .env / .env.example # shared by Compose AND the apps
-└── pnpm-workspace.yaml
-```
-
 ## Screenshots
 
 ### Dashboard
