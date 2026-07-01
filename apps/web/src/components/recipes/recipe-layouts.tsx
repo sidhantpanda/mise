@@ -65,7 +65,7 @@ function RecipeList({ recipes }: { recipes: Recipe[] }) {
           params={{ id: recipe.identifier }}
           className="group grid gap-4 rounded-xl border border-border bg-card p-3 transition hover:-translate-y-0.5 hover:shadow-md sm:grid-cols-[132px_minmax(0,1fr)_auto] sm:items-center"
         >
-          <div className="aspect-[4/3] overflow-hidden rounded-lg sm:h-24 sm:aspect-auto">
+          <div className="aspect-4/3 overflow-hidden rounded-lg sm:h-24 sm:aspect-auto">
             <img
               src={recipe.image[0]}
               alt={recipe.name}
