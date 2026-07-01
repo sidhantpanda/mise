@@ -76,7 +76,10 @@ function RecipesPage() {
     >
       <AddRecipeDialog open={newRecipeOpen} onOpenChange={setNewRecipeOpen} />
 
-      <div className="mb-6 flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
+      <div
+        className="sticky z-[5] -mx-4 mb-6 flex flex-col gap-3 border-b border-border bg-background/85 px-4 py-3 backdrop-blur sm:-mx-6 sm:px-6 md:-mx-10 md:px-10 xl:flex-row xl:items-center xl:justify-between"
+        style={{ top: "var(--app-header-height, 0px)" }}
+      >
         <div className="flex gap-2 overflow-x-auto pb-1 sm:flex-wrap sm:overflow-visible">
           {categories.map((c) => (
             <button

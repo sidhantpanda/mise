@@ -17,7 +17,7 @@ import { useMe, type AuthUser } from "@/hooks";
 import { useLogout } from "@/hooks/mutations";
 import { HouseholdSwitcher } from "@/components/household-switcher";
 import { cn } from "@/lib/utils";
-import type { ReactNode } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import {
   Sheet,
   SheetClose,
@@ -51,6 +51,20 @@ export function AppShell({
 }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const me = useMe();
+  const headerRef = useRef<HTMLElement>(null);
+  const [headerHeight, setHeaderHeight] = useState(0);
+
+  // Publish the sticky header's measured height so page content can pin sticky
+  // toolbars directly beneath it (the header height varies with title/actions).
+  useEffect(() => {
+    const el = headerRef.current;
+    if (!el) return;
+    const update = () => setHeaderHeight(el.offsetHeight);
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [me.data]);
 
   // SSR and the first client render hit this branch (no session data yet), so no
   // protected content is rendered until auth is confirmed on the client.
@@ -68,8 +82,14 @@ export function AppShell({
       </aside>
 
       {/* Main */}
-      <div className="flex-1 min-w-0 flex flex-col">
-        <header className="sticky top-0 z-10 bg-background/85 backdrop-blur border-b border-border">
+      <div
+        className="flex-1 min-w-0 flex flex-col"
+        style={{ "--app-header-height": `${headerHeight}px` } as CSSProperties}
+      >
+        <header
+          ref={headerRef}
+          className="sticky top-0 z-10 bg-background/85 backdrop-blur border-b border-border"
+        >
           <div className="px-4 sm:px-6 md:px-10 py-4 sm:py-5 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 sm:gap-6">
             <div className="flex min-w-0 items-start gap-3">
               <MobileNav pathname={pathname} household={household} user={user} />
