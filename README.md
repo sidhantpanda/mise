@@ -40,6 +40,10 @@ that household.
 
 ![Recipes](docs/recipes.png)
 
+### Recipe Details
+
+![Recipes](docs/recipe-detail.png)
+
 ### Meal plan
 
 ![Meal plan](docs/meal-plan.png)
