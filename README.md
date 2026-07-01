@@ -257,3 +257,11 @@ docker compose run --rm migrate
   `schema.prisma`.
 - Recipes, pantry items, and meals are exchanged in their Schema.org shapes end‑to‑end,
   so the API responses map directly onto the frontend types.
+
+## License
+
+Licensed under the [Elastic License 2.0](LICENSE.txt) (ELv2). In short: you're free
+to use, copy, modify, and self‑host this software — including inside a business —
+provided you keep the copyright/license notices intact. You may **not** provide it to
+third parties as a hosted or managed service. This is a source‑available license, not
+an OSI‑approved open‑source license.

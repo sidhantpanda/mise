@@ -2,6 +2,7 @@
   "name": "web",
   "private": true,
   "sideEffects": false,
+  "license": "Elastic-2.0",
   "type": "module",
   "scripts": {
     "dev": "cross-env PORT=4000 tsx watch server.ts",

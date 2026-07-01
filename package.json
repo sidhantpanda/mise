@@ -1,6 +1,8 @@
 {
-  "name": "kitchen-companion-hub",
+  "name": "mise",
+  "author": "Sidhant Panda",
   "private": true,
+  "license": "Elastic-2.0",
   "type": "module",
   "packageManager": "pnpm@11.7.0",
   "scripts": {

@@ -1,6 +1,7 @@
 {
   "name": "server",
   "private": true,
+  "license": "Elastic-2.0",
   "type": "module",
   "exports": {
     "./app": "./dist/src/app.js"
