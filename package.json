@@ -1,0 +1,25 @@
+{
+  "name": "kitchen-companion-hub",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@11.7.0",
+  "scripts": {
+    "dev:db": "docker compose -f compose.dev.yml up",
+    "dev": "concurrently -n api,web -c green,blue \"pnpm --filter server dev\" \"pnpm --filter web dev\"",
+    "build": "pnpm -r build",
+    "start": "concurrently -n api,web -c green,blue \"pnpm --filter server start\" \"pnpm --filter web start\"",
+    "preview": "pnpm --filter web preview",
+    "lint": "pnpm -r lint",
+    "format": "prettier --write .",
+    "db:create": "pnpm --filter server db:create",
+    "db:push": "pnpm --filter server db:push",
+    "db:seed": "pnpm --filter server db:seed",
+    "db:studio": "pnpm --filter server db:studio"
+  },
+  "dependencies": {
+    "concurrently": "^10.0.3"
+  },
+  "devDependencies": {
+    "prettier": "^3.7.3"
+  }
+}

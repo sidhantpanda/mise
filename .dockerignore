@@ -1,0 +1,17 @@
+# Anything that should be built inside the image or never shipped.
+**/node_modules
+**/dist
+dist-ssr
+.git
+.gitignore
+*.log
+logs
+data
+.env
+.env.*.local
+.DS_Store
+.vscode
+.idea
+plan
+Dockerfile
+.dockerignore

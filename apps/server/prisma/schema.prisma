@@ -1,0 +1,202 @@
+// Pragmatic v1 schema — maps 1:1 to the web app's Schema.org shapes (see
+// apps/web/src/lib/mock-data.ts). Recipe ingredients stay free-text string[],
+// pantry uses a single quantity, one household is auto-created per user.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum HouseholdType {
+  Household
+  Restaurant
+}
+
+enum MemberRole {
+  Owner
+  Admin
+  Member
+}
+
+enum MealType {
+  Breakfast
+  Lunch
+  Dinner
+  Snack
+}
+
+enum PantryLocation {
+  Pantry
+  Fridge
+  Freezer
+}
+
+enum InvitationStatus {
+  Pending
+  Accepted
+  Rejected
+}
+
+model User {
+  id                String            @id @default(uuid())
+  email             String            @unique
+  displayName       String
+  passwordHash      String
+  avatarColor       String?
+  activeHouseholdId String?
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  memberships       HouseholdMember[]
+  createdHouseholds Household[]       @relation("HouseholdCreatedBy")
+  createdRecipes    Recipe[]          @relation("RecipeCreatedBy")
+  accessTokens      AccessToken[]
+  activeHousehold   Household?        @relation("ActiveHousehold", fields: [activeHouseholdId], references: [id], onDelete: SetNull)
+}
+
+model Household {
+  id             String            @id @default(uuid())
+  name           String
+  type           HouseholdType     @default(Household)
+  createdById    String
+  createdBy      User              @relation("HouseholdCreatedBy", fields: [createdById], references: [id])
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+  members        HouseholdMember[]
+  invitations    Invitation[]
+  recipes        Recipe[]
+  meals          PlannedMeal[]
+  shopping       ShoppingItem[]
+  pantry         PantryItem[]
+  accessTokens   AccessToken[]
+  activeForUsers User[]            @relation("ActiveHousehold")
+}
+
+model AccessToken {
+  id          String    @id @default(uuid())
+  userId      String
+  householdId String
+  name        String
+  tokenHash   String    @unique
+  tokenPrefix String
+  scopes      String[]  @default(["read"])
+  lastUsedAt  DateTime?
+  expiresAt   DateTime?
+  revokedAt   DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  household   Household @relation(fields: [householdId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([householdId])
+}
+
+model HouseholdMember {
+  householdId String
+  userId      String
+  role        MemberRole @default(Member)
+  joinedAt    DateTime   @default(now())
+  household   Household  @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([householdId, userId])
+}
+
+model Invitation {
+  id          String           @id @default(uuid())
+  householdId String
+  email       String
+  role        MemberRole       @default(Member)
+  status      InvitationStatus @default(Pending)
+  sentAt      DateTime         @default(now())
+  acceptedAt  DateTime?
+  household   Household        @relation(fields: [householdId], references: [id], onDelete: Cascade)
+
+  @@unique([householdId, email])
+}
+
+model Recipe {
+  id                 String        @id @default(uuid())
+  householdId        String
+  name               String
+  description        String        @default("")
+  image              String[]      @default([])
+  authorName         String        @default("")
+  datePublished      String        @default("")
+  prepTime           String        @default("")
+  cookTime           String        @default("")
+  performTime        String        @default("")
+  totalTime          String        @default("")
+  cookingMethod      String        @default("")
+  recipeYield        String        @default("")
+  howToYield         Json?         @map("yield")
+  recipeCategory     String        @default("")
+  recipeCuisine      String        @default("")
+  keywords           String[]      @default([])
+  suitableForDiet    String[]      @default([])
+  recipeIngredient   String[]      @default([])
+  recipeInstructions Json          @default("[]")
+  estimatedCost      Json?
+  supply             Json?
+  tool               Json?
+  nutrition          Json?
+  schemaJson         Json?
+  ratingValue        Float?
+  ratingCount        Int?
+  createdById        String?
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+  household          Household     @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  createdBy          User?         @relation("RecipeCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  meals              PlannedMeal[]
+
+  @@index([householdId])
+  @@index([createdById])
+}
+
+model PlannedMeal {
+  id          String    @id @default(uuid())
+  householdId String
+  date        String
+  mealType    MealType
+  recipeId    String?
+  servings    Int       @default(1)
+  assigneeId  String?
+  createdAt   DateTime  @default(now())
+  household   Household @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  recipe      Recipe?   @relation(fields: [recipeId], references: [id], onDelete: SetNull)
+
+  @@index([householdId, date])
+}
+
+model ShoppingItem {
+  id           String    @id @default(uuid())
+  householdId  String
+  name         String
+  quantity     String    @default("")
+  category     String    @default("")
+  checked      Boolean   @default(false)
+  fromRecipeId String?
+  createdAt    DateTime  @default(now())
+  household    Household @relation(fields: [householdId], references: [id], onDelete: Cascade)
+
+  @@index([householdId])
+}
+
+model PantryItem {
+  id            String         @id @default(uuid())
+  householdId   String
+  name          String
+  category      String         @default("")
+  quantityValue Float          @default(0)
+  quantityUnit  String         @default("")
+  expires       String?
+  location      PantryLocation @default(Pantry)
+  createdAt     DateTime       @default(now())
+  household     Household      @relation(fields: [householdId], references: [id], onDelete: Cascade)
+
+  @@index([householdId])
+}
