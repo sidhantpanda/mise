@@ -36,7 +36,7 @@ export function verifyToken(token: string): { id: string } | null {
 export const cookieOptions = {
   httpOnly: true,
   sameSite: "lax" as const,
-  secure: env.NODE_ENV === "production",
+  secure: env.COOKIE_SECURE,
   maxAge: MAX_AGE_MS,
   path: "/",
 };

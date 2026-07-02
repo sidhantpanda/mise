@@ -12,6 +12,10 @@ const schema = z.object({
   SERVER_PORT: z.coerce.number().default(4000),
   WEB_ORIGIN: z.string().url().default("http://localhost:3000"),
   NODE_ENV: z.string().default("development"),
+  // Whether auth cookies get the `Secure` flag. Defaults to on in production,
+  // but set COOKIE_SECURE=false to serve over plain HTTP (e.g. a LAN/homelab
+  // deployment without TLS) — browsers drop Secure cookies over HTTP.
+  COOKIE_SECURE: z.enum(["true", "false"]).optional(),
 });
 
 const parsed = schema.safeParse(process.env);
@@ -20,4 +24,9 @@ if (!parsed.success) {
   process.exit(1);
 }
 
-export const env = parsed.data;
+const cookieSecure =
+  parsed.data.COOKIE_SECURE !== undefined
+    ? parsed.data.COOKIE_SECURE === "true"
+    : parsed.data.NODE_ENV === "production";
+
+export const env = { ...parsed.data, COOKIE_SECURE: cookieSecure };
