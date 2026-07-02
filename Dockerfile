@@ -37,9 +37,6 @@ RUN pnpm build
 FROM base AS runtime
 ENV NODE_ENV=production
 ENV PORT=3000
-# No Prisma CLI in this image, so the app must not self-migrate on boot. Schema
-# sync runs as a separate one-shot step (the `migrate` service in compose.yml).
-ENV AUTO_MIGRATE=false
 
 COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
 COPY apps/server/package.json apps/server/
@@ -48,22 +45,16 @@ COPY apps/web/package.json apps/web/
 COPY apps/server/prisma apps/server/prisma
 COPY apps/server/prisma.config.ts apps/server/
 
-# Install prod deps, generate the client, then strip the Prisma CLI + Studio/dev
-# packages — all in ONE layer so the removal actually shrinks the image (an `rm`
-# in a later layer wouldn't). `@prisma/client` + the query engine stay; only the
-# CLI tooling (used at build time for `generate`, and by the migrate step) goes.
+# Install prod deps and generate the client. The Prisma CLI stays in this image
+# so the app can sync the schema on boot (`prisma db push`, gated by
+# AUTO_MIGRATE). The CLI eagerly requires its @prisma/* siblings (studio-core,
+# dev, pglite) at load time, so those must stay too — we only strip the bundler
+# leftovers (@rolldown), which nothing at runtime uses. Done in the SAME layer so
+# the removal actually shrinks the image (an `rm` in a later layer wouldn't).
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
     pnpm install --prod --frozen-lockfile \
  && pnpm --filter server exec prisma generate \
- && rm -rf \
-      node_modules/.pnpm/prisma@* \
-      node_modules/.pnpm/@prisma+studio-core@* \
-      node_modules/.pnpm/@prisma+dev@* \
-      node_modules/.pnpm/@electric-sql+pglite@* \
-      node_modules/.pnpm/@rolldown+* \
-      node_modules/.bin/prisma \
-      apps/server/node_modules/prisma \
-      apps/server/node_modules/.bin/prisma
+ && rm -rf node_modules/.pnpm/@rolldown+*
 
 # Built output from the build stage.
 COPY --from=build /app/apps/server/dist apps/server/dist

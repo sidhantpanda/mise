@@ -1,21 +1,7 @@
-# Development Postgres (+ Adminer DB UI) for Kitchen Companion Hub.
-# Reads credentials from the root .env (same file the server uses via dotenv).
-#   docker compose up -d      # start the database + Adminer
-#   docker compose down       # stop them (data persists in ./data/postgres)
-#
-# Postgres data is bind-mounted to ./data/postgres (gitignored). To wipe the
-# database, stop the stack and delete that directory: `rm -rf ./data/postgres`.
-#
-# Adminer (database UI): http://localhost:8080
-#   System:   PostgreSQL
-#   Server:   postgres        (the service name; pre-filled)
-#   Username: ${POSTGRES_USER}      (default: kitchen)
-#   Password: ${POSTGRES_PASSWORD}  (default: kitchen)
-#   Database: ${POSTGRES_DB}        (default: kitchen)
 services:
   postgres:
     image: postgres:16
-    container_name: kitchen-postgres
+    container_name: mise-postgres
     restart: unless-stopped
     env_file: .env
     environment:
@@ -37,7 +23,7 @@ services:
 
   adminer:
     image: adminer:latest
-    container_name: kitchen-adminer
+    container_name: mise-adminer
     restart: unless-stopped
     depends_on:
       postgres:

@@ -7,9 +7,8 @@ import { serverRoot } from "../paths.js";
  * Prisma schema. Uses `prisma db push` (dev-oriented, no migration history) so a
  * developer can `docker compose up` a fresh Postgres and just run the server.
  *
- * Set AUTO_MIGRATE=false to skip this — the production image does that so it
- * doesn't need the Prisma CLI at runtime; schema sync runs as a separate
- * one-shot step (see the `migrate` service in compose.yml) instead.
+ * Set AUTO_MIGRATE=false to skip this when the schema is managed out of band
+ * (e.g. a separate migration job or a read-only replica).
  */
 export async function ensureDatabase(): Promise<void> {
   if (process.env.AUTO_MIGRATE === "false") {

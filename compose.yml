@@ -1,46 +1,21 @@
-# Full application stack for Kitchen Companion Hub: the bundled app (API + SSR
-# frontend served on one port) plus its Postgres database and the Adminer DB UI.
-# All values are read from the root .env (see .env.example).
-#
-#   docker compose up -d --build   # build the image and start the whole stack
-#   docker compose down            # stop it (Postgres data persists in ./data/postgres)
-#
-# App:      http://localhost:${APP_PORT} (default 3000)
-# Adminer:  http://localhost:${ADMINER_PORT} (default 8080; System: PostgreSQL, Server: postgres)
-#
-# For local development you usually only want the database — use compose.dev.yml
-# (or `pnpm dev:db`) and run the apps with `pnpm dev`.
 services:
-  # One-shot schema sync. The runtime image has no Prisma CLI, so `prisma db
-  # push` runs here from the build stage (which has it) before the app starts.
-  migrate:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      target: build
-    image: kitchen-companion-hub:build
-    depends_on:
-      postgres:
-        condition: service_healthy
-    environment:
-      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:${POSTGRES_PORT:-5432}/${POSTGRES_DB}
-    command: ["pnpm", "--filter", "server", "exec", "prisma", "db", "push", "--accept-data-loss"]
-    restart: "no"
-
-  app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: kitchen-companion-hub:latest
-    container_name: kitchen-app
+  mise:
+    image: ghcr.io/sidhantpanda/mise:latest
+    pull_policy: always
+    container_name: mise
     restart: unless-stopped
     depends_on:
       postgres:
         condition: service_healthy
-      migrate:
-        condition: service_completed_successfully
+    # Pull everything from the root .env into the container. Anything set under
+    # `environment:` below still wins (Compose precedence: environment > env_file),
+    # which is how the container-network DATABASE_URL overrides the localhost one.
+    env_file: .env
     environment:
       NODE_ENV: production
+      # The runtime image ships the Prisma CLI, so the app syncs the schema
+      # itself on boot (createDatabaseIfMissing + `prisma db push`).
+      AUTO_MIGRATE: "true"
       # Inside the compose network Postgres is reached by its service name, not
       # localhost — so build the URL from the same POSTGRES_* vars Postgres uses.
       DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:${POSTGRES_PORT:-5432}/${POSTGRES_DB}
@@ -63,7 +38,7 @@ services:
 
   postgres:
     image: postgres:16
-    container_name: kitchen-postgres
+    container_name: mise-postgres
     restart: unless-stopped
     env_file: .env
     environment:
@@ -76,7 +51,7 @@ services:
     ports:
       - "${POSTGRES_PORT:-5432}:${POSTGRES_PORT:-5432}"
     volumes:
-      - ./data/postgres:/var/lib/postgresql/data
+      - postgres-data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB} -p ${POSTGRES_PORT:-5432}"]
       interval: 5s
@@ -85,7 +60,7 @@ services:
 
   adminer:
     image: adminer:latest
-    container_name: kitchen-adminer
+    container_name: mise-adminer
     restart: unless-stopped
     depends_on:
       postgres:
@@ -96,3 +71,8 @@ services:
       # Pre-fill the "Server" field on the login screen.
       ADMINER_DEFAULT_SERVER: postgres
       ADMINER_DESIGN: dracula
+
+volumes:
+  # Named volume for Postgres data — managed by Docker (see `docker volume ls`),
+  # survives `docker compose down`, removed only with `docker compose down -v`.
+  postgres-data:
