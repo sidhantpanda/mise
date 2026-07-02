@@ -58,20 +58,6 @@ services:
       timeout: 5s
       retries: 10
 
-  adminer:
-    image: adminer:latest
-    container_name: mise-adminer
-    restart: unless-stopped
-    depends_on:
-      postgres:
-        condition: service_healthy
-    ports:
-      - "${ADMINER_PORT:-8080}:8080"
-    environment:
-      # Pre-fill the "Server" field on the login screen.
-      ADMINER_DEFAULT_SERVER: postgres
-      ADMINER_DESIGN: dracula
-
 volumes:
   # Named volume for Postgres data — managed by Docker (see `docker volume ls`),
   # survives `docker compose down`, removed only with `docker compose down -v`.

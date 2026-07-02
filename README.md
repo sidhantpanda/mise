@@ -25,6 +25,12 @@ See the [Roadmap](ROADMAP.md) for what's planned next.
 
 ![Meal plan](docs/meal-plan.png)
 
+## Run with docker compose
+
+1. Copy [compose.yml](compose.yml)
+2. Copy [.env.example](.env.example) to `.env`
+3. Run `docker compose up -d`
+
 ## Prerequisites
 
 - **Node.js** 20+ (developed on 24) — for local development
