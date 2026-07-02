@@ -5,6 +5,8 @@ plans, pantry, and a shopping list in one place. Recipes are stored in standard
 [Schema.org Recipe](https://schema.org/Recipe) JSON‑LD, so data is portable to and from
 any compliant tool.
 
+See the [Roadmap](ROADMAP.md) for what's planned next.
+
 ## Screenshots
 
 ### Dashboard
