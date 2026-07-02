@@ -46,10 +46,15 @@ function Dashboard() {
     >
       {/* hero stats */}
       <div className="grid grid-cols-1 min-[420px]:grid-cols-2 md:grid-cols-4 gap-3 mb-8">
-        <StatCard label="Today's meals" value={todays.length.toString()} hint="planned" />
-        <StatCard label="Recipes" value={recipes.length.toString()} hint="in library" />
-        <StatCard label="Shopping" value={toBuy.toString()} hint="items to buy" accent />
-        <StatCard label="Pantry" value={pantry.length.toString()} hint="items tracked" />
+        <StatCard
+          label="Today's meals"
+          value={todays.length.toString()}
+          hint="planned"
+          to="/meal-plan"
+        />
+        <StatCard label="Recipes" value={recipes.length.toString()} hint="in library" to="/recipes" />
+        <StatCard label="Shopping" value={toBuy.toString()} hint="items to buy" accent to="/shopping-list" />
+        <StatCard label="Pantry" value={pantry.length.toString()} hint="items tracked" to="/pantry" />
       </div>
 
       <div className="grid min-w-0 lg:grid-cols-3 gap-6">
@@ -174,20 +179,23 @@ function StatCard({
   value,
   hint,
   accent,
+  to,
 }: {
   label: string;
   value: string;
   hint: string;
   accent?: boolean;
+  to: "/meal-plan" | "/recipes" | "/shopping-list" | "/pantry";
 }) {
   return (
-    <div
-      className={`rounded-2xl p-4 sm:p-5 border ${accent ? "bg-accent text-accent-foreground border-accent" : "bg-card border-border"}`}
+    <Link
+      to={to}
+      className={`block rounded-2xl p-4 sm:p-5 border transition ${accent ? "bg-accent text-accent-foreground border-accent hover:bg-accent/90" : "bg-card border-border hover:bg-secondary/60"}`}
     >
       <div className="text-[11px] uppercase tracking-wider opacity-70">{label}</div>
       <div className="text-display text-3xl sm:text-4xl mt-2 leading-none">{value}</div>
       <div className="text-xs mt-1 opacity-70">{hint}</div>
-    </div>
+    </Link>
   );
 }
 
