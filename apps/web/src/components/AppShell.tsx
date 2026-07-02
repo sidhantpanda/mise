@@ -139,7 +139,7 @@ function MobileNav({
       </SheetTrigger>
       <SheetContent
         side="left"
-        className="w-72 max-w-[85vw] border-sidebar-border bg-sidebar p-0 text-sidebar-foreground"
+        className="flex w-72 max-w-[85vw] flex-col overflow-y-auto border-sidebar-border bg-sidebar p-0 text-sidebar-foreground"
       >
         <SheetHeader className="sr-only">
           <SheetTitle>Navigation</SheetTitle>
