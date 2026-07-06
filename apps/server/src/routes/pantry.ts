@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { z } from "zod";
+import { pantryItemCreateSchema, pantryItemUpdateSchema } from "common";
 import { prisma } from "../prisma.js";
 import { AppError } from "../lib/AppError.js";
 import { toPantryDTO } from "../lib/mappers.js";
@@ -7,31 +7,6 @@ import { requireWriteAuth } from "../middleware/auth.js";
 import { routeParam } from "../lib/request.js";
 
 export const pantryRouter = Router();
-
-const location = z.enum(["Pantry", "Fridge", "Freezer"]);
-
-const quantity = z.object({
-  value: z.number(),
-  unitText: z.string(),
-});
-
-const createSchema = z.object({
-  name: z.string().trim().min(1),
-  category: z.string().default(""),
-  quantity: quantity.default({ value: 0, unitText: "" }),
-  expires: z.string().nullish(),
-  location: location.default("Pantry"),
-});
-
-const updateSchema = z
-  .object({
-    name: z.string().trim().min(1),
-    category: z.string(),
-    quantity,
-    expires: z.string().nullable(),
-    location,
-  })
-  .partial();
 
 pantryRouter.get("/", async (req, res) => {
   const items = await prisma.pantryItem.findMany({
@@ -42,7 +17,7 @@ pantryRouter.get("/", async (req, res) => {
 });
 
 pantryRouter.post("/", requireWriteAuth, async (req, res) => {
-  const input = createSchema.parse(req.body);
+  const input = pantryItemCreateSchema.parse(req.body);
   const item = await prisma.pantryItem.create({
     data: {
       householdId: req.user!.householdId,
@@ -59,7 +34,7 @@ pantryRouter.post("/", requireWriteAuth, async (req, res) => {
 
 pantryRouter.patch("/:id", requireWriteAuth, async (req, res) => {
   const id = routeParam(req.params.id, "Pantry item id");
-  const input = updateSchema.parse(req.body);
+  const input = pantryItemUpdateSchema.parse(req.body);
   const existing = await prisma.pantryItem.findFirst({
     where: { id, householdId: req.user!.householdId },
     select: { id: true },

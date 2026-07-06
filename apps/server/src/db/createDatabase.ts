@@ -37,7 +37,9 @@ export async function createDatabaseIfMissing(): Promise<{ created: boolean; dat
 if (import.meta.url === `file://${process.argv[1]}`) {
   createDatabaseIfMissing()
     .then(({ created, database }) => {
-      console.log(created ? `Created database "${database}".` : `Database "${database}" already exists.`);
+      console.log(
+        created ? `Created database "${database}".` : `Database "${database}" already exists.`,
+      );
       process.exit(0);
     })
     .catch((err) => {

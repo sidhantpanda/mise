@@ -1,19 +1,24 @@
-export type RecipeHowToStep = { "@type": "HowToStep"; name?: string; text: string };
-export type RecipeHowToSection = {
+import { isRecord } from "./schema-json.js";
+
+export type HowToStep = {
+  "@type": "HowToStep";
+  name?: string;
+  text: string;
+};
+
+export type HowToSection = {
   "@type": "HowToSection";
   name?: string;
-  itemListElement: RecipeHowToStep[];
+  itemListElement: HowToStep[];
 };
-export type RecipeInstruction = RecipeHowToStep | RecipeHowToSection;
 
-const isRecord = (value: unknown): value is Record<string, unknown> =>
-  typeof value === "object" && value !== null && !Array.isArray(value);
+export type RecipeInstruction = HowToStep | HowToSection;
 
 function optionalName(value: Record<string, unknown>) {
   return typeof value.name === "string" && value.name.trim() ? value.name.trim() : undefined;
 }
 
-function normalizeStep(value: unknown): RecipeHowToStep[] {
+function normalizeStep(value: unknown): HowToStep[] {
   return normalizeRecipeInstructions(value).flatMap((instruction) =>
     instruction["@type"] === "HowToSection" ? instruction.itemListElement : [instruction],
   );
@@ -30,7 +35,9 @@ export function normalizeRecipeInstructions(value: unknown): RecipeInstruction[]
 
   const text = typeof value.text === "string" ? value.text.trim() : "";
   if (text) {
-    return [{ "@type": "HowToStep", ...(optionalName(value) ? { name: optionalName(value) } : {}), text }];
+    return [
+      { "@type": "HowToStep", ...(optionalName(value) ? { name: optionalName(value) } : {}), text },
+    ];
   }
 
   const steps = normalizeStep(value.itemListElement);

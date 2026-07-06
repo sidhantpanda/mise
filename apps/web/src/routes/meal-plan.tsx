@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { AppShell, PrimaryButton } from "@/components/AppShell";
-import { type PlannedMeal } from "@/lib/mock-data";
+import { type PlannedMeal } from "common";
 import { useMe, useMeals, useRecipes } from "@/hooks";
 import { PlanMealDialog } from "@/components/plan-meal-dialog";
 

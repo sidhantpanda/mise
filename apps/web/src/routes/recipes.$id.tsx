@@ -1,11 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
-import {
-  formatDuration,
-  type HowToStep,
-  type Recipe,
-  type RecipeInstruction,
-} from "@/lib/mock-data";
+import { formatDuration, type HowToStep, type Recipe, type RecipeInstruction } from "common";
 import { useMe, useRecipes } from "@/hooks";
 import { useDeleteRecipe, useAddFromRecipe } from "@/hooks/mutations";
 import {

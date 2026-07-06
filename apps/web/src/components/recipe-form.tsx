@@ -3,7 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Plus, Trash2, Sparkles } from "lucide-react";
-import type { Recipe, RecipeInstruction } from "@/lib/mock-data";
+import type { Recipe, RecipeInstruction } from "common";
 import { useCreateRecipe, useUpdateRecipe } from "@/hooks/mutations";
 import { toast } from "sonner";
 

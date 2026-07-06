@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { z } from "zod";
+import { accessTokenCreateSchema } from "common";
 import { AppError } from "../lib/AppError.js";
 import {
   generateAccessToken,
@@ -12,14 +12,6 @@ import { prisma } from "../prisma.js";
 
 export const accessTokensRouter = Router();
 
-const scope = z.enum(["read", "write"]);
-
-const createSchema = z.object({
-  name: z.string().trim().min(1).max(120),
-  scopes: z.array(scope).min(1).default(["read"]),
-  expiresAt: z.string().datetime().nullish(),
-});
-
 accessTokensRouter.get("/", async (req, res) => {
   const tokens = await prisma.accessToken.findMany({
     where: { userId: req.user!.id, revokedAt: null },
@@ -31,7 +23,7 @@ accessTokensRouter.get("/", async (req, res) => {
 
 accessTokensRouter.post("/", async (req, res) => {
   if (!req.user!.householdId) throw new AppError(403, "No active household");
-  const input = createSchema.parse(req.body);
+  const input = accessTokenCreateSchema.parse(req.body);
   const token = generateAccessToken();
   const accessToken = await prisma.accessToken.create({
     data: {

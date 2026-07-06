@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { type PlannedMeal } from "@/lib/mock-data";
+import { type PlannedMeal } from "common";
 import { useMe, useRecipes } from "@/hooks";
 import { useCreateMeal, useUpdateMeal, useDeleteMeal } from "@/hooks/mutations";
 import { toast } from "sonner";

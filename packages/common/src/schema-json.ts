@@ -1,3 +1,5 @@
+// Helpers for working with loosely-typed Schema.org JSON-LD documents.
+
 export const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null && !Array.isArray(value);
 

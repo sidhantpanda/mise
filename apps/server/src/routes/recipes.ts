@@ -3,13 +3,19 @@ import { z } from "zod";
 import type { Prisma } from "@prisma/client";
 import { strFromU8, unzipSync } from "fflate";
 import multer from "multer";
+import {
+  findRecipeJsonLd,
+  findRecipeJsonLds,
+  isRecord,
+  normalizeRecipeInstructions,
+  recipeInputSchema,
+  type ParsedRecipeInput,
+} from "common";
 import { prisma } from "../prisma.js";
 import { AppError } from "../lib/AppError.js";
 import { toRecipeDTO } from "../lib/mappers.js";
 import { requireWriteAuth } from "../middleware/auth.js";
 import { routeParam } from "../lib/request.js";
-import { normalizeRecipeInstructions } from "../lib/recipeInstructions.js";
-import { findRecipeJsonLd, findRecipeJsonLds, isRecord } from "../lib/schemaJson.js";
 
 export const recipesRouter = Router();
 
@@ -18,65 +24,7 @@ const upload = multer({
   limits: { fileSize: 10 * 1024 * 1024 },
 });
 
-const nutritionSchema = z
-  .object({
-    "@type": z.literal("NutritionInformation").optional(),
-    calories: z.string().optional(),
-    proteinContent: z.string().optional(),
-    carbohydrateContent: z.string().optional(),
-    fatContent: z.string().optional(),
-  })
-  .nullish();
-
-const optionalString = z
-  .unknown()
-  .transform((value) => (typeof value === "string" ? value : undefined));
-
-const stringList = z.unknown().transform((value) => {
-  if (Array.isArray(value)) return value.filter((item): item is string => typeof item === "string");
-  if (typeof value !== "string") return undefined;
-  return value
-    .split(",")
-    .map((item) => item.trim())
-    .filter(Boolean);
-});
-
-const authorSchema = z.unknown().transform((value) => {
-  if (!isRecord(value) || typeof value.name !== "string") return undefined;
-  return { name: value.name };
-});
-
-// Accepts the Schema.org Recipe shape the web app produces. All fields optional
-// for PATCH; create applies sensible defaults via Prisma.
-const recipeInput = z.object({
-  name: z.string().trim().min(1).optional(),
-  description: optionalString.optional(),
-  image: stringList.optional(),
-  author: authorSchema.optional(),
-  prepTime: optionalString.optional(),
-  cookTime: optionalString.optional(),
-  performTime: optionalString.optional(),
-  totalTime: optionalString.optional(),
-  cookingMethod: optionalString.optional(),
-  recipeYield: optionalString.optional(),
-  yield: z.unknown().optional(),
-  recipeCategory: optionalString.optional(),
-  recipeCuisine: optionalString.optional(),
-  keywords: stringList.optional(),
-  suitableForDiet: stringList.optional(),
-  recipeIngredient: stringList.optional(),
-  recipeInstructions: z.unknown().optional(),
-  estimatedCost: z.unknown().optional(),
-  supply: z.unknown().optional(),
-  tool: z.unknown().optional(),
-  nutrition: nutritionSchema,
-  schemaJson: z.unknown().optional(),
-  aggregateRating: z
-    .object({ ratingValue: z.coerce.number(), ratingCount: z.coerce.number().int() })
-    .nullish(),
-});
-
-type RecipeInput = z.infer<typeof recipeInput>;
+type RecipeInput = ParsedRecipeInput;
 
 type UploadDocument = {
   source: string;
@@ -223,7 +171,7 @@ recipesRouter.get("/:id", async (req, res) => {
 });
 
 recipesRouter.post("/", requireWriteAuth, async (req, res) => {
-  const input = recipeInput.parse(recipeBody(req.body));
+  const input = recipeInputSchema.parse(recipeBody(req.body));
   if (!input.name) throw new AppError(400, "Recipe name is required");
   const recipe = await prisma.recipe.create({
     data: {
@@ -258,7 +206,7 @@ recipesRouter.post("/upload", requireWriteAuth, upload.single("file"), async (re
 
   for (const candidate of candidates) {
     try {
-      const input = recipeInput.parse(recipeBody(candidate.recipe));
+      const input = recipeInputSchema.parse(recipeBody(candidate.recipe));
       if (!input.name) throw new AppError(400, "Recipe name is required");
       const recipe = await prisma.recipe.create({
         data: {
@@ -295,7 +243,7 @@ recipesRouter.post("/upload", requireWriteAuth, upload.single("file"), async (re
 
 recipesRouter.patch("/:id", requireWriteAuth, async (req, res) => {
   const id = routeParam(req.params.id, "Recipe id");
-  const input = recipeInput.parse(recipeBody(req.body));
+  const input = recipeInputSchema.parse(recipeBody(req.body));
   const existing = await prisma.recipe.findFirst({
     where: { id, householdId: req.user!.householdId },
     select: { id: true },

@@ -54,7 +54,7 @@
   --popover: oklch(0.99 0.008 85);
   --popover-foreground: oklch(0.22 0.025 60);
 
-  --primary: oklch(0.38 0.065 160);          /* deep forest green */
+  --primary: oklch(0.38 0.065 160); /* deep forest green */
   --primary-foreground: oklch(0.97 0.012 85);
 
   --secondary: oklch(0.93 0.018 80);
@@ -63,7 +63,7 @@
   --muted: oklch(0.93 0.014 82);
   --muted-foreground: oklch(0.48 0.018 65);
 
-  --accent: oklch(0.62 0.16 42);             /* terracotta */
+  --accent: oklch(0.62 0.16 42); /* terracotta */
   --accent-foreground: oklch(0.98 0.012 85);
 
   --destructive: oklch(0.52 0.21 27);
@@ -126,12 +126,14 @@
     -webkit-font-smoothing: antialiased;
   }
 
-  h1, h2, h3, .font-display {
+  h1,
+  h2,
+  h3,
+  .font-display {
     font-family: var(--font-display);
     letter-spacing: -0.02em;
     font-weight: 400;
   }
-
 }
 
 @utility text-display {

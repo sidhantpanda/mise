@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { AppShell, PrimaryButton, SearchBar } from "@/components/AppShell";
-import type { PantryItem } from "@/lib/mock-data";
+import type { PantryItem } from "common";
 import { usePantry } from "@/hooks";
 import { PantryItemDialog } from "@/components/pantry-item-dialog";
 import { Refrigerator, Snowflake, Archive } from "lucide-react";

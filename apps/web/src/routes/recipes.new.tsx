@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { RecipeForm } from "@/components/recipe-form";
-import type { Recipe } from "@/lib/mock-data";
+import type { Recipe } from "common";
 
 export const Route = createFileRoute("/recipes/new")({
   head: () => ({

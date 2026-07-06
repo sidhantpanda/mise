@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { RecipeGridCard, RecipeEyebrow, RecipeStats } from "@/components/recipes/recipe-card";
 import { RecipeLayout } from "@/components/recipes/recipe-layout";
 import { RecipeTable } from "@/components/recipes/recipe-table";
-import type { Recipe } from "@/lib/mock-data";
+import type { Recipe } from "common";
 
 export function RecipesLayout({ recipes, layout }: { recipes: Recipe[]; layout: RecipeLayout }) {
   if (recipes.length === 0) return null;

@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
-import type { ShoppingItem } from "@/lib/mock-data";
+import type { ShoppingItem } from "common";
 import { keys } from "../keys";
 
 export type ShoppingInput = Omit<ShoppingItem, "id">;

@@ -1,5 +1,9 @@
 import { Router } from "express";
-import { z } from "zod";
+import {
+  shoppingCheckedUpdateSchema,
+  shoppingItemCreateSchema,
+  shoppingItemUpdateSchema,
+} from "common";
 import { prisma } from "../prisma.js";
 import { AppError } from "../lib/AppError.js";
 import { toShoppingDTO } from "../lib/mappers.js";
@@ -7,29 +11,6 @@ import { requireWriteAuth } from "../middleware/auth.js";
 import { routeParam } from "../lib/request.js";
 
 export const shoppingRouter = Router();
-
-const createSchema = z.object({
-  name: z.string().trim().min(1),
-  quantity: z.string().default(""),
-  category: z.string().default(""),
-  checked: z.boolean().default(false),
-  fromRecipeId: z.string().optional(),
-});
-
-const updateSchema = z
-  .object({
-    name: z.string().trim().min(1),
-    quantity: z.string(),
-    category: z.string(),
-    checked: z.boolean(),
-    fromRecipeId: z.string().nullable(),
-  })
-  .partial();
-
-const checkedUpdateSchema = z.object({
-  ids: z.array(z.string().min(1)).min(1),
-  checked: z.boolean(),
-});
 
 shoppingRouter.get("/", async (req, res) => {
   const items = await prisma.shoppingItem.findMany({
@@ -40,7 +21,7 @@ shoppingRouter.get("/", async (req, res) => {
 });
 
 shoppingRouter.post("/", requireWriteAuth, async (req, res) => {
-  const input = createSchema.parse(req.body);
+  const input = shoppingItemCreateSchema.parse(req.body);
   const item = await prisma.shoppingItem.create({
     data: {
       householdId: req.user!.householdId,
@@ -104,7 +85,7 @@ shoppingRouter.post("/from-recipe/:recipeId", requireWriteAuth, async (req, res)
 });
 
 shoppingRouter.patch("/", requireWriteAuth, async (req, res) => {
-  const input = checkedUpdateSchema.parse(req.body);
+  const input = shoppingCheckedUpdateSchema.parse(req.body);
   const { count } = await prisma.shoppingItem.updateMany({
     where: { id: { in: input.ids }, householdId: req.user!.householdId },
     data: { checked: input.checked },
@@ -120,7 +101,7 @@ shoppingRouter.patch("/", requireWriteAuth, async (req, res) => {
 
 shoppingRouter.patch("/:id", requireWriteAuth, async (req, res) => {
   const id = routeParam(req.params.id, "Shopping item id");
-  const input = updateSchema.parse(req.body);
+  const input = shoppingItemUpdateSchema.parse(req.body);
   const { count } = await prisma.shoppingItem.updateMany({
     where: { id, householdId: req.user!.householdId },
     data: {

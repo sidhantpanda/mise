@@ -9,7 +9,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useCreateShopping, useUpdateShopping } from "@/hooks/mutations";
-import type { ShoppingItem } from "@/lib/mock-data";
+import type { ShoppingItem } from "common";
 import { toast } from "sonner";
 
 const categories = [

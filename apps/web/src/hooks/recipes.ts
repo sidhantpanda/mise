@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
-import type { Recipe } from "@/lib/mock-data";
+import type { Recipe } from "common";
 import { keys } from "./keys";
 
 export function useRecipes() {

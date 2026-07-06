@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { z } from "zod";
+import { householdInviteSchema, householdUpdateSchema } from "common";
 import { prisma } from "../prisma.js";
 import { AppError } from "../lib/AppError.js";
 import { getHouseholdDTO } from "../lib/household.js";
@@ -10,21 +10,14 @@ householdRouter.get("/", async (req, res) => {
   res.json(await getHouseholdDTO(req.user!.householdId));
 });
 
-const updateSchema = z.object({
-  name: z.string().trim().min(1).optional(),
-  type: z.enum(["Household", "Restaurant"]).optional(),
-});
-
 householdRouter.patch("/", async (req, res) => {
-  const input = updateSchema.parse(req.body);
+  const input = householdUpdateSchema.parse(req.body);
   await prisma.household.update({ where: { id: req.user!.householdId }, data: input });
   res.json(await getHouseholdDTO(req.user!.householdId));
 });
 
-const inviteSchema = z.object({ email: z.string().trim().toLowerCase().email() });
-
 householdRouter.post("/invitations", async (req, res) => {
-  const { email } = inviteSchema.parse(req.body);
+  const { email } = householdInviteSchema.parse(req.body);
   await prisma.invitation.upsert({
     where: { householdId_email: { householdId: req.user!.householdId, email } },
     create: { householdId: req.user!.householdId, email },

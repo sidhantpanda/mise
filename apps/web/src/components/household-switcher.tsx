@@ -18,7 +18,7 @@ import {
 import { HouseholdSetupForm } from "@/components/household-setup-form";
 import { useMe } from "@/hooks";
 import { useSwitchHousehold, useAcceptInvitation, useRejectInvitation } from "@/hooks/mutations";
-import type { Household } from "@/lib/mock-data";
+import type { Household } from "common";
 
 function initials(name: string) {
   return name

@@ -1,14 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { Recipe, RecipeInput, RecipeUploadResult } from "common";
 import { api } from "@/lib/api";
-import type { Recipe } from "@/lib/mock-data";
 import { keys } from "../keys";
-
-export type RecipeInput = Partial<Omit<Recipe, "@context" | "@type" | "identifier">>;
-
-export type RecipeUploadResult = {
-  created: Recipe[];
-  errors: { source: string; name?: string; error: string }[];
-};
 
 export function useCreateRecipe() {
   const qc = useQueryClient();

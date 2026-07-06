@@ -5,7 +5,7 @@ import { AddRecipeDialog } from "@/components/recipes/add-recipe-dialog";
 import { isRecipeLayout, RecipeLayout } from "@/components/recipes/recipe-layout";
 import { RecipeLayoutSwitcher } from "@/components/recipes/recipe-layout-switcher";
 import { RecipesLayout } from "@/components/recipes/recipe-layouts";
-import type { Recipe } from "@/lib/mock-data";
+import type { Recipe } from "common";
 import { useRecipes } from "@/hooks";
 
 export const Route = createFileRoute("/recipes/")({

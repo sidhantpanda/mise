@@ -3,7 +3,8 @@ import { useState } from "react";
 import { AlertTriangle, ArrowLeft, CheckCircle2, FileJson, UploadCloud } from "lucide-react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
-import { useUploadRecipes, type RecipeUploadResult } from "@/hooks/mutations";
+import { useUploadRecipes } from "@/hooks/mutations";
+import type { RecipeUploadResult } from "common";
 
 export const Route = createFileRoute("/recipes/upload")({
   head: () => ({

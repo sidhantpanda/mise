@@ -4,11 +4,10 @@ import type {
   Recipe as PrismaRecipe,
   ShoppingItem as PrismaShoppingItem,
 } from "@prisma/client";
-import { normalizeRecipeInstructions } from "./recipeInstructions.js";
-import { asString, compactObject, isRecord } from "./schemaJson.js";
+import { asString, compactObject, isRecord, normalizeRecipeInstructions } from "common";
 
-// These output shapes mirror apps/web/src/lib/mock-data.ts exactly so the
-// frontend can consume API responses without remapping.
+// These output shapes mirror the types in packages/common/src/models.ts exactly
+// so the frontend can consume API responses without remapping.
 
 const DEFAULT_RECIPE_IMAGE =
   "https://images.unsplash.com/photo-1495521821757-a1efb6729352?w=1200&q=80";

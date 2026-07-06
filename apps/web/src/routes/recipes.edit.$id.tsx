@@ -3,7 +3,7 @@ import { ArrowLeft } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { RecipeForm } from "@/components/recipe-form";
 import { useRecipes } from "@/hooks";
-import type { Recipe } from "@/lib/mock-data";
+import type { Recipe } from "common";
 
 export const Route = createFileRoute("/recipes/edit/$id")({
   head: () => ({

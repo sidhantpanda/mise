@@ -56,13 +56,16 @@ export async function getPendingInvitations(email: string) {
   }));
 }
 
-// Mirrors the Household interface in apps/web/src/lib/mock-data.ts.
+// Mirrors the Household interface in packages/common/src/models.ts.
 export async function getHouseholdDTO(householdId: string) {
   const household = await prisma.household.findUnique({
     where: { id: householdId },
     include: {
       members: { include: { user: true }, orderBy: { joinedAt: "asc" } },
-      invitations: { where: { status: { in: ["Pending", "Rejected"] } }, orderBy: { sentAt: "asc" } },
+      invitations: {
+        where: { status: { in: ["Pending", "Rejected"] } },
+        orderBy: { sentAt: "asc" },
+      },
     },
   });
   if (!household) throw new AppError(404, "Household not found");
@@ -87,7 +90,12 @@ export async function getHouseholdDTO(householdId: string) {
   };
 }
 
-export function userDTO(user: { id: string; displayName: string; email: string; avatarColor: string | null }) {
+export function userDTO(user: {
+  id: string;
+  displayName: string;
+  email: string;
+  avatarColor: string | null;
+}) {
   return {
     id: user.id,
     name: user.displayName,

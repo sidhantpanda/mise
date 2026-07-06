@@ -6,7 +6,8 @@ import { AppShell } from "@/components/AppShell";
 import { DateTimePicker } from "@/components/ui/date-time-picker";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useAccessTokens, type CreatedAccessToken } from "@/hooks";
+import { useAccessTokens } from "@/hooks";
+import type { CreatedAccessToken } from "common";
 import { useCreateAccessToken, useRevokeAccessToken } from "@/hooks/mutations";
 import { ApiError } from "@/lib/api";
 

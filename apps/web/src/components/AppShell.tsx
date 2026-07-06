@@ -12,8 +12,8 @@ import {
   LogOut,
   KeyRound,
 } from "lucide-react";
-import type { Household } from "@/lib/mock-data";
-import { useMe, type AuthUser } from "@/hooks";
+import type { AuthUser, Household } from "common";
+import { useMe } from "@/hooks";
 import { useLogout } from "@/hooks/mutations";
 import { HouseholdSwitcher } from "@/components/household-switcher";
 import { cn } from "@/lib/utils";

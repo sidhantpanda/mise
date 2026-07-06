@@ -1,8 +1,14 @@
 import { Router } from "express";
-import { z } from "zod";
+import { loginSchema, signupSchema } from "common";
 import { prisma } from "../prisma.js";
 import { AppError } from "../lib/AppError.js";
-import { COOKIE_NAME, cookieOptions, hashPassword, signToken, verifyPassword } from "../lib/auth.js";
+import {
+  COOKIE_NAME,
+  cookieOptions,
+  hashPassword,
+  signToken,
+  verifyPassword,
+} from "../lib/auth.js";
 import { buildMe } from "../lib/household.js";
 import { requireAuth } from "../middleware/auth.js";
 
@@ -17,17 +23,6 @@ const AVATAR_COLORS = [
   "oklch(0.58 0.13 320)",
 ];
 const pickColor = () => AVATAR_COLORS[Math.floor(Math.random() * AVATAR_COLORS.length)];
-
-const signupSchema = z.object({
-  name: z.string().trim().min(1, "Name is required").max(120),
-  email: z.string().trim().toLowerCase().email(),
-  password: z.string().min(8, "Password must be at least 8 characters").max(200),
-});
-
-const loginSchema = z.object({
-  email: z.string().trim().toLowerCase().email(),
-  password: z.string().min(1),
-});
 
 // New users start without a household and are sent through onboarding to create
 // one (see routes/onboarding.ts).

@@ -1,25 +1,17 @@
 /**
  * Domain types using Schema.org vocabulary (https://schema.org/Recipe).
- * These mirror the JSON the API returns (see apps/server/src/lib/mappers.ts), so
- * components and React Query hooks share one set of types. The seed data that
- * used to live here now lives in apps/server/prisma/seed.ts.
+ * These describe the JSON the API returns (see apps/server/src/lib/mappers.ts),
+ * so server mappers and web components/hooks share one set of types.
  */
-
-export type ISODuration = string; // e.g. "PT30M" = 30 minutes
-
-export interface HowToStep {
-  "@type": "HowToStep";
-  name?: string;
-  text: string;
-}
-
-export interface HowToSection {
-  "@type": "HowToSection";
-  name?: string;
-  itemListElement: HowToStep[];
-}
-
-export type RecipeInstruction = HowToStep | HowToSection;
+import type {
+  HouseholdType,
+  InvitationStatus,
+  MealType,
+  MemberRole,
+  PantryLocation,
+} from "./enums.js";
+import type { RecipeInstruction } from "./recipe-instructions.js";
+import type { ISODuration } from "./duration.js";
 
 /** Schema.org Recipe — https://schema.org/Recipe */
 export interface Recipe {
@@ -76,14 +68,14 @@ export interface PantryItem {
   category: string;
   quantity: { "@type": "QuantitativeValue"; value: number; unitText: string };
   expires?: string; // ISO date
-  location: "Pantry" | "Fridge" | "Freezer";
+  location: PantryLocation;
 }
 
 /** Meal plan entry — Schema.org "PlanAction" style. */
 export interface PlannedMeal {
   identifier: string;
   date: string; // YYYY-MM-DD
-  mealType: "Breakfast" | "Lunch" | "Dinner" | "Snack";
+  mealType: MealType;
   recipeId: string;
   servings: number;
   assignee?: string;
@@ -97,8 +89,6 @@ export interface ShoppingItem {
   checked: boolean;
   fromRecipeId?: string;
 }
-
-export type HouseholdType = "Household" | "Restaurant";
 
 export interface HouseholdSummary {
   id: string;
@@ -114,10 +104,15 @@ export interface Household {
     id: string;
     name: string;
     email: string;
-    role: "Owner" | "Admin" | "Member";
+    role: MemberRole;
     avatarColor: string;
   }[];
-  invitations: { id: string; email: string; status: "Pending" | "Rejected"; sentAt: string }[];
+  invitations: {
+    id: string;
+    email: string;
+    status: Exclude<InvitationStatus, "Accepted">;
+    sentAt: string;
+  }[];
 }
 
 /** A pending invitation addressed to the current user (shown in onboarding + switcher). */
@@ -125,20 +120,6 @@ export interface PendingInvitation {
   id: string;
   household: HouseholdSummary;
   inviterName: string;
-  role: "Owner" | "Admin" | "Member";
+  role: MemberRole;
   sentAt: string;
 }
-
-export const isoDurationToMinutes = (iso: ISODuration): number => {
-  const m = iso.match(/PT(?:(\d+)H)?(?:(\d+)M)?/);
-  if (!m) return 0;
-  return parseInt(m[1] || "0") * 60 + parseInt(m[2] || "0");
-};
-
-export const formatDuration = (iso: ISODuration): string => {
-  const min = isoDurationToMinutes(iso);
-  if (min < 60) return `${min} min`;
-  const h = Math.floor(min / 60);
-  const r = min % 60;
-  return r ? `${h}h ${r}m` : `${h}h`;
-};

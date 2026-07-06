@@ -133,7 +133,17 @@ const schemas = {
       createdAt: { type: "string", format: "date-time" },
       revokedAt: nullable({ type: "string", format: "date-time" }),
     },
-    required: ["id", "name", "prefix", "scopes", "household", "lastUsedAt", "expiresAt", "createdAt", "revokedAt"],
+    required: [
+      "id",
+      "name",
+      "prefix",
+      "scopes",
+      "household",
+      "lastUsedAt",
+      "expiresAt",
+      "createdAt",
+      "revokedAt",
+    ],
   },
   CreatedAccessToken: {
     allOf: [
@@ -176,11 +186,7 @@ const schemas = {
     anyOf: [ref("RecipeInstructionStep"), ref("RecipeInstructionSection")],
   },
   RecipeInstructionInput: {
-    anyOf: [
-      { type: "string" },
-      ref("RecipeInstructionStep"),
-      ref("RecipeInstructionSection"),
-    ],
+    anyOf: [{ type: "string" }, ref("RecipeInstructionStep"), ref("RecipeInstructionSection")],
   },
   Nutrition: {
     type: "object",
@@ -240,7 +246,18 @@ const schemas = {
       nutrition: ref("Nutrition"),
       aggregateRating: ref("AggregateRating"),
     },
-    required: ["@context", "@type", "identifier", "name", "description", "image", "author", "datePublished", "recipeIngredient", "recipeInstructions"],
+    required: [
+      "@context",
+      "@type",
+      "identifier",
+      "name",
+      "description",
+      "image",
+      "author",
+      "datePublished",
+      "recipeIngredient",
+      "recipeInstructions",
+    ],
   },
   RecipeInput: {
     type: "object",
@@ -260,9 +277,15 @@ const schemas = {
       recipeCategory: { type: "string" },
       recipeCuisine: { type: "string" },
       keywords: { anyOf: [{ type: "string" }, { type: "array", items: { type: "string" } }] },
-      suitableForDiet: { anyOf: [{ type: "string" }, { type: "array", items: { type: "string" } }] },
-      recipeIngredient: { anyOf: [{ type: "string" }, { type: "array", items: { type: "string" } }] },
-      recipeInstructions: { anyOf: [ref("RecipeInstructionInput"), arrayOf(ref("RecipeInstructionInput"))] },
+      suitableForDiet: {
+        anyOf: [{ type: "string" }, { type: "array", items: { type: "string" } }],
+      },
+      recipeIngredient: {
+        anyOf: [{ type: "string" }, { type: "array", items: { type: "string" } }],
+      },
+      recipeInstructions: {
+        anyOf: [ref("RecipeInstructionInput"), arrayOf(ref("RecipeInstructionInput"))],
+      },
       estimatedCost: {},
       supply: {},
       tool: {},
@@ -460,7 +483,8 @@ const routes: RouteSpec[] = [
     path: "/api/auth/tokens",
     tags: ["Access Tokens"],
     summary: "Create an access token",
-    description: "The full token value is returned once in this response and is not stored in plaintext.",
+    description:
+      "The full token value is returned once in this response and is not stored in plaintext.",
     security: "session",
     requestBody: ref("CreateAccessTokenInput"),
     responses: { 201: { description: "Created access token.", schema: ref("CreatedAccessToken") } },
@@ -640,7 +664,9 @@ const routes: RouteSpec[] = [
     tags: ["Shopping"],
     summary: "Clear checked shopping items",
     security: "write",
-    responses: { 200: { description: "Remaining shopping items.", schema: arrayOf(ref("ShoppingItem")) } },
+    responses: {
+      200: { description: "Remaining shopping items.", schema: arrayOf(ref("ShoppingItem")) },
+    },
   },
   {
     method: "post",
@@ -648,7 +674,9 @@ const routes: RouteSpec[] = [
     tags: ["Shopping"],
     summary: "Add a recipe's ingredients to the shopping list",
     security: "write",
-    responses: { 200: { description: "Shopping additions.", schema: ref("ShoppingFromRecipeResult") } },
+    responses: {
+      200: { description: "Shopping additions.", schema: ref("ShoppingFromRecipeResult") },
+    },
   },
   {
     method: "patch",
@@ -657,7 +685,9 @@ const routes: RouteSpec[] = [
     summary: "Check or uncheck multiple shopping items",
     security: "write",
     requestBody: ref("ShoppingCheckedInput"),
-    responses: { 200: { description: "Updated shopping items.", schema: arrayOf(ref("ShoppingItem")) } },
+    responses: {
+      200: { description: "Updated shopping items.", schema: arrayOf(ref("ShoppingItem")) },
+    },
   },
   {
     method: "patch",
@@ -766,10 +796,22 @@ function buildPaths() {
       ...(route.requestBody ? { requestBody: requestBody(route.requestBody) } : {}),
       responses: {
         ...responsesFor(route),
-        400: { description: "Bad request.", content: { "application/json": { schema: ref("Error") } } },
-        401: { description: "Not authenticated.", content: { "application/json": { schema: ref("Error") } } },
-        403: { description: "Forbidden.", content: { "application/json": { schema: ref("Error") } } },
-        404: { description: "Not found.", content: { "application/json": { schema: ref("Error") } } },
+        400: {
+          description: "Bad request.",
+          content: { "application/json": { schema: ref("Error") } },
+        },
+        401: {
+          description: "Not authenticated.",
+          content: { "application/json": { schema: ref("Error") } },
+        },
+        403: {
+          description: "Forbidden.",
+          content: { "application/json": { schema: ref("Error") } },
+        },
+        404: {
+          description: "Not found.",
+          content: { "application/json": { schema: ref("Error") } },
+        },
       },
     };
   }

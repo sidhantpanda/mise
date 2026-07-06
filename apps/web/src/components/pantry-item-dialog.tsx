@@ -9,7 +9,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useCreatePantry, useUpdatePantry } from "@/hooks/mutations";
-import type { PantryItem } from "@/lib/mock-data";
+import type { PantryItem } from "common";
 import { toast } from "sonner";
 
 const locations = ["Pantry", "Fridge", "Freezer"] as const;

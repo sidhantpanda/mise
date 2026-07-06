@@ -9,7 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { formatDuration, isoDurationToMinutes, type Recipe } from "@/lib/mock-data";
+import { formatDuration, isoDurationToMinutes, type Recipe } from "common";
 import { cn } from "@/lib/utils";
 
 enum RecipeTableSortKey {

@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { Clock, Star, Users } from "lucide-react";
-import { formatDuration, type Recipe } from "@/lib/mock-data";
+import { formatDuration, type Recipe } from "common";
 import { cn } from "@/lib/utils";
 
 export function RecipeGridCard({ recipe }: { recipe: Recipe }) {

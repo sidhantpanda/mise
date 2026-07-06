@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
-import { formatDuration } from "@/lib/mock-data";
+import { formatDuration } from "common";
 import { useMe, useMeals, useRecipes, usePantry, useShopping } from "@/hooks";
 import { Clock, AlertTriangle, ArrowUpRight, Sparkles } from "lucide-react";
 
@@ -52,9 +52,25 @@ function Dashboard() {
           hint="planned"
           to="/meal-plan"
         />
-        <StatCard label="Recipes" value={recipes.length.toString()} hint="in library" to="/recipes" />
-        <StatCard label="Shopping" value={toBuy.toString()} hint="items to buy" accent to="/shopping-list" />
-        <StatCard label="Pantry" value={pantry.length.toString()} hint="items tracked" to="/pantry" />
+        <StatCard
+          label="Recipes"
+          value={recipes.length.toString()}
+          hint="in library"
+          to="/recipes"
+        />
+        <StatCard
+          label="Shopping"
+          value={toBuy.toString()}
+          hint="items to buy"
+          accent
+          to="/shopping-list"
+        />
+        <StatCard
+          label="Pantry"
+          value={pantry.length.toString()}
+          hint="items tracked"
+          to="/pantry"
+        />
       </div>
 
       <div className="grid min-w-0 lg:grid-cols-3 gap-6">

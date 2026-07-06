@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { AppShell, PrimaryButton } from "@/components/AppShell";
-import { type ShoppingItem } from "@/lib/mock-data";
+import { type ShoppingItem } from "common";
 import { useShopping } from "@/hooks";
 import { useClearChecked, useDeleteShopping, useSetShoppingChecked } from "@/hooks/mutations";
 import { Check, CheckCheck, Pencil, Square, Trash2 } from "lucide-react";

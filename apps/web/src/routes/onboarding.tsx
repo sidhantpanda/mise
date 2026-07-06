@@ -4,7 +4,7 @@ import { Home, UtensilsCrossed } from "lucide-react";
 import { useMe } from "@/hooks";
 import { useAcceptInvitation, useRejectInvitation } from "@/hooks/mutations";
 import { HouseholdSetupForm } from "@/components/household-setup-form";
-import type { PendingInvitation } from "@/lib/mock-data";
+import type { PendingInvitation } from "common";
 import { AuthShell } from "./login";
 
 export const Route = createFileRoute("/onboarding")({

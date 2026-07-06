@@ -29,6 +29,7 @@ FROM base AS build
 COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
 COPY apps/server/package.json apps/server/
 COPY apps/web/package.json apps/web/
+COPY packages/common/package.json packages/common/
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 COPY . .
 RUN pnpm build
@@ -41,6 +42,7 @@ ENV PORT=3000
 COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
 COPY apps/server/package.json apps/server/
 COPY apps/web/package.json apps/web/
+COPY packages/common/package.json packages/common/
 # Prisma schema/config are needed to generate the client during install.
 COPY apps/server/prisma apps/server/prisma
 COPY apps/server/prisma.config.ts apps/server/
@@ -56,7 +58,9 @@ RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
  && pnpm --filter server exec prisma generate \
  && rm -rf node_modules/.pnpm/@rolldown+*
 
-# Built output from the build stage.
+# Built output from the build stage. The server imports the common workspace
+# package at runtime, so its dist must ship too (the web SSR bundle inlines it).
+COPY --from=build /app/packages/common/dist packages/common/dist
 COPY --from=build /app/apps/server/dist apps/server/dist
 COPY --from=build /app/apps/web/dist apps/web/dist
 

@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
+import type { CreatedAccessToken } from "common";
 import { keys } from "../keys";
-import type { CreatedAccessToken } from "../access-tokens";
 
 export function useCreateAccessToken() {
   const qc = useQueryClient();

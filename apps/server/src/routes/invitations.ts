@@ -16,7 +16,8 @@ async function loadOwnPendingInvitation(invitationId: string, userId: string) {
   if (!invitation || invitation.email.toLowerCase() !== user.email.toLowerCase()) {
     throw new AppError(403, "This invitation isn't addressed to you");
   }
-  if (invitation.status !== "Pending") throw new AppError(409, "This invitation is no longer pending");
+  if (invitation.status !== "Pending")
+    throw new AppError(409, "This invitation is no longer pending");
   return invitation;
 }
 
@@ -36,7 +37,10 @@ invitationsRouter.post("/:id/accept", async (req, res) => {
       data: { status: "Accepted", acceptedAt: new Date() },
     });
     // Drop the user into the household they just joined.
-    await tx.user.update({ where: { id: userId }, data: { activeHouseholdId: invitation.householdId } });
+    await tx.user.update({
+      where: { id: userId },
+      data: { activeHouseholdId: invitation.householdId },
+    });
   });
 
   res.json({ ok: true });

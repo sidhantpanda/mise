@@ -1,8 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
-import type { Household } from "@/lib/mock-data";
+import type { Household, Me } from "common";
 import { meKey } from "../keys";
-import type { Me } from "../auth";
 import { invalidateAll } from "./cache";
 
 export function useLogin() {
