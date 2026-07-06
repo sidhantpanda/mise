@@ -15,6 +15,7 @@ import { mealsRouter } from "./routes/meals.js";
 import { shoppingRouter } from "./routes/shopping.js";
 import { pantryRouter } from "./routes/pantry.js";
 import { householdRouter } from "./routes/household.js";
+import { handleMcpRequest } from "./mcp/handler.js";
 import { createOpenApiDocument, swaggerHtml } from "./openapi.js";
 
 // Builds the API Express app after bootstrapping the database. Every route is
@@ -43,6 +44,12 @@ export async function createApiApp(): Promise<express.Express> {
   app.use("/api/shopping", requireAuth, requireHousehold, shoppingRouter);
   app.use("/api/pantry", requireAuth, requireHousehold, pantryRouter);
   app.use("/api/household", requireAuth, requireHousehold, requireSessionAuth, householdRouter);
+
+  // Model Context Protocol endpoint (Streamable HTTP). Authenticated with the same
+  // Bearer access tokens as the REST API; per-tool scope is enforced inside the MCP
+  // server. Lets LLM clients (Claude, ChatGPT) act on a household — e.g. "send this
+  // recipe to Mise". See docs/mcp.md.
+  app.all("/mcp", requireAuth, requireHousehold, handleMcpRequest);
 
   app.use("/api", notFound);
   app.use(errorHandler);
