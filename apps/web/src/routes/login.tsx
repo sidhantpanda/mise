@@ -1,6 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { Soup } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useLogin } from "@/hooks/mutations";
@@ -93,9 +92,13 @@ export function AuthShell({
     <div className="flex min-h-screen items-center justify-center bg-background px-4 py-10">
       <div className="w-full max-w-sm">
         <div className="mb-8 flex flex-col items-center text-center">
-          <div className="size-12 rounded-2xl bg-primary text-primary-foreground grid place-items-center">
-            <Soup className="size-6" />
-          </div>
+          <img
+            src="/icon-192.png"
+            alt="Mise"
+            className="size-14 rounded-2xl object-contain"
+            width={56}
+            height={56}
+          />
           <h1 className="text-display text-3xl mt-4">{title}</h1>
           <p className="text-sm text-muted-foreground mt-1">{subtitle}</p>
         </div>
