@@ -22,6 +22,7 @@ Create a token in Mise under account settings (or `POST /api/auth/tokens`).
 | Tool | Scope | Description |
 |------|-------|-------------|
 | `create_recipe` | `write` | Save a recipe to the caller's household. Accepts structured fields (name, `recipeIngredient`, `recipeInstructions`, times, cuisine…) and/or a full Schema.org Recipe JSON-LD object via `schemaJson`. Runs through the same normalization as the REST `POST /api/recipes` route. |
+| `search_recipes` | `read` | Full-text search over the caller's recipe library (name, ingredients, cuisine, category, keywords) via Meilisearch — typo-tolerant. Returns matches in relevance order. Backs the same index as `GET /api/recipes/search`. Requires Meilisearch to be configured (`MEILI_URL`). |
 
 ## Try it with MCP Inspector
 

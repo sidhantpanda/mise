@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import { env } from "./env.js";
 import { ensureDatabase } from "./startup/ensureDatabase.js";
+import { ensureSearch } from "./startup/ensureSearch.js";
 import { requireAuth, requireHousehold, requireSessionAuth } from "./middleware/auth.js";
 import { errorHandler, notFound } from "./middleware/error.js";
 import { authRouter } from "./routes/auth.js";
@@ -25,6 +26,7 @@ import { createOpenApiDocument, swaggerHtml } from "./openapi.js";
 // single port in production, while still running standalone (see index.ts) in dev.
 export async function createApiApp(): Promise<express.Express> {
   await ensureDatabase();
+  await ensureSearch();
 
   const app = express();
   app.use(cors({ origin: env.WEB_ORIGIN, credentials: true }));

@@ -6,7 +6,7 @@ import { isRecipeLayout, RecipeLayout } from "@/components/recipes/recipe-layout
 import { RecipeLayoutSwitcher } from "@/components/recipes/recipe-layout-switcher";
 import { RecipesLayout } from "@/components/recipes/recipe-layouts";
 import type { Recipe } from "common";
-import { useRecipes } from "@/hooks";
+import { useDebouncedValue, useRecipes, useRecipeSearch } from "@/hooks";
 
 export const Route = createFileRoute("/recipes/")({
   head: () => ({
@@ -38,6 +38,14 @@ function RecipesPage() {
   const [newRecipeOpen, setNewRecipeOpen] = useState(false);
   const [layout, setLayout] = useState<RecipeLayout>(RecipeLayout.Grid);
 
+  // Full-text search runs server-side (Meilisearch) once there's a query; with an
+  // empty query we show the whole library. The category chips filter client-side
+  // on top of whichever set is showing.
+  const debouncedQ = useDebouncedValue(q);
+  const searching = debouncedQ.trim().length > 0;
+  const search = useRecipeSearch(debouncedQ);
+  const source = searching ? (search.data ?? EMPTY) : recipes;
+
   useEffect(() => {
     const savedLayout = window.localStorage.getItem(LAYOUT_STORAGE_KEY);
     if (isRecipeLayout(savedLayout)) {
@@ -52,15 +60,8 @@ function RecipesPage() {
 
   const filtered = useMemo(
     () =>
-      recipes.filter((r) => {
-        const matchQ =
-          !q ||
-          r.name.toLowerCase().includes(q.toLowerCase()) ||
-          r.keywords.some((k) => k.includes(q.toLowerCase()));
-        const matchC = cat === "All" || r.recipeCategory.toLowerCase() === cat.toLowerCase();
-        return matchQ && matchC;
-      }),
-    [q, cat, recipes],
+      source.filter((r) => cat === "All" || r.recipeCategory.toLowerCase() === cat.toLowerCase()),
+    [cat, source],
   );
 
   return (
@@ -101,9 +102,11 @@ function RecipesPage() {
 
       <RecipesLayout recipes={filtered} layout={layout} />
 
-      {filtered.length === 0 && (
+      {filtered.length === 0 && !(searching && search.isFetching) && (
         <div className="text-center py-20 text-muted-foreground">
-          No recipes match those filters.
+          {searching
+            ? `No recipes match "${debouncedQ.trim()}".`
+            : "No recipes match those filters."}
         </div>
       )}
     </AppShell>

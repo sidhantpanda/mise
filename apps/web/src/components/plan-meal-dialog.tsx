@@ -10,7 +10,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { type PlannedMeal } from "common";
-import { useMe, useRecipes } from "@/hooks";
+import { useDebouncedValue, useMe, useRecipes, useRecipeSearch } from "@/hooks";
 import { useCreateMeal, useUpdateMeal, useDeleteMeal } from "@/hooks/mutations";
 import { toast } from "sonner";
 import { Search } from "lucide-react";
@@ -60,7 +60,11 @@ export function PlanMealDialog({
     setQ("");
   }, [open, meal, defaultDate, defaultMealType]);
 
-  const filtered = recipes.filter((r) => !q || r.name.toLowerCase().includes(q.toLowerCase()));
+  // Search the library server-side (Meilisearch) while typing; show everything
+  // when the box is empty.
+  const debouncedQ = useDebouncedValue(q);
+  const search = useRecipeSearch(debouncedQ);
+  const filtered = debouncedQ.trim() ? (search.data ?? []) : recipes;
 
   const submit = async () => {
     if (!recipeId) {

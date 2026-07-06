@@ -16,6 +16,11 @@ const schema = z.object({
   // but set COOKIE_SECURE=false to serve over plain HTTP (e.g. a LAN/homelab
   // deployment without TLS) — browsers drop Secure cookies over HTTP.
   COOKIE_SECURE: z.enum(["true", "false"]).optional(),
+  // Meilisearch powers recipe search. Leave MEILI_URL unset to run without search
+  // (the search endpoint/tool then report that search is unavailable, and recipe
+  // writes simply skip indexing).
+  MEILI_URL: z.string().url().optional(),
+  MEILI_MASTER_KEY: z.string().optional(),
 });
 
 const parsed = schema.safeParse(process.env);

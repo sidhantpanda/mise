@@ -1,6 +1,7 @@
 export const keys = {
   recipes: ["recipes"] as const,
   recipe: (id: string) => ["recipes", id] as const,
+  recipeSearch: (q: string) => ["recipes", "search", q] as const,
   meals: ["meals"] as const,
   shopping: ["shopping"] as const,
   pantry: ["pantry"] as const,
