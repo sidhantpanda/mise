@@ -31,7 +31,7 @@ export function AddRecipeDialog({
               onOpenChange(false);
               navigate({ to: "/recipes/library" });
             }}
-            className="group flex min-h-44 flex-col rounded-xl border border-border bg-card p-5 text-left transition hover:border-primary hover:bg-primary/5"
+            className="group flex min-h-44 cursor-pointer flex-col rounded-xl border border-border bg-card p-5 text-left transition hover:border-primary hover:bg-primary/5"
           >
             <span className="grid size-11 place-items-center rounded-lg bg-secondary text-foreground">
               <Globe className="size-5" />
@@ -51,7 +51,7 @@ export function AddRecipeDialog({
               onOpenChange(false);
               navigate({ to: "/recipes/upload" });
             }}
-            className="group flex min-h-44 flex-col rounded-xl border border-border bg-card p-5 text-left transition hover:border-primary hover:bg-primary/5"
+            className="group flex min-h-44 cursor-pointer flex-col rounded-xl border border-border bg-card p-5 text-left transition hover:border-primary hover:bg-primary/5"
           >
             <span className="grid size-11 place-items-center rounded-lg bg-secondary text-foreground">
               <FileArchive className="size-5" />
@@ -71,7 +71,7 @@ export function AddRecipeDialog({
               onOpenChange(false);
               navigate({ to: "/recipes/new" });
             }}
-            className="group flex min-h-44 flex-col rounded-xl border border-border bg-card p-5 text-left transition hover:border-primary hover:bg-primary/5"
+            className="group flex min-h-44 cursor-pointer flex-col rounded-xl border border-border bg-card p-5 text-left transition hover:border-primary hover:bg-primary/5"
           >
             <span className="grid size-11 place-items-center rounded-lg bg-secondary text-foreground">
               <PencilLine className="size-5" />

@@ -1,29 +1,39 @@
 import { Link } from "@tanstack/react-router";
 import { RecipeGridCard, RecipeEyebrow, RecipeStats } from "@/components/recipes/recipe-card";
 import { RecipeLayout } from "@/components/recipes/recipe-layout";
+import { RecipeCtaCard, type RecipeCta } from "@/components/recipes/recipe-cta-card";
 import { RecipeTable } from "@/components/recipes/recipe-table";
 import type { Recipe } from "common";
 
-export function RecipesLayout({ recipes, layout }: { recipes: Recipe[]; layout: RecipeLayout }) {
+export function RecipesLayout({
+  recipes,
+  layout,
+  cta,
+}: {
+  recipes: Recipe[];
+  layout: RecipeLayout;
+  cta?: RecipeCta;
+}) {
   if (recipes.length === 0) return null;
 
-  if (layout === RecipeLayout.Compact) return <CompactGrid recipes={recipes} />;
-  if (layout === RecipeLayout.List) return <RecipeList recipes={recipes} />;
-  if (layout === RecipeLayout.Table) return <RecipeTable recipes={recipes} />;
-  return <RecipeGrid recipes={recipes} />;
+  if (layout === RecipeLayout.Compact) return <CompactGrid recipes={recipes} cta={cta} />;
+  if (layout === RecipeLayout.List) return <RecipeList recipes={recipes} cta={cta} />;
+  if (layout === RecipeLayout.Table) return <RecipeTable recipes={recipes} cta={cta} />;
+  return <RecipeGrid recipes={recipes} cta={cta} />;
 }
 
-function RecipeGrid({ recipes }: { recipes: Recipe[] }) {
+function RecipeGrid({ recipes, cta }: { recipes: Recipe[]; cta?: RecipeCta }) {
   return (
     <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
       {recipes.map((recipe) => (
         <RecipeGridCard key={recipe.identifier} recipe={recipe} />
       ))}
+      {cta && <RecipeCtaCard cta={cta} layout={RecipeLayout.Grid} />}
     </div>
   );
 }
 
-function CompactGrid({ recipes }: { recipes: Recipe[] }) {
+function CompactGrid({ recipes, cta }: { recipes: Recipe[]; cta?: RecipeCta }) {
   return (
     <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
       {recipes.map((recipe) => (
@@ -51,11 +61,12 @@ function CompactGrid({ recipes }: { recipes: Recipe[] }) {
           </div>
         </Link>
       ))}
+      {cta && <RecipeCtaCard cta={cta} layout={RecipeLayout.Compact} />}
     </div>
   );
 }
 
-function RecipeList({ recipes }: { recipes: Recipe[] }) {
+function RecipeList({ recipes, cta }: { recipes: Recipe[]; cta?: RecipeCta }) {
   return (
     <div className="space-y-3">
       {recipes.map((recipe) => (
@@ -82,6 +93,7 @@ function RecipeList({ recipes }: { recipes: Recipe[] }) {
           <RecipeStats recipe={recipe} className="justify-start gap-x-4 sm:w-56 sm:justify-end" />
         </Link>
       ))}
+      {cta && <RecipeCtaCard cta={cta} layout={RecipeLayout.List} />}
     </div>
   );
 }

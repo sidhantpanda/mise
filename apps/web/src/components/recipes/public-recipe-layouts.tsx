@@ -19,6 +19,11 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { RecipeLayout } from "@/components/recipes/recipe-layout";
+import {
+  RecipeCtaCard,
+  RecipeCtaTableRow,
+  type RecipeCta,
+} from "@/components/recipes/recipe-cta-card";
 import { publicRecipeSlug } from "@/hooks";
 import { useImportPublicRecipe } from "@/hooks/mutations";
 import type { PublicRecipeSummary } from "common";
@@ -28,14 +33,21 @@ type LayoutViewProps = {
   recipes: PublicRecipeSummary[];
   importedIds: Set<string>;
   onImported: (id: string) => void;
+  cta?: RecipeCta;
 };
 
 type LayoutProps = LayoutViewProps & { layout: RecipeLayout };
 
-export function PublicRecipesLayout({ recipes, layout, importedIds, onImported }: LayoutProps) {
+export function PublicRecipesLayout({
+  recipes,
+  layout,
+  importedIds,
+  onImported,
+  cta,
+}: LayoutProps) {
   if (recipes.length === 0) return null;
 
-  const shared = { importedIds, onImported };
+  const shared = { importedIds, onImported, cta };
   if (layout === RecipeLayout.Compact) return <CompactGrid recipes={recipes} {...shared} />;
   if (layout === RecipeLayout.List) return <RecipeList recipes={recipes} {...shared} />;
   if (layout === RecipeLayout.Table) return <RecipeTable recipes={recipes} {...shared} />;
@@ -139,7 +151,7 @@ function TimeStat({ time, className }: { time: string; className?: string }) {
   );
 }
 
-function RecipeGrid({ recipes, importedIds, onImported }: LayoutViewProps) {
+function RecipeGrid({ recipes, importedIds, onImported, cta }: LayoutViewProps) {
   return (
     <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
       {recipes.map((recipe) => (
@@ -178,11 +190,12 @@ function RecipeGrid({ recipes, importedIds, onImported }: LayoutViewProps) {
           </div>
         </div>
       ))}
+      {cta && <RecipeCtaCard cta={cta} layout={RecipeLayout.Grid} />}
     </div>
   );
 }
 
-function CompactGrid({ recipes, importedIds, onImported }: LayoutViewProps) {
+function CompactGrid({ recipes, importedIds, onImported, cta }: LayoutViewProps) {
   return (
     <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
       {recipes.map((recipe) => (
@@ -218,11 +231,12 @@ function CompactGrid({ recipes, importedIds, onImported }: LayoutViewProps) {
           </div>
         </div>
       ))}
+      {cta && <RecipeCtaCard cta={cta} layout={RecipeLayout.Compact} />}
     </div>
   );
 }
 
-function RecipeList({ recipes, importedIds, onImported }: LayoutViewProps) {
+function RecipeList({ recipes, importedIds, onImported, cta }: LayoutViewProps) {
   return (
     <div className="space-y-3">
       {recipes.map((recipe) => (
@@ -260,6 +274,7 @@ function RecipeList({ recipes, importedIds, onImported }: LayoutViewProps) {
           </div>
         </div>
       ))}
+      {cta && <RecipeCtaCard cta={cta} layout={RecipeLayout.List} />}
     </div>
   );
 }
@@ -285,7 +300,7 @@ const tableColumns: { key: SortKey; label: string; className?: string }[] = [
   { key: SortKey.Time, label: "Time" },
 ];
 
-function RecipeTable({ recipes, importedIds, onImported }: LayoutViewProps) {
+function RecipeTable({ recipes, importedIds, onImported, cta }: LayoutViewProps) {
   const [sort, setSort] = useState<TableSort>({
     key: SortKey.Recipe,
     direction: SortDirection.Asc,
@@ -353,6 +368,7 @@ function RecipeTable({ recipes, importedIds, onImported }: LayoutViewProps) {
               </TableCell>
             </TableRow>
           ))}
+          {cta && <RecipeCtaTableRow cta={cta} colSpan={tableColumns.length + 1} />}
         </TableBody>
       </Table>
     </div>

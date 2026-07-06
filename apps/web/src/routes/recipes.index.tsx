@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
+import { Plus } from "lucide-react";
 import { AppShell, PrimaryButton, SearchBar } from "@/components/AppShell";
 import { AddRecipeDialog } from "@/components/recipes/add-recipe-dialog";
 import { isRecipeLayout, RecipeLayout } from "@/components/recipes/recipe-layout";
@@ -126,7 +127,21 @@ function RecipesPage() {
         />
       </div>
 
-      <RecipesLayout recipes={filtered} layout={layout} />
+      <RecipesLayout
+        recipes={filtered}
+        layout={layout}
+        cta={
+          searching
+            ? undefined
+            : {
+                title: "Add a new recipe?",
+                description: "Create your own or import from our public library",
+                actionLabel: "Add recipe",
+                icon: Plus,
+                onClick: () => setNewRecipeOpen(true),
+              }
+        }
+      />
 
       {filtered.length === 0 && !(searching && search.isFetching) && (
         <div className="text-center py-20 text-muted-foreground">

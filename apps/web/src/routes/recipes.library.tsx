@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { ArrowLeft, Loader2 } from "lucide-react";
+import { ArrowLeft, HeartHandshake, Loader2 } from "lucide-react";
 import { AppShell, SearchBar } from "@/components/AppShell";
 import { PublicRecipesLayout } from "@/components/recipes/public-recipe-layouts";
 import { isRecipeLayout, RecipeLayout } from "@/components/recipes/recipe-layout";
@@ -164,6 +164,13 @@ function PublicLibraryPage() {
           layout={layout}
           importedIds={importedIds}
           onImported={markImported}
+          cta={{
+            title: "Contribute your recipe",
+            description: "Share your recipes with all Mise users",
+            actionLabel: "Contribute",
+            icon: HeartHandshake,
+            href: "https://github.com/sidhantpanda/mise-public#readme",
+          }}
         />
       )}
     </AppShell>

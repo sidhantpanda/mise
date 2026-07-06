@@ -10,6 +10,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { formatDuration, isoDurationToMinutes, type Recipe } from "common";
+import { RecipeCtaTableRow, type RecipeCta } from "@/components/recipes/recipe-cta-card";
 import { cn } from "@/lib/utils";
 
 enum RecipeTableSortKey {
@@ -47,7 +48,7 @@ type RecipeTableSort = {
   direction: RecipeTableSortDirection;
 };
 
-export function RecipeTable({ recipes }: { recipes: Recipe[] }) {
+export function RecipeTable({ recipes, cta }: { recipes: Recipe[]; cta?: RecipeCta }) {
   const [sort, setSort] = useState<RecipeTableSort>({
     key: RecipeTableSortKey.Recipe,
     direction: RecipeTableSortDirection.Asc,
@@ -123,6 +124,7 @@ export function RecipeTable({ recipes }: { recipes: Recipe[] }) {
               </TableCell>
             </TableRow>
           ))}
+          {cta && <RecipeCtaTableRow cta={cta} colSpan={recipeTableColumns.length} />}
         </TableBody>
       </Table>
     </div>
