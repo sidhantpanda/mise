@@ -1,4 +1,8 @@
+![Logo](docs/mise-logo.png)
+
 # Mise — Kitchen Companion Hub
+
+
 
 Mise is a Schema.org‑native kitchen OS for households and restaurants: recipes, meal
 plans, pantry, and a shopping list in one place. Recipes are stored in standard
