@@ -13,7 +13,8 @@ import { Label } from "@/components/ui/label";
 import { useHousehold } from "@/hooks";
 import { useInvite, useRevokeInvite, useUpdateHousehold } from "@/hooks/mutations";
 import { toast } from "sonner";
-import { Mail, Settings, Shield, X } from "lucide-react";
+import { Download, Loader2, Mail, Settings, Shield, X } from "lucide-react";
+import { api, ApiError } from "@/lib/api";
 
 export const Route = createFileRoute("/household")({
   head: () => ({
@@ -42,6 +43,19 @@ function HouseholdPage() {
   const [email, setEmail] = useState("");
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [name, setName] = useState("");
+  const [downloading, setDownloading] = useState(false);
+
+  const downloadLibrary = async () => {
+    setDownloading(true);
+    try {
+      const date = new Date().toISOString().slice(0, 10);
+      await api.download("/recipes/export", `mise-recipes-${date}.zip`);
+    } catch (err) {
+      toast.error(err instanceof ApiError ? err.message : "Couldn't download the recipe library.");
+    } finally {
+      setDownloading(false);
+    }
+  };
 
   const send = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -194,6 +208,28 @@ function HouseholdPage() {
           )}
         </section>
       </div>
+
+      <section className="mt-6 bg-card border border-border rounded-2xl p-4 sm:p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-5 sm:gap-6">
+        <div className="min-w-0">
+          <h3 className="text-display text-2xl">Download all recipe library</h3>
+          <p className="text-sm text-muted-foreground mt-1 max-w-xl">
+            Export every recipe in {hh.name} as a ZIP of Schema.org JSON-LD files. Keep a backup or
+            move your library elsewhere — the ZIP imports straight back into Mise.
+          </p>
+        </div>
+        <button
+          onClick={downloadLibrary}
+          disabled={downloading}
+          className="shrink-0 inline-flex items-center justify-center gap-2 h-10 px-5 rounded-full bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition disabled:opacity-60"
+        >
+          {downloading ? (
+            <Loader2 className="size-4 animate-spin" />
+          ) : (
+            <Download className="size-4" />
+          )}
+          {downloading ? "Preparing…" : "Download"}
+        </button>
+      </section>
 
       <section className="mt-6 bg-primary text-primary-foreground rounded-2xl p-4 sm:p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-5 sm:gap-6">
         <div className="min-w-0">

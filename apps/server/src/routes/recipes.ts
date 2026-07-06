@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { z } from "zod";
 import type { Prisma } from "@prisma/client";
-import { strFromU8, unzipSync } from "fflate";
+import { strFromU8, strToU8, unzipSync, zipSync } from "fflate";
 import multer from "multer";
 import { findRecipeJsonLds, recipeInputSchema } from "common";
 import { prisma } from "../prisma.js";
@@ -110,6 +110,53 @@ recipesRouter.get("/search", async (req, res) => {
     .map(toRecipeDTO);
 
   res.json({ hits, total: result.total, limit: result.limit, offset: result.offset });
+});
+
+// Turn a recipe name into a filesystem-safe base for its file inside the export
+// zip. Falls back to "recipe" so an unnamed recipe still gets a valid filename.
+function recipeFileBase(name: string) {
+  const slug = name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 60);
+  return slug || "recipe";
+}
+
+// Export every recipe in the caller's household as a zip of JSON-LD files (one
+// Schema.org Recipe per `.json` file). The zip round-trips through the existing
+// `/upload` importer, so a household can back up and restore its whole library.
+// Registered before "/:id" so "export" isn't read as an id.
+recipesRouter.get("/export", async (req, res) => {
+  const recipes = await prisma.recipe.findMany({
+    where: { householdId: req.user!.householdId },
+    orderBy: { createdAt: "desc" },
+    include: withAuthor,
+  });
+
+  // fflate happily zips an empty set, but the resulting entry-less archive is
+  // rejected by macOS Archive Utility ("empty or contains no readable items"),
+  // so surface a clear error instead of handing back a broken download.
+  if (recipes.length === 0) {
+    throw new AppError(400, "This household has no recipes to export yet.");
+  }
+
+  const files: Record<string, Uint8Array> = {};
+  const usedNames = new Set<string>();
+  for (const recipe of recipes) {
+    const dto = toRecipeDTO(recipe);
+    const base = recipeFileBase(dto.name);
+    let filename = `${base}.json`;
+    for (let n = 2; usedNames.has(filename); n++) filename = `${base}-${n}.json`;
+    usedNames.add(filename);
+    files[filename] = strToU8(JSON.stringify(dto, null, 2));
+  }
+
+  const zipped = zipSync(files, { level: 6 });
+  const date = new Date().toISOString().slice(0, 10);
+  res.setHeader("Content-Type", "application/zip");
+  res.setHeader("Content-Disposition", `attachment; filename="mise-recipes-${date}.zip"`);
+  res.send(Buffer.from(zipped));
 });
 
 recipesRouter.get("/:id", async (req, res) => {
