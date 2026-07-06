@@ -77,6 +77,7 @@ function RecipesPage() {
     <AppShell
       title="Recipe library"
       subtitle={`${recipes.length} recipes · Schema.org Recipe format`}
+      compactHeaderOnMobile
       actions={
         <>
           <SearchBar value={q} onChange={setQ} placeholder="Search recipes, tags…" />
@@ -87,10 +88,10 @@ function RecipesPage() {
       <AddRecipeDialog open={newRecipeOpen} onOpenChange={setNewRecipeOpen} />
 
       <div
-        className="sticky z-5 -mx-4 mb-6 flex flex-col gap-3 border-b border-border bg-background/85 px-4 py-3 backdrop-blur sm:-mx-6 sm:px-6 md:-mx-10 md:px-10 xl:flex-row xl:items-center xl:justify-between"
+        className="sticky z-5 -mx-4 mb-4 flex items-center gap-2 border-b border-border bg-background/85 px-4 py-2 backdrop-blur sm:-mx-6 sm:mb-6 sm:flex-col sm:items-stretch sm:gap-3 sm:px-6 sm:py-3 md:-mx-10 md:px-10 xl:flex-row xl:items-center xl:justify-between"
         style={{ top: "var(--app-header-height, 0px)" }}
       >
-        <div className="flex gap-2 overflow-x-auto pb-1 sm:flex-wrap sm:overflow-visible">
+        <div className="flex min-w-0 flex-1 gap-2 overflow-x-auto pb-1 sm:flex-wrap sm:overflow-visible">
           {categories.map((c) => (
             <button
               key={c}
@@ -106,7 +107,12 @@ function RecipesPage() {
           ))}
         </div>
 
-        <RecipeLayoutSwitcher layout={layout} onLayoutChange={selectLayout} />
+        <RecipeLayoutSwitcher
+          layout={layout}
+          onLayoutChange={selectLayout}
+          className="p-0.5 sm:p-1"
+          buttonClassName="size-8 sm:size-9"
+        />
       </div>
 
       <RecipesLayout recipes={filtered} layout={layout} />

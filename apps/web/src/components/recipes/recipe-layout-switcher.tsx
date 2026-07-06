@@ -13,14 +13,21 @@ const recipeLayouts = [
 export function RecipeLayoutSwitcher({
   layout,
   onLayoutChange,
+  className,
+  buttonClassName,
 }: {
   layout: RecipeLayout;
   onLayoutChange: (layout: RecipeLayout) => void;
+  className?: string;
+  buttonClassName?: string;
 }) {
   return (
     <TooltipProvider delayDuration={150}>
       <div
-        className="flex w-fit shrink-0 items-center rounded-full border border-border bg-card p-1"
+        className={cn(
+          "flex w-fit shrink-0 items-center rounded-full border border-border bg-card p-1",
+          className,
+        )}
         aria-label="Recipe layout"
       >
         {recipeLayouts.map(({ value, label, Icon }) => (
@@ -35,6 +42,7 @@ export function RecipeLayoutSwitcher({
                   "grid size-9 shrink-0 place-items-center rounded-full text-muted-foreground transition hover:text-foreground",
                   layout === value &&
                     "bg-primary text-primary-foreground hover:text-primary-foreground",
+                  buttonClassName,
                 )}
               >
                 <Icon className="size-4" />

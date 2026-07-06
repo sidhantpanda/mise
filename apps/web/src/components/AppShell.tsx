@@ -43,11 +43,13 @@ export function AppShell({
   title,
   subtitle,
   actions,
+  compactHeaderOnMobile = false,
 }: {
   children: ReactNode;
   title: string;
   subtitle?: string;
   actions?: ReactNode;
+  compactHeaderOnMobile?: boolean;
 }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const me = useMe();
@@ -90,12 +92,33 @@ export function AppShell({
           ref={headerRef}
           className="sticky top-0 z-10 bg-background/85 backdrop-blur border-b border-border"
         >
-          <div className="px-4 sm:px-6 md:px-10 py-4 sm:py-5 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 sm:gap-6">
+          <div
+            className={cn(
+              "px-4 sm:px-6 md:px-10 py-4 sm:py-5 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 sm:gap-6",
+              compactHeaderOnMobile && "py-3 gap-3 sm:py-5 sm:gap-6",
+            )}
+          >
             <div className="flex min-w-0 items-start gap-3">
               <MobileNav pathname={pathname} household={household} user={user} />
               <div className="min-w-0">
-                <h1 className="text-display text-3xl md:text-4xl wrap-break-word">{title}</h1>
-                {subtitle && <p className="text-sm text-muted-foreground mt-1">{subtitle}</p>}
+                <h1
+                  className={cn(
+                    "text-display text-3xl md:text-4xl wrap-break-word",
+                    compactHeaderOnMobile && "text-2xl sm:text-3xl md:text-4xl",
+                  )}
+                >
+                  {title}
+                </h1>
+                {subtitle && (
+                  <p
+                    className={cn(
+                      "text-sm text-muted-foreground mt-1",
+                      compactHeaderOnMobile && "hidden sm:block",
+                    )}
+                  >
+                    {subtitle}
+                  </p>
+                )}
               </div>
             </div>
             <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto sm:justify-end">
