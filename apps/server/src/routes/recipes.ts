@@ -78,32 +78,38 @@ recipesRouter.get("/", async (req, res) => {
 recipesRouter.get("/search", async (req, res) => {
   if (!isSearchEnabled()) throw new AppError(503, "Recipe search is not available");
   const query = typeof req.query.q === "string" ? req.query.q : "";
-  const limit = typeof req.query.limit === "string" ? Number(req.query.limit) : undefined;
+  const limitParam = typeof req.query.limit === "string" ? Number(req.query.limit) : undefined;
+  const offsetParam = typeof req.query.offset === "string" ? Number(req.query.offset) : undefined;
+  const categoryParam = typeof req.query.category === "string" ? req.query.category : undefined;
+  const category = categoryParam && categoryParam !== "All" ? categoryParam : undefined;
 
-  let hits;
+  let result;
   try {
-    hits = await searchRecipes({
+    result = await searchRecipes({
       householdId: req.user!.householdId,
       query,
-      limit: Number.isFinite(limit) ? limit : undefined,
+      limit: Number.isFinite(limitParam) ? limitParam : undefined,
+      offset: Number.isFinite(offsetParam) ? offsetParam : undefined,
+      category,
     });
   } catch {
     throw new AppError(503, "Recipe search is temporarily unavailable");
   }
 
-  const ids = hits.map((hit) => hit.id);
-  if (ids.length === 0) {
-    res.json([]);
-    return;
-  }
-
-  const recipes = await prisma.recipe.findMany({
-    where: { id: { in: ids }, householdId: req.user!.householdId },
-    include: withAuthor,
-  });
+  const ids = result.hits.map((hit) => hit.id);
+  const recipes = ids.length
+    ? await prisma.recipe.findMany({
+        where: { id: { in: ids }, householdId: req.user!.householdId },
+        include: withAuthor,
+      })
+    : [];
   const byId = new Map(recipes.map((recipe) => [recipe.id, recipe]));
-  const ordered = ids.map((id) => byId.get(id)).filter((recipe) => recipe !== undefined);
-  res.json(ordered.map(toRecipeDTO));
+  const hits = ids
+    .map((id) => byId.get(id))
+    .filter((recipe) => recipe !== undefined)
+    .map(toRecipeDTO);
+
+  res.json({ hits, total: result.total, limit: result.limit, offset: result.offset });
 });
 
 recipesRouter.get("/:id", async (req, res) => {

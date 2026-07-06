@@ -82,7 +82,7 @@ export async function ensureRecipeIndex(): Promise<void> {
       "authorName",
       "description",
     ],
-    filterableAttributes: ["householdId"],
+    filterableAttributes: ["householdId", "recipeCategory"],
     sortableAttributes: ["createdAt"],
   });
 }
@@ -110,22 +110,48 @@ export async function removeRecipeFromIndex(id: string): Promise<void> {
   }
 }
 
-// Search recipes within a single household. Throws if search is disabled — callers
-// should check isSearchEnabled() first and surface a clear "search unavailable"
-// response instead.
+export type RecipeSearchResult = {
+  hits: RecipeSearchDoc[];
+  total: number;
+  limit: number;
+  offset: number;
+};
+
+// Escape a value for use inside a double-quoted Meilisearch filter literal.
+function quote(value: string): string {
+  return `"${value.replace(/\\/g, "\\\\").replace(/"/g, '\\"')}"`;
+}
+
+// Search recipes within a single household, one page at a time. `total` is
+// Meilisearch's estimate of all matches (for "N results" / has-more), while `hits`
+// is just the requested page. Throws if search is disabled — callers should check
+// isSearchEnabled() first and surface a clear "search unavailable" response.
 export async function searchRecipes(params: {
   householdId: string;
   query: string;
   limit?: number;
-}): Promise<RecipeSearchDoc[]> {
+  offset?: number;
+  category?: string;
+}): Promise<RecipeSearchResult> {
   const m = meili();
   if (!m) throw new Error("Search is not configured");
   const limit = Math.min(Math.max(params.limit ?? 20, 1), 100);
+  const offset = Math.max(params.offset ?? 0, 0);
+
+  const filters = [`householdId = ${quote(params.householdId)}`];
+  if (params.category) filters.push(`recipeCategory = ${quote(params.category)}`);
+
   const result = await m.index(RECIPE_INDEX).search<RecipeSearchDoc>(params.query, {
-    filter: `householdId = "${params.householdId}"`,
+    filter: filters.join(" AND "),
     limit,
+    offset,
   });
-  return result.hits;
+  return {
+    hits: result.hits,
+    total: result.estimatedTotalHits ?? result.hits.length,
+    limit,
+    offset,
+  };
 }
 
 // Backfill the index from Postgres. Idempotent (addDocuments upserts by id), run

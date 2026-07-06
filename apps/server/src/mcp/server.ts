@@ -154,7 +154,7 @@ export function buildMcpServer(ctx: McpAuthContext): McpServer {
       }
 
       try {
-        const hits = await searchRecipes({
+        const { hits, total } = await searchRecipes({
           householdId: ctx.householdId,
           query: args.query,
           limit: args.limit ?? 10,
@@ -166,13 +166,10 @@ export function buildMcpServer(ctx: McpAuthContext): McpServer {
           const facets = [hit.recipeCuisine, hit.recipeCategory].filter(Boolean).join(", ");
           return `- ${hit.name}${facets ? ` (${facets})` : ""} — id ${hit.id}`;
         });
+        const shown =
+          total > hits.length ? `Showing ${hits.length} of ${total} matches` : `Found ${hits.length} recipe${hits.length === 1 ? "" : "s"}`;
         return {
-          content: [
-            {
-              type: "text",
-              text: `Found ${hits.length} recipe${hits.length === 1 ? "" : "s"}:\n${lines.join("\n")}`,
-            },
-          ],
+          content: [{ type: "text", text: `${shown}:\n${lines.join("\n")}` }],
         };
       } catch {
         return {
