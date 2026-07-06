@@ -210,9 +210,13 @@ function SidebarContent({
     <>
       <div className="px-6 pt-7 pb-8">
         <NavLink to="/" closeOnNavigate={closeOnNavigate} className="flex items-center gap-2.5">
-          <div className="size-9 rounded-xl bg-primary text-primary-foreground grid place-items-center">
-            <Soup className="size-5" />
-          </div>
+          <img
+            src="/icon-192.png"
+            alt="Mise"
+            className="size-9 rounded-xl object-contain"
+            width={36}
+            height={36}
+          />
           <div>
             <div className="text-display text-xl leading-none">Mise</div>
             <div className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground mt-1">
