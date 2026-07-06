@@ -144,12 +144,14 @@ recipesRouter.get("/export", async (req, res) => {
   const files: Record<string, Uint8Array> = {};
   const usedNames = new Set<string>();
   for (const recipe of recipes) {
-    const dto = toRecipeDTO(recipe);
-    const base = recipeFileBase(dto.name);
+    const { identifier: _identifier, author, ...dto } = toRecipeDTO(recipe);
+    const { identifier: _authorIdentifier, ...authorRest } = author;
+    const exportDto = { ...dto, author: authorRest };
+    const base = recipeFileBase(exportDto.name);
     let filename = `${base}.json`;
     for (let n = 2; usedNames.has(filename); n++) filename = `${base}-${n}.json`;
     usedNames.add(filename);
-    files[filename] = strToU8(JSON.stringify(dto, null, 2));
+    files[filename] = strToU8(JSON.stringify(exportDto, null, 2));
   }
 
   const zipped = zipSync(files, { level: 6 });
