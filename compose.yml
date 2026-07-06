@@ -7,6 +7,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      meilisearch:
+        condition: service_started
     # Pull everything from the root .env into the container. Anything set under
     # `environment:` below still wins (Compose precedence: environment > env_file),
     # which is how the container-network DATABASE_URL overrides the localhost one.
@@ -21,6 +23,9 @@ services:
       DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:${POSTGRES_PORT:-5432}/${POSTGRES_DB}
       JWT_SECRET: ${JWT_SECRET}
       WEB_ORIGIN: ${WEB_ORIGIN:-http://localhost:3000}
+      # Meilisearch is reached by its compose service name inside the network.
+      MEILI_URL: http://meilisearch:7700
+      MEILI_MASTER_KEY: ${MEILI_MASTER_KEY}
     ports:
       - "${APP_PORT:-3000}:3000"
     healthcheck:
@@ -58,7 +63,23 @@ services:
       timeout: 5s
       retries: 10
 
+  meilisearch:
+    image: getmeili/meilisearch:v1.11
+    container_name: mise-meilisearch
+    restart: unless-stopped
+    environment:
+      # Production Meilisearch requires a master key of at least 16 bytes — set
+      # MEILI_MASTER_KEY in .env (it also authenticates the app's requests).
+      MEILI_MASTER_KEY: ${MEILI_MASTER_KEY}
+      MEILI_ENV: production
+      MEILI_NO_ANALYTICS: "true"
+    volumes:
+      - meili-data:/meili_data
+
 volumes:
   # Named volume for Postgres data — managed by Docker (see `docker volume ls`),
   # survives `docker compose down`, removed only with `docker compose down -v`.
   postgres-data:
+  # Meilisearch index storage. Rebuildable from Postgres on boot, but persisting
+  # it avoids a full reindex on every restart.
+  meili-data:

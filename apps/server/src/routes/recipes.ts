@@ -8,6 +8,12 @@ import { prisma } from "../prisma.js";
 import { AppError } from "../lib/AppError.js";
 import { toRecipeDTO } from "../lib/mappers.js";
 import { createRecipe, recipeBody, toColumns, withAuthor } from "../lib/recipes.js";
+import {
+  indexRecipe,
+  isSearchEnabled,
+  removeRecipeFromIndex,
+  searchRecipes,
+} from "../lib/recipeSearch.js";
 import { requireWriteAuth } from "../middleware/auth.js";
 import { routeParam } from "../lib/request.js";
 
@@ -63,6 +69,41 @@ recipesRouter.get("/", async (req, res) => {
     include: withAuthor,
   });
   res.json(recipes.map(toRecipeDTO));
+});
+
+// Full-text recipe search within the caller's household, backed by Meilisearch.
+// Meili returns matching ids in relevance order; we hydrate full recipes from
+// Postgres (preserving that order) so the response is the same RecipeDTO shape as
+// the list endpoint. Registered before "/:id" so "search" isn't read as an id.
+recipesRouter.get("/search", async (req, res) => {
+  if (!isSearchEnabled()) throw new AppError(503, "Recipe search is not available");
+  const query = typeof req.query.q === "string" ? req.query.q : "";
+  const limit = typeof req.query.limit === "string" ? Number(req.query.limit) : undefined;
+
+  let hits;
+  try {
+    hits = await searchRecipes({
+      householdId: req.user!.householdId,
+      query,
+      limit: Number.isFinite(limit) ? limit : undefined,
+    });
+  } catch {
+    throw new AppError(503, "Recipe search is temporarily unavailable");
+  }
+
+  const ids = hits.map((hit) => hit.id);
+  if (ids.length === 0) {
+    res.json([]);
+    return;
+  }
+
+  const recipes = await prisma.recipe.findMany({
+    where: { id: { in: ids }, householdId: req.user!.householdId },
+    include: withAuthor,
+  });
+  const byId = new Map(recipes.map((recipe) => [recipe.id, recipe]));
+  const ordered = ids.map((id) => byId.get(id)).filter((recipe) => recipe !== undefined);
+  res.json(ordered.map(toRecipeDTO));
 });
 
 recipesRouter.get("/:id", async (req, res) => {
@@ -145,6 +186,7 @@ recipesRouter.patch("/:id", requireWriteAuth, async (req, res) => {
     data: toColumns(input),
     include: withAuthor,
   });
+  await indexRecipe(recipe);
   res.json(toRecipeDTO(recipe));
 });
 
@@ -163,5 +205,6 @@ recipesRouter.delete("/:id", requireWriteAuth, async (req, res) => {
     }),
     prisma.recipe.delete({ where: { id } }),
   ]);
+  await removeRecipeFromIndex(id);
   res.json({ ok: true });
 });

@@ -8,6 +8,7 @@ import {
 import { prisma } from "../prisma.js";
 import { AppError } from "./AppError.js";
 import { toRecipeDTO } from "./mappers.js";
+import { indexRecipe } from "./recipeSearch.js";
 import { findRecipeJsonLd } from "common";
 
 type RecipeInput = ParsedRecipeInput;
@@ -126,5 +127,6 @@ export async function createRecipe(params: {
     },
     include: withAuthor,
   });
+  await indexRecipe(recipe);
   return toRecipeDTO(recipe);
 }
