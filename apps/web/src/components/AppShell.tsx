@@ -95,7 +95,8 @@ export function AppShell({
           <div
             className={cn(
               "px-4 sm:px-6 md:px-10 py-4 sm:py-5 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 sm:gap-6",
-              compactHeaderOnMobile && "py-3 gap-3 sm:py-5 sm:gap-6",
+              compactHeaderOnMobile &&
+                "py-3 gap-3 sm:flex-col sm:items-stretch sm:py-5 sm:gap-4 lg:flex-row lg:items-end lg:gap-6",
             )}
           >
             <div className="flex min-w-0 items-start gap-3">
@@ -121,7 +122,12 @@ export function AppShell({
                 )}
               </div>
             </div>
-            <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto sm:justify-end">
+            <div
+              className={cn(
+                "flex w-full flex-wrap items-center gap-2 sm:w-auto sm:justify-end",
+                compactHeaderOnMobile && "sm:w-full lg:w-auto",
+              )}
+            >
               {actions}
             </div>
           </div>
@@ -280,19 +286,26 @@ export function SearchBar({
   value,
   onChange,
   placeholder = "Search…",
+  className,
+  inputClassName,
 }: {
   value: string;
   onChange: (v: string) => void;
   placeholder?: string;
+  className?: string;
+  inputClassName?: string;
 }) {
   return (
-    <div className="relative min-w-0 flex-1 sm:flex-none">
+    <div className={cn("relative min-w-0 flex-1 sm:flex-none", className)}>
       <Search className="size-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
       <input
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="h-9 w-full sm:w-64 rounded-full border border-input bg-card pl-9 pr-3 text-sm outline-none focus:ring-2 focus:ring-ring/40"
+        className={cn(
+          "h-9 w-full sm:w-64 rounded-full border border-input bg-card pl-9 pr-3 text-sm outline-none focus:ring-2 focus:ring-ring/40",
+          inputClassName,
+        )}
       />
     </div>
   );

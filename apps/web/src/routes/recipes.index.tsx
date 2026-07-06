@@ -76,11 +76,22 @@ function RecipesPage() {
   return (
     <AppShell
       title="Recipe library"
-      subtitle={`${recipes.length} recipes · Schema.org Recipe format`}
+      // subtitle={`${recipes.length} recipes`}
       compactHeaderOnMobile
       actions={
         <>
-          <SearchBar value={q} onChange={setQ} placeholder="Search recipes, tags…" />
+          <RecipeLayoutSwitcher
+            layout={layout}
+            onLayoutChange={selectLayout}
+            className="hidden p-0.5 sm:flex lg:p-1"
+            buttonClassName="size-8 lg:size-9"
+          />
+          <SearchBar
+            value={q}
+            onChange={setQ}
+            placeholder="Search recipes, tags…"
+            inputClassName="sm:w-36 lg:w-64"
+          />
           <PrimaryButton onClick={() => setNewRecipeOpen(true)}>New recipe</PrimaryButton>
         </>
       }
@@ -110,8 +121,8 @@ function RecipesPage() {
         <RecipeLayoutSwitcher
           layout={layout}
           onLayoutChange={selectLayout}
-          className="p-0.5 sm:p-1"
-          buttonClassName="size-8 sm:size-9"
+          className="p-0.5 sm:hidden"
+          buttonClassName="size-8"
         />
       </div>
 
