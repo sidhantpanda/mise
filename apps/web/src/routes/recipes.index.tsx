@@ -5,6 +5,7 @@ import { AppShell, PrimaryButton, SearchBar } from "@/components/AppShell";
 import { AddRecipeDialog } from "@/components/recipes/add-recipe-dialog";
 import { isRecipeLayout, RecipeLayout } from "@/components/recipes/recipe-layout";
 import { RecipeLayoutSwitcher } from "@/components/recipes/recipe-layout-switcher";
+import { RecipeCtaCard } from "@/components/recipes/recipe-cta-card";
 import { RecipesLayout } from "@/components/recipes/recipe-layouts";
 import type { Recipe } from "common";
 import { useDebouncedValue, useRecipes, useRecipeSearch } from "@/hooks";
@@ -74,6 +75,17 @@ function RecipesPage() {
     [searching, searchHits, recipes, cat],
   );
 
+  // Cold start: the household has no recipes at all (not just filtered out).
+  const isEmptyLibrary = !searching && recipes.length === 0;
+
+  const addRecipeCta = {
+    title: "Add a new recipe?",
+    description: "Create your own or import from our public library",
+    actionLabel: "Add recipe",
+    icon: Plus,
+    onClick: () => setNewRecipeOpen(true),
+  };
+
   return (
     <AppShell
       title="Recipe library"
@@ -127,43 +139,47 @@ function RecipesPage() {
         />
       </div>
 
-      <RecipesLayout
-        recipes={filtered}
-        layout={layout}
-        cta={
-          searching
-            ? undefined
-            : {
-                title: "Add a new recipe?",
-                description: "Create your own or import from our public library",
-                actionLabel: "Add recipe",
-                icon: Plus,
-                onClick: () => setNewRecipeOpen(true),
-              }
-        }
-      />
-
-      {filtered.length === 0 && !(searching && search.isFetching) && (
-        <div className="text-center py-20 text-muted-foreground">
-          {searching
-            ? `No recipes match "${debouncedQ.trim()}".`
-            : "No recipes match those filters."}
+      {isEmptyLibrary ? (
+        <div className="mx-auto max-w-md py-14 text-center">
+          <h2 className="text-display text-2xl">Your recipe library is empty</h2>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Add your first recipe to get started.
+          </p>
+          <div className="mx-auto mt-6 max-w-xs">
+            <RecipeCtaCard cta={addRecipeCta} layout={RecipeLayout.Grid} />
+          </div>
         </div>
-      )}
+      ) : (
+        <>
+          <RecipesLayout
+            recipes={filtered}
+            layout={layout}
+            cta={searching ? undefined : addRecipeCta}
+          />
 
-      {searching && search.hasNextPage && (
-        <div className="flex justify-center py-8">
-          <button
-            type="button"
-            onClick={() => search.fetchNextPage()}
-            disabled={search.isFetchingNextPage}
-            className="h-10 px-6 rounded-full border border-border bg-card text-sm hover:bg-accent hover:text-accent-foreground transition disabled:opacity-50"
-          >
-            {search.isFetchingNextPage
-              ? "Loading…"
-              : `Load more (${searchTotal - filtered.length} more)`}
-          </button>
-        </div>
+          {filtered.length === 0 && !(searching && search.isFetching) && (
+            <div className="text-center py-20 text-muted-foreground">
+              {searching
+                ? `No recipes match "${debouncedQ.trim()}".`
+                : "No recipes match those filters."}
+            </div>
+          )}
+
+          {searching && search.hasNextPage && (
+            <div className="flex justify-center py-8">
+              <button
+                type="button"
+                onClick={() => search.fetchNextPage()}
+                disabled={search.isFetchingNextPage}
+                className="h-10 px-6 rounded-full border border-border bg-card text-sm hover:bg-accent hover:text-accent-foreground transition disabled:opacity-50"
+              >
+                {search.isFetchingNextPage
+                  ? "Loading…"
+                  : `Load more (${searchTotal - filtered.length} more)`}
+              </button>
+            </div>
+          )}
+        </>
       )}
     </AppShell>
   );
