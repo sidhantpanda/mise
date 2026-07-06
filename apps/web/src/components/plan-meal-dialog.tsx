@@ -64,7 +64,9 @@ export function PlanMealDialog({
   // when the box is empty.
   const debouncedQ = useDebouncedValue(q);
   const search = useRecipeSearch(debouncedQ);
-  const filtered = debouncedQ.trim() ? (search.data ?? []) : recipes;
+  const searchHits = search.data?.pages.flatMap((page) => page.hits) ?? [];
+  const searching = debouncedQ.trim().length > 0;
+  const filtered = searching ? searchHits : recipes;
 
   const submit = async () => {
     if (!recipeId) {
@@ -169,6 +171,16 @@ export function PlanMealDialog({
                   )}
                 </button>
               ))}
+              {searching && search.hasNextPage && (
+                <button
+                  type="button"
+                  onClick={() => search.fetchNextPage()}
+                  disabled={search.isFetchingNextPage}
+                  className="w-full p-2.5 text-center text-xs font-medium text-primary hover:bg-secondary/60 transition disabled:opacity-50"
+                >
+                  {search.isFetchingNextPage ? "Loading…" : "Load more"}
+                </button>
+              )}
             </div>
           </div>
 

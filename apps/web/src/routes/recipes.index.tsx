@@ -38,13 +38,18 @@ function RecipesPage() {
   const [newRecipeOpen, setNewRecipeOpen] = useState(false);
   const [layout, setLayout] = useState<RecipeLayout>(RecipeLayout.Grid);
 
-  // Full-text search runs server-side (Meilisearch) once there's a query; with an
-  // empty query we show the whole library. The category chips filter client-side
-  // on top of whichever set is showing.
+  // Full-text search runs server-side (Meilisearch) and is paginated. With an
+  // empty query we show the whole library and the category chips filter it
+  // client-side; while searching, the category is applied server-side so it
+  // composes with pagination.
   const debouncedQ = useDebouncedValue(q);
   const searching = debouncedQ.trim().length > 0;
-  const search = useRecipeSearch(debouncedQ);
-  const source = searching ? (search.data ?? EMPTY) : recipes;
+  const search = useRecipeSearch(debouncedQ, cat);
+  const searchHits = useMemo(
+    () => search.data?.pages.flatMap((page) => page.hits) ?? EMPTY,
+    [search.data],
+  );
+  const searchTotal = search.data?.pages[0]?.total ?? 0;
 
   useEffect(() => {
     const savedLayout = window.localStorage.getItem(LAYOUT_STORAGE_KEY);
@@ -60,8 +65,12 @@ function RecipesPage() {
 
   const filtered = useMemo(
     () =>
-      source.filter((r) => cat === "All" || r.recipeCategory.toLowerCase() === cat.toLowerCase()),
-    [cat, source],
+      searching
+        ? searchHits
+        : recipes.filter(
+            (r) => cat === "All" || r.recipeCategory.toLowerCase() === cat.toLowerCase(),
+          ),
+    [searching, searchHits, recipes, cat],
   );
 
   return (
@@ -107,6 +116,21 @@ function RecipesPage() {
           {searching
             ? `No recipes match "${debouncedQ.trim()}".`
             : "No recipes match those filters."}
+        </div>
+      )}
+
+      {searching && search.hasNextPage && (
+        <div className="flex justify-center py-8">
+          <button
+            type="button"
+            onClick={() => search.fetchNextPage()}
+            disabled={search.isFetchingNextPage}
+            className="h-10 px-6 rounded-full border border-border bg-card text-sm hover:bg-accent hover:text-accent-foreground transition disabled:opacity-50"
+          >
+            {search.isFetchingNextPage
+              ? "Loading…"
+              : `Load more (${searchTotal - filtered.length} more)`}
+          </button>
         </div>
       )}
     </AppShell>
