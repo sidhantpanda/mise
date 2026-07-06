@@ -1,0 +1,195 @@
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useState } from "react";
+import { ArrowLeft, Check, ChefHat, Clock, Download, Loader2, Star, Users } from "lucide-react";
+import { toast } from "sonner";
+import { AppShell } from "@/components/AppShell";
+import { RecipeMethod } from "@/components/recipes/recipe-method";
+import { publicRecipeLocation, usePublicRecipe } from "@/hooks";
+import { useImportPublicRecipe } from "@/hooks/mutations";
+import { formatDuration } from "common";
+
+export const Route = createFileRoute("/recipes/library_/view")({
+  validateSearch: (search: Record<string, unknown>): { id: string } => ({
+    id: typeof search.id === "string" ? search.id : "",
+  }),
+  head: () => ({
+    meta: [
+      { title: "Public recipe — Mise" },
+      { name: "description", content: "Preview a public library recipe before importing it." },
+    ],
+  }),
+  component: PublicRecipePreviewPage,
+});
+
+function PublicRecipePreviewPage() {
+  const { id } = Route.useSearch();
+  const location = id ? publicRecipeLocation(id) : "";
+  const navigate = useNavigate();
+  const query = usePublicRecipe(location);
+  const importRecipe = useImportPublicRecipe();
+  const [imported, setImported] = useState(false);
+  const r = query.data;
+
+  const onImport = async () => {
+    if (!location) return;
+    try {
+      const { recipe } = await importRecipe.mutateAsync(location);
+      setImported(true);
+      toast.success(`Imported "${recipe.name}"`, {
+        action: {
+          label: "Open",
+          onClick: () => navigate({ to: "/recipes/$id", params: { id: recipe.identifier } }),
+        },
+      });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Import failed");
+    }
+  };
+
+  const importButton = (
+    <button
+      type="button"
+      onClick={onImport}
+      disabled={!r || importRecipe.isPending || imported}
+      className="inline-flex shrink-0 items-center justify-center gap-1.5 h-9 px-4 rounded-full bg-primary text-primary-foreground text-sm font-medium whitespace-nowrap transition hover:opacity-90 disabled:opacity-60"
+    >
+      {imported ? (
+        <>
+          <Check className="size-4" /> Imported
+        </>
+      ) : importRecipe.isPending ? (
+        <>
+          <Loader2 className="size-4 animate-spin" /> Importing
+        </>
+      ) : (
+        <>
+          <Download className="size-4" /> Import to my library
+        </>
+      )}
+    </button>
+  );
+
+  return (
+    <AppShell
+      title={r?.name ?? (query.isLoading ? "Loading…" : "Public recipe")}
+      subtitle={r ? [r.recipeCuisine, r.recipeCategory].filter(Boolean).join(" · ") : undefined}
+      actions={
+        <>
+          {importButton}
+          <Link
+            to="/recipes/library"
+            className="inline-flex shrink-0 items-center justify-center gap-1.5 h-9 px-4 rounded-full border border-input bg-card text-sm whitespace-nowrap hover:bg-accent hover:text-accent-foreground transition"
+          >
+            <ArrowLeft className="size-4" /> Library
+          </Link>
+        </>
+      }
+    >
+      {query.isLoading ? (
+        <div className="flex justify-center py-24 text-muted-foreground">
+          <Loader2 className="size-6 animate-spin" />
+        </div>
+      ) : query.isError || !r ? (
+        <div className="mx-auto max-w-md py-20 text-center">
+          <p className="text-foreground">This recipe could not be loaded.</p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {query.error instanceof Error ? query.error.message : "Please try again shortly."}
+          </p>
+          <Link
+            to="/recipes/library"
+            className="mt-5 inline-flex h-9 items-center rounded-full border border-border bg-card px-5 text-sm hover:bg-accent hover:text-accent-foreground transition"
+          >
+            Back to library
+          </Link>
+        </div>
+      ) : (
+        <div className="grid gap-8 lg:grid-cols-5">
+          <div className="lg:col-span-3">
+            <div className="overflow-hidden rounded-2xl border border-border bg-card">
+              <img src={r.image[0]} alt={r.name} className="aspect-16/10 w-full object-cover" />
+            </div>
+
+            <p className="mt-6 text-base leading-relaxed text-muted-foreground sm:text-lg">
+              {r.description}
+            </p>
+
+            <div className="mt-6 grid grid-cols-1 gap-4 border-y border-border py-5 min-[420px]:grid-cols-2 sm:gap-6 md:grid-cols-3 xl:grid-cols-5">
+              <Meta
+                icon={<Clock className="size-4" />}
+                label="Prep"
+                value={formatDuration(r.prepTime)}
+              />
+              <Meta
+                icon={<ChefHat className="size-4" />}
+                label="Cook"
+                value={formatDuration(r.cookTime)}
+              />
+              <Meta
+                icon={<Clock className="size-4" />}
+                label="Total"
+                value={formatDuration(r.totalTime)}
+              />
+              <Meta
+                icon={<Users className="size-4" />}
+                label="Yield"
+                value={r.recipeYield || "—"}
+              />
+              {r.aggregateRating && (
+                <Meta
+                  icon={<Star className="size-4 fill-accent text-accent" />}
+                  label="Rating"
+                  value={`${r.aggregateRating.ratingValue} (${r.aggregateRating.ratingCount})`}
+                />
+              )}
+            </div>
+
+            <section className="mt-8">
+              <h2 className="mb-4 text-display text-2xl">Method</h2>
+              <RecipeMethod instructions={r.recipeInstructions} />
+            </section>
+          </div>
+
+          <aside className="space-y-5 lg:col-span-2">
+            <div className="rounded-2xl border border-border bg-card p-4 sm:p-6 lg:sticky lg:top-28">
+              <h2 className="text-display text-2xl">Ingredients</h2>
+              <ul className="mt-4 space-y-2.5">
+                {r.recipeIngredient.map((ing, i) => (
+                  <li key={i} className="flex items-start gap-3 text-[15px]">
+                    <span className="mt-2 size-1.5 shrink-0 rounded-full bg-primary" />
+                    <span>{ing}</span>
+                  </li>
+                ))}
+              </ul>
+              <div className="mt-6">{importButton}</div>
+            </div>
+
+            {r.keywords.length > 0 && (
+              <div className="flex flex-wrap gap-1.5">
+                {r.keywords.map((k) => (
+                  <span
+                    key={k}
+                    className="rounded-full bg-secondary px-2.5 py-1 text-xs text-secondary-foreground"
+                  >
+                    #{k}
+                  </span>
+                ))}
+              </div>
+            )}
+          </aside>
+        </div>
+      )}
+    </AppShell>
+  );
+}
+
+function Meta({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
+  return (
+    <div className="flex items-center gap-2.5">
+      <div className="grid size-9 place-items-center rounded-lg bg-secondary">{icon}</div>
+      <div>
+        <div className="text-[11px] uppercase tracking-wider text-muted-foreground">{label}</div>
+        <div className="text-sm font-medium">{value}</div>
+      </div>
+    </div>
+  );
+}

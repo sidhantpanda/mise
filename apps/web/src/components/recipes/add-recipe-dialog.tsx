@@ -1,5 +1,5 @@
 import { useNavigate } from "@tanstack/react-router";
-import { ArrowRight, FileArchive, PencilLine } from "lucide-react";
+import { ArrowRight, FileArchive, Globe, PencilLine } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -24,7 +24,27 @@ export function AddRecipeDialog({
           <DialogTitle>Add recipe</DialogTitle>
           <DialogDescription>Choose how you want to add recipes to your library.</DialogDescription>
         </DialogHeader>
-        <div className="grid gap-3 sm:grid-cols-2">
+        <div className="grid gap-3 sm:grid-cols-3">
+          <button
+            type="button"
+            onClick={() => {
+              onOpenChange(false);
+              navigate({ to: "/recipes/library" });
+            }}
+            className="group flex min-h-44 flex-col rounded-xl border border-border bg-card p-5 text-left transition hover:border-primary hover:bg-primary/5"
+          >
+            <span className="grid size-11 place-items-center rounded-lg bg-secondary text-foreground">
+              <Globe className="size-5" />
+            </span>
+            <span className="mt-4 text-display text-xl">Browse public library</span>
+            <span className="mt-2 text-sm text-muted-foreground">
+              Import curated community recipes with one click.
+            </span>
+            <span className="mt-auto inline-flex items-center gap-1 pt-4 text-sm font-medium text-primary">
+              Browse <ArrowRight className="size-4 transition group-hover:translate-x-0.5" />
+            </span>
+          </button>
+
           <button
             type="button"
             onClick={() => {

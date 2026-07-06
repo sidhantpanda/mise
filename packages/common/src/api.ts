@@ -42,3 +42,23 @@ export type RecipeUploadResult = {
   created: Recipe[];
   errors: { source: string; name?: string; error: string }[];
 };
+
+/**
+ * One entry in the public recipe library index (list.json). `id` is the
+ * library-relative file path, which doubles as the stable identifier the client
+ * sends back to import the recipe.
+ */
+export type PublicRecipeSummary = {
+  id: string;
+  name: string;
+  time: string;
+  cuisine: string;
+  mealType: string;
+  description: string;
+  imageUrl: string;
+};
+
+/** Response of POST /public-library/import. */
+export type PublicLibraryImportResult = {
+  recipe: Recipe;
+};

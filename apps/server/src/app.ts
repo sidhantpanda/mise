@@ -12,6 +12,7 @@ import { accessTokensRouter } from "./routes/accessTokens.js";
 import { householdsRouter } from "./routes/households.js";
 import { invitationsRouter } from "./routes/invitations.js";
 import { recipesRouter } from "./routes/recipes.js";
+import { publicLibraryRouter } from "./routes/publicLibrary.js";
 import { mealsRouter } from "./routes/meals.js";
 import { shoppingRouter } from "./routes/shopping.js";
 import { pantryRouter } from "./routes/pantry.js";
@@ -42,6 +43,7 @@ export async function createApiApp(): Promise<express.Express> {
   app.use("/api/households", requireAuth, requireSessionAuth, householdsRouter);
   app.use("/api/invitations", requireAuth, requireSessionAuth, invitationsRouter);
   app.use("/api/recipes", requireAuth, requireHousehold, recipesRouter);
+  app.use("/api/public-library", requireAuth, requireHousehold, publicLibraryRouter);
   app.use("/api/meals", requireAuth, requireHousehold, mealsRouter);
   app.use("/api/shopping", requireAuth, requireHousehold, shoppingRouter);
   app.use("/api/pantry", requireAuth, requireHousehold, pantryRouter);

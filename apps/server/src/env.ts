@@ -21,6 +21,14 @@ const schema = z.object({
   // writes simply skip indexing).
   MEILI_URL: z.string().url().optional(),
   MEILI_MASTER_KEY: z.string().optional(),
+  // Points at the public recipe library's list.json (a curated index of
+  // community recipes anyone can browse and import). Relative file_location
+  // entries in that list are resolved against this URL. Override to host your
+  // own library; unset falls back to the official Mise public library.
+  PUBLIC_LIBRARY_URL: z
+    .string()
+    .url()
+    .default("https://raw.githubusercontent.com/sidhantpanda/mise-public/main/list.json"),
 });
 
 const parsed = schema.safeParse(process.env);

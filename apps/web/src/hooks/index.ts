@@ -6,6 +6,7 @@ export * from "./form-field";
 export * from "./household";
 export * from "./meals";
 export * from "./pantry";
+export * from "./public-library";
 export * from "./recipes";
 export * from "./sidebar";
 export * from "./use-debounced-value";
