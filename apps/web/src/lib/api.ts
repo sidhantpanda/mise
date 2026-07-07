@@ -13,11 +13,25 @@ export class ApiError extends Error {
   }
 }
 
-async function request<T>(method: string, path: string, body?: unknown): Promise<T> {
-  const res = await fetch(`${API_URL}/api${path}`, {
+// Set only when a route loader calls `serverApi()` during SSR: Node's fetch has
+// no cookie jar and no implicit same-origin base, so the incoming request's
+// origin/cookie header have to be forwarded explicitly for that one call.
+type ServerRequestInit = { origin: string; cookie?: string };
+
+async function request<T>(
+  method: string,
+  path: string,
+  body?: unknown,
+  serverInit?: ServerRequestInit,
+): Promise<T> {
+  const base = API_URL || serverInit?.origin || "";
+  const headers = new Headers(body !== undefined ? { "Content-Type": "application/json" } : undefined);
+  if (serverInit?.cookie) headers.set("Cookie", serverInit.cookie);
+
+  const res = await fetch(`${base}/api${path}`, {
     method,
-    credentials: "include",
-    headers: body !== undefined ? { "Content-Type": "application/json" } : undefined,
+    credentials: serverInit ? undefined : "include",
+    headers,
     body: body !== undefined ? JSON.stringify(body) : undefined,
   });
 
@@ -106,3 +120,18 @@ export const api = {
   patch: <T>(path: string, body?: unknown) => request<T>("PATCH", path, body),
   delete: <T>(path: string) => request<T>("DELETE", path),
 };
+
+export type ApiClient = Pick<typeof api, "get">;
+
+// A GET-only client bound to one incoming request, for use inside route loaders
+// during SSR (never store this anywhere shared — it carries that request's
+// session cookie). Client-side code keeps using `api` directly.
+export function serverApi(req: Request): ApiClient {
+  const serverInit: ServerRequestInit = {
+    origin: new URL(req.url).origin,
+    cookie: req.headers.get("cookie") ?? undefined,
+  };
+  return {
+    get: <T>(path: string) => request<T>("GET", path, undefined, serverInit),
+  };
+}

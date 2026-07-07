@@ -11,7 +11,7 @@ import { getRouter } from "./router";
 // request URL, loads matching routes, and dehydrates router/query state (which
 // the <Scripts /> in __root.tsx serializes into the document for hydration).
 export async function render(request: Request): Promise<string> {
-  const handler = createRequestHandler({ createRouter: getRouter, request });
+  const handler = createRequestHandler({ createRouter: () => getRouter(request), request });
 
   const response = await handler(({ router, responseHeaders }) =>
     renderRouterToString({

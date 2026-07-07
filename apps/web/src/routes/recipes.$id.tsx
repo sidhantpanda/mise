@@ -2,8 +2,10 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
 import { RecipeMethod } from "@/components/recipes/recipe-method";
 import { formatDuration, type Recipe } from "common";
-import { useMe, useRecipes } from "@/hooks";
+import { useMe, useRecipes, recipesQueryOptions } from "@/hooks";
 import { useDeleteRecipe, useAddFromRecipe } from "@/hooks/mutations";
+import { serverApi } from "@/lib/api";
+import { recipeMetaTags } from "@/lib/recipe-meta";
 import {
   Clock,
   ChefHat,
@@ -26,8 +28,20 @@ import { PlanMealDialog } from "@/components/plan-meal-dialog";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/recipes/$id")({
-  head: () => ({
-    meta: [{ title: "Recipe — Mise" }, { name: "description", content: "Recipe details" }],
+  // Best-effort: primes the title (and warms the recipes cache) for SSR. If it
+  // fails — e.g. no session cookie to forward — the page still works, since
+  // `useRecipes()` below fetches with the browser's real cookies regardless.
+  loader: async ({ context, params }) => {
+    try {
+      const client = context.request ? serverApi(context.request) : undefined;
+      const recipes = await context.queryClient.ensureQueryData(recipesQueryOptions(client));
+      return recipes.find((r) => r.identifier === params.id);
+    } catch {
+      return undefined;
+    }
+  },
+  head: ({ loaderData }) => ({
+    meta: recipeMetaTags(loaderData, { title: "Recipe — Mise", description: "Recipe details" }),
   }),
   component: RecipePage,
   notFoundComponent: () => (

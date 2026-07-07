@@ -67,7 +67,11 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   );
 }
 
-export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
+export const Route = createRootRouteWithContext<{
+  queryClient: QueryClient;
+  // Set only during SSR, scoped to that one request — see router.tsx.
+  request?: Request;
+}>()({
   head: () => ({
     meta: [
       { charSet: "utf-8" },

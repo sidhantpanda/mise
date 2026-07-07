@@ -4,19 +4,36 @@ import { ArrowLeft, Check, ChefHat, Clock, Download, Loader2, Star, Users } from
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { RecipeMethod } from "@/components/recipes/recipe-method";
-import { publicRecipeLocation, usePublicRecipe } from "@/hooks";
+import { publicRecipeLocation, publicRecipeQueryOptions, usePublicRecipe } from "@/hooks";
 import { useImportPublicRecipe } from "@/hooks/mutations";
 import { formatDuration } from "common";
+import { serverApi } from "@/lib/api";
+import { recipeMetaTags } from "@/lib/recipe-meta";
 
 export const Route = createFileRoute("/recipes/library_/view")({
   validateSearch: (search: Record<string, unknown>): { id: string } => ({
     id: typeof search.id === "string" ? search.id : "",
   }),
-  head: () => ({
-    meta: [
-      { title: "Public recipe — Mise" },
-      { name: "description", content: "Preview a public library recipe before importing it." },
-    ],
+  loaderDeps: ({ search }) => ({ id: search.id }),
+  // Best-effort: primes the title (and warms the cache) for SSR. `/public-library`
+  // still requires a session (requireAuth + requireHousehold), so this needs the
+  // visitor's cookie forwarded just like the private recipe route.
+  loader: async ({ context, deps }) => {
+    if (!deps.id) return undefined;
+    try {
+      const client = context.request ? serverApi(context.request) : undefined;
+      return await context.queryClient.ensureQueryData(
+        publicRecipeQueryOptions(publicRecipeLocation(deps.id), client),
+      );
+    } catch {
+      return undefined;
+    }
+  },
+  head: ({ loaderData }) => ({
+    meta: recipeMetaTags(loaderData, {
+      title: "Public recipe — Mise",
+      description: "Preview a public library recipe before importing it.",
+    }),
   }),
   component: PublicRecipePreviewPage,
 });

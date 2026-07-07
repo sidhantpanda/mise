@@ -1,10 +1,14 @@
-import { keepPreviousData, useInfiniteQuery, useQuery } from "@tanstack/react-query";
-import { api } from "@/lib/api";
+import { keepPreviousData, queryOptions, useInfiniteQuery, useQuery } from "@tanstack/react-query";
+import { api, type ApiClient } from "@/lib/api";
 import type { Recipe } from "common";
 import { keys } from "./keys";
 
+export function recipesQueryOptions(client: ApiClient = api) {
+  return queryOptions({ queryKey: keys.recipes, queryFn: () => client.get<Recipe[]>("/recipes") });
+}
+
 export function useRecipes() {
-  return useQuery({ queryKey: keys.recipes, queryFn: () => api.get<Recipe[]>("/recipes") });
+  return useQuery(recipesQueryOptions());
 }
 
 export const RECIPE_SEARCH_PAGE_SIZE = 24;

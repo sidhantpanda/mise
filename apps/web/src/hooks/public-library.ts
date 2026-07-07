@@ -1,5 +1,5 @@
-import { useQuery } from "@tanstack/react-query";
-import { api } from "@/lib/api";
+import { queryOptions, useQuery } from "@tanstack/react-query";
+import { api, type ApiClient } from "@/lib/api";
 import type { PublicRecipeSummary, Recipe } from "common";
 import { keys } from "./keys";
 
@@ -24,11 +24,15 @@ export function usePublicLibrary() {
   });
 }
 
-export function usePublicRecipe(id: string) {
-  return useQuery({
+export function publicRecipeQueryOptions(id: string, client: ApiClient = api) {
+  return queryOptions({
     queryKey: keys.publicRecipe(id),
-    queryFn: () => api.get<Recipe>(`/public-library/recipe?id=${encodeURIComponent(id)}`),
+    queryFn: () => client.get<Recipe>(`/public-library/recipe?id=${encodeURIComponent(id)}`),
     enabled: !!id,
     staleTime: 5 * 60 * 1000,
   });
+}
+
+export function usePublicRecipe(id: string) {
+  return useQuery(publicRecipeQueryOptions(id));
 }
