@@ -15,6 +15,7 @@ import {
   Code2,
   Pencil,
   Trash2,
+  Download,
   Minus,
   Plus,
   RotateCcw,
@@ -89,6 +90,11 @@ function RecipePage() {
     toast.success("Recipe JSON-LD copied");
   };
 
+  const exportJson = () => {
+    downloadRecipeJson(r);
+    toast.success("Recipe JSON downloaded");
+  };
+
   const ingredientScale = previewYield / baseYield.amount;
   const scaledIngredients = r.recipeIngredient.map((ing) =>
     scaleIngredientLine(ing, ingredientScale),
@@ -101,11 +107,17 @@ function RecipePage() {
   return (
     <AppShell
       title={r.name}
-      subtitle={`${r.recipeCuisine} · ${r.recipeCategory} · by ${
-        r.author.identifier && r.author.identifier === currentUserId ? "you" : r.author.name
-      }`}
+      subtitle={`${r.recipeCuisine} · ${r.recipeCategory} · by ${r.author.identifier && r.author.identifier === currentUserId ? "you" : r.author.name
+        }`}
       actions={
         <>
+          <button
+            type="button"
+            onClick={exportJson}
+            className="inline-flex shrink-0 items-center justify-center gap-1.5 h-9 px-4 rounded-full border border-input bg-card text-sm whitespace-nowrap hover:bg-accent hover:text-accent-foreground transition"
+          >
+            <Download className="size-4" /> Export
+          </button>
           <Link
             to="/recipes/edit/$id"
             params={{ id: r.identifier }}
@@ -116,6 +128,7 @@ function RecipePage() {
           <button
             onClick={onDelete}
             className="inline-flex shrink-0 items-center justify-center gap-1.5 h-9 px-4 rounded-full border border-input bg-card text-sm whitespace-nowrap hover:bg-destructive hover:text-destructive-foreground transition"
+            aria-label="Delete recipe"
           >
             <Trash2 className="size-4" />
           </button>
@@ -320,6 +333,27 @@ function Nut({ label, value }: { label: string; value: string }) {
       <dd className="font-display text-lg">{value}</dd>
     </div>
   );
+}
+
+function downloadRecipeJson(recipe: Recipe) {
+  const blob = new Blob([JSON.stringify(recipe, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `${recipeFileBase(recipe.name)}.json`;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+}
+
+function recipeFileBase(name: string) {
+  const slug = name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 60);
+  return slug || "recipe";
 }
 
 function parseRecipeYield(value?: string) {
