@@ -159,14 +159,11 @@ function PublicRecipePreviewPage() {
                 />
               )}
             </div>
-
-            <section className="mt-8">
-              <h2 className="mb-4 text-display text-2xl">Method</h2>
-              <RecipeMethod instructions={r.recipeInstructions} />
-            </section>
           </div>
 
-          <aside className="space-y-5 lg:col-span-2">
+          {/* Ordered ahead of Method here so it appears above it on mobile; the
+              lg:row-span-2 keeps it spanning both rows of the left column on desktop. */}
+          <aside className="space-y-5 lg:col-span-2 lg:row-span-2">
             <div className="rounded-2xl border border-border bg-card p-4 sm:p-6 lg:sticky lg:top-28">
               <h2 className="text-display text-2xl">Ingredients</h2>
               <ul className="mt-4 space-y-2.5">
@@ -193,6 +190,11 @@ function PublicRecipePreviewPage() {
               </div>
             )}
           </aside>
+
+          <section className="lg:col-span-3">
+            <h2 className="mb-4 text-display text-2xl">Method</h2>
+            <RecipeMethod instructions={r.recipeInstructions} />
+          </section>
         </div>
       )}
     </AppShell>

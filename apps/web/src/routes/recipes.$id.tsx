@@ -190,14 +190,11 @@ function RecipePage() {
               />
             )}
           </div>
-
-          <section className="mt-8">
-            <h2 className="text-display text-2xl mb-4">Method</h2>
-            <RecipeMethod instructions={r.recipeInstructions} />
-          </section>
         </div>
 
-        <aside className="lg:col-span-2 space-y-5">
+        {/* Ordered ahead of Method here so it appears above it on mobile; the
+            lg:row-span-2 keeps it spanning both rows of the left column on desktop. */}
+        <aside className="lg:col-span-2 lg:row-span-2 space-y-5">
           <div className="bg-card border border-border rounded-2xl p-4 sm:p-6 lg:sticky lg:top-28">
             <div className="flex flex-col gap-4 mb-4 min-[420px]:flex-row min-[420px]:items-start min-[420px]:justify-between">
               <div>
@@ -319,6 +316,11 @@ function RecipePage() {
             </pre>
           )}
         </aside>
+
+        <section className="lg:col-span-3">
+          <h2 className="text-display text-2xl mb-4">Method</h2>
+          <RecipeMethod instructions={r.recipeInstructions} />
+        </section>
       </div>
 
       <RelatedStrip currentId={r.identifier} recipes={recipes} />
