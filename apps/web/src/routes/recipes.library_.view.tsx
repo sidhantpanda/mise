@@ -130,7 +130,7 @@ function PublicRecipePreviewPage() {
               {r.description}
             </p>
 
-            <div className="mt-6 grid grid-cols-1 gap-4 border-y border-border py-5 min-[420px]:grid-cols-2 sm:gap-6 md:grid-cols-3 xl:grid-cols-5">
+            <div className="mt-6 grid grid-cols-4 gap-2 border-y border-border py-5 sm:grid-cols-5 sm:gap-6">
               <Meta
                 icon={<Clock className="size-4" />}
                 label="Prep"
@@ -203,11 +203,15 @@ function PublicRecipePreviewPage() {
 
 function Meta({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
   return (
-    <div className="flex items-center gap-2.5">
-      <div className="grid size-9 place-items-center rounded-lg bg-secondary">{icon}</div>
-      <div>
-        <div className="text-[11px] uppercase tracking-wider text-muted-foreground">{label}</div>
-        <div className="text-sm font-medium">{value}</div>
+    <div className="flex flex-col items-center gap-1.5 text-center sm:flex-row sm:items-center sm:gap-2.5 sm:text-left">
+      <div className="grid size-8 sm:size-9 shrink-0 place-items-center rounded-lg bg-secondary">
+        {icon}
+      </div>
+      <div className="min-w-0">
+        <div className="text-[10px] sm:text-[11px] uppercase tracking-wider text-muted-foreground">
+          {label}
+        </div>
+        <div className="text-xs sm:text-sm font-medium">{value}</div>
       </div>
     </div>
   );

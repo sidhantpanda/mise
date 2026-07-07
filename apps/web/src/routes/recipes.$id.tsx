@@ -165,7 +165,7 @@ function RecipePage() {
             {r.description}
           </p>
 
-          <div className="grid grid-cols-1 min-[420px]:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-4 sm:gap-6 mt-6 py-5 border-y border-border">
+          <div className="grid grid-cols-4 sm:grid-cols-5 gap-2 sm:gap-6 mt-6 py-5 border-y border-border">
             <Meta
               icon={<Clock className="size-4" />}
               label="Prep"
@@ -332,11 +332,15 @@ function RecipePage() {
 
 function Meta({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
   return (
-    <div className="flex items-center gap-2.5">
-      <div className="size-9 rounded-lg bg-secondary grid place-items-center">{icon}</div>
-      <div>
-        <div className="text-[11px] uppercase tracking-wider text-muted-foreground">{label}</div>
-        <div className="text-sm font-medium">{value}</div>
+    <div className="flex flex-col items-center gap-1.5 text-center sm:flex-row sm:items-center sm:gap-2.5 sm:text-left">
+      <div className="size-8 sm:size-9 shrink-0 rounded-lg bg-secondary grid place-items-center">
+        {icon}
+      </div>
+      <div className="min-w-0">
+        <div className="text-[10px] sm:text-[11px] uppercase tracking-wider text-muted-foreground">
+          {label}
+        </div>
+        <div className="text-xs sm:text-sm font-medium">{value}</div>
       </div>
     </div>
   );
