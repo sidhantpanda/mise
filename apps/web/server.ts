@@ -12,6 +12,16 @@ const root = path.dirname(fileURLToPath(import.meta.url));
 
 type RenderFn = (request: Request) => Promise<string>;
 
+// The API's internal address for SSR loaders' self-fetches (priming data like a
+// recipe's page title). This must be a loopback-reachable origin, never the
+// public Host header: behind a reverse proxy that Host is the external domain,
+// and looping back out through it fails on networks without NAT hairpinning. The
+// API front door is pinned to port 3000 in the container (see apps/server start
+// script); SERVER_URL overrides it. Resolved here — not in the SSR bundle —
+// because Vite constant-folds process.env at build time, so the bundle can't
+// read it at runtime.
+const INTERNAL_API_ORIGIN = process.env.SERVER_URL ?? "http://localhost:3000";
+
 // Build a standard web Request from the incoming express request so it can be
 // handed to TanStack Router's createRequestHandler.
 function toWebRequest(req: express.Request): Request {
@@ -21,6 +31,8 @@ function toWebRequest(req: express.Request): Request {
     if (Array.isArray(value)) value.forEach((v) => headers.append(key, v));
     else if (value != null) headers.set(key, value);
   }
+  // Set after copying client headers so an inbound request can't spoof it.
+  headers.set("x-internal-api-origin", INTERNAL_API_ORIGIN);
   return new Request(url, { method: req.method, headers });
 }
 

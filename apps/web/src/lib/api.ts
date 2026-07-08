@@ -14,9 +14,17 @@ export class ApiError extends Error {
 }
 
 // Set only when a route loader calls `serverApi()` during SSR: Node's fetch has
-// no cookie jar and no implicit same-origin base, so the incoming request's
-// origin/cookie header have to be forwarded explicitly for that one call.
+// no cookie jar and no implicit same-origin base, so the cookie header has to be
+// forwarded explicitly for that one call. `origin` is always the API's own
+// internal address (see `serverApi`) — deriving it from the incoming request's
+// Host header would break behind a reverse proxy, where Host is the public
+// domain rather than something the container can loop back to.
 type ServerRequestInit = { origin: string; cookie?: string };
+
+// server.ts stamps every SSR request with the API's internal origin under this
+// header (it runs under tsx, where process.env is readable — this bundled module
+// can't reach env at runtime because Vite constant-folds process.env at build).
+export const INTERNAL_API_ORIGIN_HEADER = "x-internal-api-origin";
 
 async function request<T>(
   method: string,
@@ -126,9 +134,17 @@ export type ApiClient = Pick<typeof api, "get">;
 // A GET-only client bound to one incoming request, for use inside route loaders
 // during SSR (never store this anywhere shared — it carries that request's
 // session cookie). Client-side code keeps using `api` directly.
+//
+// `origin` is the API's own internal address, read from the header server.ts
+// stamped on the request. It must NOT be derived from the incoming request's
+// URL: behind a reverse proxy that Host is the public domain, so a self-fetch
+// built from it leaves the container and round-trips through the public internet
+// — which fails or hangs on networks without NAT hairpinning, silently falling
+// back to a generic tab title (the loader below swallows the error). The literal
+// fallback only covers a request that somehow reached here without the header.
 export function serverApi(req: Request): ApiClient {
   const serverInit: ServerRequestInit = {
-    origin: new URL(req.url).origin,
+    origin: req.headers.get(INTERNAL_API_ORIGIN_HEADER) ?? "http://localhost:3000",
     cookie: req.headers.get("cookie") ?? undefined,
   };
   return {

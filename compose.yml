@@ -23,6 +23,12 @@ services:
       DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:${POSTGRES_PORT:-5432}/${POSTGRES_DB}
       JWT_SECRET: ${JWT_SECRET}
       WEB_ORIGIN: ${WEB_ORIGIN:-http://localhost:3000}
+      # The web SSR process fetches back to the API in-container to prime data
+      # (e.g. a recipe's page title). This is the API's internal address — always
+      # localhost:3000 in the bundled image, never the public WEB_ORIGIN, which a
+      # loopback fetch can't reach behind a reverse proxy. Override only if the
+      # API front door is moved off :3000.
+      SERVER_URL: ${SERVER_URL:-http://localhost:3000}
       # Meilisearch is reached by its compose service name inside the network.
       MEILI_URL: http://meilisearch:7700
       MEILI_MASTER_KEY: ${MEILI_MASTER_KEY}
