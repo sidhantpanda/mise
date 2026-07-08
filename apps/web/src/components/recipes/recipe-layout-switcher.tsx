@@ -2,6 +2,7 @@ import { Grid2X2, Grid3X3, List, Table2, type LucideIcon } from "lucide-react";
 import { RecipeLayout } from "@/components/recipes/recipe-layout";
 import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Button } from "@/components/ui/button";
 
 const recipeLayouts = [
   { value: RecipeLayout.Grid, label: "Grid", Icon: Grid2X2 },
@@ -33,20 +34,22 @@ export function RecipeLayoutSwitcher({
         {recipeLayouts.map(({ value, label, Icon }) => (
           <Tooltip key={value}>
             <TooltipTrigger asChild>
-              <button
+              <Button
                 type="button"
+                variant="ghost"
+                size="icon"
                 aria-label={`${label} layout`}
                 aria-pressed={layout === value}
                 onClick={() => onLayoutChange(value)}
                 className={cn(
-                  "grid size-9 shrink-0 place-items-center rounded-full text-muted-foreground transition hover:text-foreground",
+                  "size-9 shrink-0 rounded-full text-muted-foreground hover:bg-transparent hover:text-foreground",
                   layout === value &&
-                    "bg-primary text-primary-foreground hover:text-primary-foreground",
+                    "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground",
                   buttonClassName,
                 )}
               >
                 <Icon className="size-4" />
-              </button>
+              </Button>
             </TooltipTrigger>
             <TooltipContent>{label}</TooltipContent>
           </Tooltip>

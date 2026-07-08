@@ -16,6 +16,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { HouseholdSetupForm } from "@/components/household-setup-form";
+import { Button } from "@/components/ui/button";
 import { useMe } from "@/hooks";
 import { useSwitchHousehold, useAcceptInvitation, useRejectInvitation } from "@/hooks/mutations";
 import type { Household } from "common";
@@ -40,9 +41,10 @@ export function HouseholdSwitcher({ active }: { active: Household }) {
     <div className="p-3 m-3 rounded-xl bg-sidebar-accent/60 border border-sidebar-border">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <button
+          <Button
             type="button"
-            className="flex w-full items-center gap-2 rounded-lg text-left transition hover:opacity-90"
+            variant="ghost"
+            className="flex h-auto w-full items-center justify-start gap-2 rounded-lg p-0 text-left font-normal hover:bg-transparent hover:text-foreground hover:opacity-90"
           >
             <div className="min-w-0 flex-1">
               <div className="text-[11px] uppercase tracking-wider text-muted-foreground">
@@ -56,7 +58,7 @@ export function HouseholdSwitcher({ active }: { active: Household }) {
               </span>
             )}
             <ChevronsUpDown className="size-4 shrink-0 text-muted-foreground" />
-          </button>
+          </Button>
         </DropdownMenuTrigger>
 
         <DropdownMenuContent align="start" className="w-60">
@@ -95,22 +97,23 @@ export function HouseholdSwitcher({ active }: { active: Household }) {
                     by {inv.inviterName}
                   </div>
                   <div className="mt-1.5 flex gap-1.5">
-                    <button
+                    <Button
                       type="button"
                       disabled={accept.isPending || reject.isPending}
                       onClick={() => accept.mutate(inv.id)}
-                      className="h-7 flex-1 rounded-md bg-primary text-primary-foreground text-xs font-medium hover:opacity-90 disabled:opacity-60"
+                      className="h-7 flex-1 rounded-md px-2 py-0 text-xs shadow-none hover:bg-primary hover:opacity-90 disabled:opacity-60"
                     >
                       Accept
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                       type="button"
+                      variant="ghost"
                       disabled={accept.isPending || reject.isPending}
                       onClick={() => reject.mutate(inv.id)}
-                      className="h-7 px-2.5 rounded-md border border-border text-xs hover:bg-accent disabled:opacity-60"
+                      className="h-7 rounded-md border border-border px-2.5 py-0 text-xs font-normal hover:bg-accent disabled:opacity-60"
                     >
                       Decline
-                    </button>
+                    </Button>
                   </div>
                 </div>
               ))}

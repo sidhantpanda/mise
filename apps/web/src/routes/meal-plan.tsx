@@ -4,6 +4,7 @@ import { AppShell, PrimaryButton } from "@/components/AppShell";
 import { type PlannedMeal } from "common";
 import { useMe, useMeals, useRecipes } from "@/hooks";
 import { PlanMealDialog } from "@/components/plan-meal-dialog";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/meal-plan")({
   head: () => ({
@@ -94,12 +95,13 @@ function MealPlanPage() {
                                 />
                               </Link>
                               <div className="min-w-0 flex-1">
-                                <button
+                                <Button
+                                  variant="ghost"
                                   onClick={() => setEditing(m)}
-                                  className="block text-xs font-medium leading-tight truncate text-left hover:underline w-full"
+                                  className="block h-auto w-full justify-start truncate p-0 text-left text-xs font-medium leading-tight hover:bg-transparent hover:underline"
                                 >
                                   {r.name}
-                                </button>
+                                </Button>
                                 <div className="text-[10px] text-muted-foreground mt-0.5">
                                   {m.servings} serv
                                 </div>
@@ -119,12 +121,13 @@ function MealPlanPage() {
                           </div>
                         );
                       })}
-                      <button
+                      <Button
+                        variant="ghost"
                         onClick={() => setCreating({ date: iso, mealType: mt })}
-                        className="w-full h-10 rounded-lg border border-dashed border-border text-xs text-muted-foreground hover:border-foreground/30 hover:text-foreground transition"
+                        className="h-10 w-full rounded-lg border border-dashed border-border text-xs font-normal text-muted-foreground hover:border-foreground/30 hover:bg-transparent hover:text-foreground"
                       >
                         + Add
-                      </button>
+                      </Button>
                     </div>
                   );
                 })}

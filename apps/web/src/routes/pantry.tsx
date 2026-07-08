@@ -4,6 +4,7 @@ import { AppShell, PrimaryButton, SearchBar } from "@/components/AppShell";
 import type { PantryItem } from "common";
 import { usePantry } from "@/hooks";
 import { PantryItemDialog } from "@/components/pantry-item-dialog";
+import { Button } from "@/components/ui/button";
 import { Refrigerator, Snowflake, Archive } from "lucide-react";
 
 export const Route = createFileRoute("/pantry")({
@@ -63,18 +64,19 @@ function PantryPage() {
     >
       <div className="flex gap-2 mb-6 overflow-x-auto pb-1 sm:flex-wrap sm:overflow-visible">
         {locations.map(({ key, icon: Icon }) => (
-          <button
+          <Button
             key={key}
+            variant="ghost"
             onClick={() => setLoc(key)}
-            className={`inline-flex shrink-0 items-center gap-1.5 px-4 py-2 rounded-full text-xs font-medium border transition ${
+            className={`shrink-0 gap-1.5 rounded-full border px-4 py-2 text-xs font-medium ${
               loc === key
-                ? "bg-primary text-primary-foreground border-primary"
-                : "bg-card border-border text-foreground/70 hover:border-foreground/30"
+                ? "bg-primary text-primary-foreground border-primary hover:bg-primary hover:text-primary-foreground"
+                : "bg-card border-border text-foreground/70 hover:border-foreground/30 hover:bg-card hover:text-foreground/70"
             }`}
           >
             <Icon className="size-3.5" />
             {key}
-          </button>
+          </Button>
         ))}
       </div>
 

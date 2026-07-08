@@ -33,7 +33,9 @@ async function request<T>(
   serverInit?: ServerRequestInit,
 ): Promise<T> {
   const base = API_URL || serverInit?.origin || "";
-  const headers = new Headers(body !== undefined ? { "Content-Type": "application/json" } : undefined);
+  const headers = new Headers(
+    body !== undefined ? { "Content-Type": "application/json" } : undefined,
+  );
   if (serverInit?.cookie) headers.set("Cookie", serverInit.cookie);
 
   const res = await fetch(`${base}/api${path}`, {

@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { AppShell, PrimaryButton } from "@/components/AppShell";
+import { Button } from "@/components/ui/button";
 import { type ShoppingItem } from "common";
 import { useShopping } from "@/hooks";
 import { useClearChecked, useDeleteShopping, useSetShoppingChecked } from "@/hooks/mutations";
@@ -50,7 +51,8 @@ function ShoppingPage() {
       actions={
         <>
           {items.length > 0 && (
-            <button
+            <Button
+              variant="ghost"
               onClick={() =>
                 setShoppingChecked.mutate({
                   ids: items.map((item) => item.id),
@@ -58,19 +60,20 @@ function ShoppingPage() {
                 })
               }
               disabled={setShoppingChecked.isPending}
-              className="inline-flex h-9 items-center gap-1.5 rounded-full border border-border bg-card px-4 text-sm whitespace-nowrap transition hover:bg-accent hover:text-accent-foreground disabled:opacity-60"
+              className="h-9 gap-1.5 rounded-full border border-border bg-card px-4 font-normal whitespace-nowrap hover:bg-accent hover:text-accent-foreground disabled:opacity-60"
             >
               {allChecked ? <Square className="size-4" /> : <CheckCheck className="size-4" />}
               {bulkCheckedLabel}
-            </button>
+            </Button>
           )}
           {done > 0 && (
-            <button
+            <Button
+              variant="ghost"
               onClick={() => clearChecked.mutate()}
-              className="h-9 px-4 rounded-full text-sm border border-border bg-card whitespace-nowrap hover:bg-accent hover:text-accent-foreground transition"
+              className="h-9 rounded-full border border-border bg-card px-4 font-normal whitespace-nowrap hover:bg-accent hover:text-accent-foreground"
             >
               Clear checked
-            </button>
+            </Button>
           )}
           <PrimaryButton onClick={() => setOpen(true)}>Add item</PrimaryButton>
         </>
@@ -97,19 +100,21 @@ function ShoppingPage() {
                 <ul className="bg-card border border-border rounded-2xl divide-y divide-border overflow-hidden">
                   {xs.map((it) => (
                     <li key={it.id} className="flex items-center gap-3 px-3 sm:px-4 py-3 group">
-                      <button
+                      <Button
+                        variant="ghost"
+                        size="icon"
                         onClick={() =>
                           setShoppingChecked.mutate({ ids: [it.id], checked: !it.checked })
                         }
                         disabled={setShoppingChecked.isPending}
-                        className={`size-6 shrink-0 rounded-full border-2 grid place-items-center transition ${
+                        className={`size-6 shrink-0 rounded-full border-2 hover:bg-transparent [&_svg]:size-3.5 ${
                           it.checked
-                            ? "bg-primary border-primary text-primary-foreground"
+                            ? "bg-primary border-primary text-primary-foreground hover:bg-primary"
                             : "border-border hover:border-primary"
                         }`}
                       >
                         {it.checked && <Check className="size-3.5" strokeWidth={3} />}
-                      </button>
+                      </Button>
                       <div
                         className={`flex-1 min-w-0 ${it.checked ? "line-through text-muted-foreground" : ""}`}
                       >
@@ -118,20 +123,24 @@ function ShoppingPage() {
                           <div className="text-xs text-muted-foreground">{it.quantity}</div>
                         )}
                       </div>
-                      <button
+                      <Button
+                        variant="ghost"
+                        size="icon"
                         onClick={() => setEditing(it)}
-                        className="shrink-0 text-muted-foreground transition hover:text-foreground sm:opacity-0 sm:group-hover:opacity-100"
+                        className="size-auto shrink-0 p-0 text-muted-foreground hover:bg-transparent hover:text-foreground sm:opacity-0 sm:group-hover:opacity-100"
                         aria-label="Edit"
                       >
                         <Pencil className="size-4" />
-                      </button>
-                      <button
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
                         onClick={() => deleteItem.mutate(it.id)}
-                        className="shrink-0 text-muted-foreground transition hover:text-destructive sm:opacity-0 sm:group-hover:opacity-100"
+                        className="size-auto shrink-0 p-0 text-muted-foreground hover:bg-transparent hover:text-destructive sm:opacity-0 sm:group-hover:opacity-100"
                         aria-label="Remove"
                       >
                         <Trash2 className="size-4" />
-                      </button>
+                      </Button>
                     </li>
                   ))}
                 </ul>

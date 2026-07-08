@@ -3,6 +3,7 @@ import { useState } from "react";
 import { ArrowLeft, Check, ChefHat, Clock, Download, Loader2, Star, Users } from "lucide-react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
+import { Button } from "@/components/ui/button";
 import { RecipeMethod } from "@/components/recipes/recipe-method";
 import { publicRecipeLocation, publicRecipeQueryOptions, usePublicRecipe } from "@/hooks";
 import { useImportPublicRecipe } from "@/hooks/mutations";
@@ -64,11 +65,11 @@ function PublicRecipePreviewPage() {
   };
 
   const importButton = (
-    <button
+    <Button
       type="button"
       onClick={onImport}
       disabled={!r || importRecipe.isPending || imported}
-      className="inline-flex shrink-0 items-center justify-center gap-1.5 h-9 px-4 rounded-full bg-primary text-primary-foreground text-sm font-medium whitespace-nowrap transition hover:opacity-90 disabled:opacity-60"
+      className="h-9 shrink-0 gap-1.5 rounded-full px-4 whitespace-nowrap shadow-none hover:bg-primary hover:opacity-90 disabled:opacity-60"
     >
       {imported ? (
         <>
@@ -83,7 +84,7 @@ function PublicRecipePreviewPage() {
           <Download className="size-4" /> Import to my library
         </>
       )}
-    </button>
+    </Button>
   );
 
   return (

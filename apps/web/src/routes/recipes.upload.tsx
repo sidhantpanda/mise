@@ -3,6 +3,7 @@ import { useState } from "react";
 import { AlertTriangle, ArrowLeft, CheckCircle2, FileJson, UploadCloud } from "lucide-react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
+import { Button } from "@/components/ui/button";
 import { useUploadRecipes } from "@/hooks/mutations";
 import type { RecipeUploadResult } from "common";
 
@@ -103,15 +104,15 @@ function UploadRecipesPage() {
                   onChange={(event) => onFiles(event.target.files)}
                 />
               </label>
-              <button
+              <Button
                 type="button"
                 onClick={submit}
                 disabled={!file || uploadRecipes.isPending}
-                className="inline-flex h-10 items-center justify-center gap-2 rounded-full bg-primary px-6 text-sm font-medium text-primary-foreground transition hover:opacity-90 disabled:opacity-60"
+                className="h-10 gap-2 rounded-full px-6 shadow-none hover:bg-primary hover:opacity-90 disabled:opacity-60"
               >
                 <UploadCloud className="size-4" />
                 {uploadRecipes.isPending ? "Uploading..." : "Upload"}
-              </button>
+              </Button>
             </div>
 
             {file && (

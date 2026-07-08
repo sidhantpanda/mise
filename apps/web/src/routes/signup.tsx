@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { useSignup } from "@/hooks/mutations";
 import { ApiError } from "@/lib/api";
 import { AuthShell, Field } from "./login";
@@ -74,13 +75,13 @@ function SignupPage() {
 
         {error && <p className="text-sm text-destructive">{error}</p>}
 
-        <button
+        <Button
           type="submit"
           disabled={signup.isPending}
-          className="h-11 w-full rounded-full bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition disabled:opacity-60"
+          className="h-11 w-full rounded-full shadow-none hover:bg-primary hover:opacity-90 disabled:opacity-60"
         >
           {signup.isPending ? "Creating…" : "Create account"}
-        </button>
+        </Button>
       </form>
 
       <p className="mt-6 text-center text-sm text-muted-foreground">

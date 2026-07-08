@@ -11,6 +11,7 @@ import { type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { Toaster } from "@/components/ui/sonner";
+import { Button } from "@/components/ui/button";
 
 function NotFoundComponent() {
   return (
@@ -46,15 +47,15 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
           We hit an error rendering this page. Try again or head home.
         </p>
         <div className="mt-6 flex flex-wrap justify-center gap-2">
-          <button
+          <Button
             onClick={() => {
               router.invalidate();
               reset();
             }}
-            className="inline-flex items-center justify-center rounded-full bg-primary px-5 py-2 text-sm font-medium text-primary-foreground hover:opacity-90"
+            className="rounded-full px-5 py-2 shadow-none hover:bg-primary hover:opacity-90"
           >
             Try again
-          </button>
+          </Button>
           <a
             href="/"
             className="inline-flex items-center justify-center rounded-full border border-input bg-card px-5 py-2 text-sm font-medium text-foreground hover:bg-accent hover:text-accent-foreground"

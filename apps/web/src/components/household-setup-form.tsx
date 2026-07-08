@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Home, UtensilsCrossed } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useCreateHousehold } from "@/hooks/mutations";
 import { ApiError } from "@/lib/api";
@@ -54,21 +55,22 @@ export function HouseholdSetupForm({
     <form onSubmit={submit} className="space-y-5">
       <div className="grid grid-cols-2 gap-3">
         {options.map(({ type: t, icon: Icon, blurb }) => (
-          <button
+          <Button
             key={t}
             type="button"
+            variant="ghost"
             onClick={() => setType(t)}
             className={cn(
-              "flex flex-col items-start gap-2 rounded-xl border p-4 text-left transition",
+              "h-auto flex-col items-start justify-start gap-2 whitespace-normal rounded-xl border p-4 text-left font-normal hover:text-foreground [&_svg]:size-5",
               type === t
-                ? "border-primary bg-primary/5 ring-1 ring-primary"
-                : "border-border hover:border-foreground/30",
+                ? "border-primary bg-primary/5 ring-1 ring-primary hover:bg-primary/5"
+                : "border-border hover:border-foreground/30 hover:bg-transparent",
             )}
           >
             <Icon className={cn("size-5", type === t ? "text-primary" : "text-muted-foreground")} />
             <div className="text-sm font-medium">{t}</div>
             <div className="text-xs text-muted-foreground leading-snug">{blurb}</div>
-          </button>
+          </Button>
         ))}
       </div>
 
@@ -89,13 +91,13 @@ export function HouseholdSetupForm({
 
       {error && <p className="text-sm text-destructive">{error}</p>}
 
-      <button
+      <Button
         type="submit"
         disabled={createHousehold.isPending}
-        className="h-11 w-full rounded-full bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition disabled:opacity-60"
+        className="h-11 w-full rounded-full shadow-none hover:bg-primary hover:opacity-90 disabled:opacity-60"
       >
         {createHousehold.isPending ? "Creating…" : `Create ${type.toLowerCase()}`}
-      </button>
+      </Button>
     </form>
   );
 }

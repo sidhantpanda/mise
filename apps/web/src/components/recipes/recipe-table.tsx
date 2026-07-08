@@ -12,6 +12,7 @@ import {
 import { formatDuration, isoDurationToMinutes, type Recipe } from "common";
 import { RecipeCtaTableRow, type RecipeCta } from "@/components/recipes/recipe-cta-card";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 enum RecipeTableSortKey {
   Recipe = "recipe",
@@ -164,18 +165,19 @@ function SortableTableHead({
       }
       className={cn(className, align === "right" && "text-right")}
     >
-      <button
+      <Button
         type="button"
+        variant="ghost"
         onClick={() => onSort(columnKey)}
         className={cn(
-          "inline-flex h-8 items-center gap-1.5 rounded-md text-left text-xs font-medium text-muted-foreground transition hover:text-foreground",
+          "h-8 gap-1.5 rounded-md p-0 text-left text-xs font-medium text-muted-foreground hover:bg-transparent hover:text-foreground [&_svg]:size-3.5",
           active && "text-foreground",
           align === "right" && "ml-auto justify-end",
         )}
       >
         <span>{label}</span>
         <Icon className="size-3.5" />
-      </button>
+      </Button>
     </TableHead>
   );
 }

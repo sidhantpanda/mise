@@ -1,5 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
+import { Button } from "@/components/ui/button";
 import { RecipeMethod } from "@/components/recipes/recipe-method";
 import { formatDuration, type Recipe } from "common";
 import { useMe, useRecipes, recipesQueryOptions } from "@/hooks";
@@ -121,17 +122,19 @@ function RecipePage() {
   return (
     <AppShell
       title={r.name}
-      subtitle={`${r.recipeCuisine} · ${r.recipeCategory} · by ${r.author.identifier && r.author.identifier === currentUserId ? "you" : r.author.name
-        }`}
+      subtitle={`${r.recipeCuisine} · ${r.recipeCategory} · by ${
+        r.author.identifier && r.author.identifier === currentUserId ? "you" : r.author.name
+      }`}
       actions={
         <>
-          <button
+          <Button
             type="button"
+            variant="ghost"
             onClick={exportJson}
-            className="inline-flex shrink-0 items-center justify-center gap-1.5 h-9 px-4 rounded-full border border-input bg-card text-sm whitespace-nowrap hover:bg-accent hover:text-accent-foreground transition"
+            className="h-9 shrink-0 gap-1.5 rounded-full border border-input bg-card px-4 font-normal whitespace-nowrap"
           >
             <Download className="size-4" /> Export
-          </button>
+          </Button>
           <Link
             to="/recipes/edit/$id"
             params={{ id: r.identifier }}
@@ -139,13 +142,14 @@ function RecipePage() {
           >
             <Pencil className="size-4" /> Edit
           </Link>
-          <button
+          <Button
+            variant="ghost"
             onClick={onDelete}
-            className="inline-flex shrink-0 items-center justify-center gap-1.5 h-9 px-4 rounded-full border border-input bg-card text-sm whitespace-nowrap hover:bg-destructive hover:text-destructive-foreground transition"
+            className="h-9 shrink-0 gap-1.5 rounded-full border border-input bg-card px-4 font-normal whitespace-nowrap hover:bg-destructive hover:text-destructive-foreground"
             aria-label="Delete recipe"
           >
             <Trash2 className="size-4" />
-          </button>
+          </Button>
           <Link
             to="/recipes"
             className="inline-flex shrink-0 items-center justify-center gap-1.5 h-9 px-4 rounded-full border border-input bg-card text-sm whitespace-nowrap hover:bg-accent hover:text-accent-foreground transition"
@@ -205,15 +209,17 @@ function RecipePage() {
               </div>
               <div className="w-40 shrink-0">
                 <div className="flex h-12 w-full items-center justify-between rounded-full border border-border bg-background p-1">
-                  <button
+                  <Button
                     type="button"
+                    variant="ghost"
+                    size="icon"
                     onClick={() => setPreviewYield((v) => Math.max(1, v - 1))}
                     disabled={previewYield <= 1}
-                    className="size-8 rounded-full grid place-items-center text-muted-foreground transition hover:bg-secondary hover:text-foreground disabled:pointer-events-none disabled:opacity-40"
+                    className="size-8 rounded-full text-muted-foreground hover:bg-secondary hover:text-foreground disabled:opacity-40"
                     aria-label="Decrease servings"
                   >
                     <Minus className="size-4" />
-                  </button>
+                  </Button>
                   <div className="flex h-10 w-20 flex-col items-center justify-center px-2 text-center">
                     <div className="h-5 text-display text-xl leading-none tabular-nums">
                       {formatNumber(previewYield)}
@@ -222,23 +228,26 @@ function RecipePage() {
                       {baseYield.unit}
                     </div>
                   </div>
-                  <button
+                  <Button
                     type="button"
+                    variant="ghost"
+                    size="icon"
                     onClick={() => setPreviewYield((v) => Math.min(99, v + 1))}
-                    className="size-8 rounded-full grid place-items-center text-muted-foreground transition hover:bg-secondary hover:text-foreground"
+                    className="size-8 rounded-full text-muted-foreground hover:bg-secondary hover:text-foreground"
                     aria-label="Increase servings"
                   >
                     <Plus className="size-4" />
-                  </button>
+                  </Button>
                 </div>
-                <button
+                <Button
                   type="button"
+                  variant="ghost"
                   onClick={() => setPreviewYield(baseYield.amount)}
                   disabled={!isAdjusted}
-                  className="mt-2 h-4 w-full inline-flex items-center justify-center gap-1.5 text-xs text-muted-foreground transition hover:text-foreground disabled:invisible"
+                  className="mt-2 h-4 w-full gap-1.5 px-0 py-0 text-xs font-normal text-muted-foreground hover:bg-transparent hover:text-foreground disabled:invisible [&_svg]:size-3"
                 >
                   <RotateCcw className="size-3" /> Reset
-                </button>
+                </Button>
               </div>
             </div>
             <ul className="space-y-2.5">
@@ -251,18 +260,18 @@ function RecipePage() {
             </ul>
 
             <div className="mt-6 grid grid-cols-1 min-[420px]:grid-cols-2 gap-2">
-              <button
+              <Button
                 onClick={() => setPlanning(true)}
-                className="h-10 rounded-full bg-primary text-primary-foreground text-sm font-medium inline-flex items-center justify-center gap-1.5 whitespace-nowrap hover:opacity-90"
+                className="h-10 gap-1.5 rounded-full whitespace-nowrap shadow-none hover:bg-primary hover:opacity-90"
               >
                 <CalendarPlus className="size-4" /> Add to plan
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={onAddToShopping}
-                className="h-10 rounded-full bg-accent text-accent-foreground text-sm font-medium inline-flex items-center justify-center gap-1.5 whitespace-nowrap hover:opacity-90"
+                className="h-10 gap-1.5 rounded-full bg-accent text-accent-foreground whitespace-nowrap shadow-none hover:bg-accent hover:opacity-90"
               >
                 <ShoppingBasket className="size-4" /> To shopping
-              </button>
+              </Button>
             </div>
           </div>
 
@@ -296,19 +305,21 @@ function RecipePage() {
           )}
 
           <div className="grid grid-cols-2 gap-2">
-            <button
+            <Button
+              variant="ghost"
               onClick={() => setShowJsonLd((v) => !v)}
-              className="text-xs inline-flex items-center justify-center gap-1.5 text-muted-foreground hover:text-foreground"
+              className="h-auto gap-1.5 px-0 py-0 text-xs font-normal text-muted-foreground hover:bg-transparent hover:text-foreground [&_svg]:size-3.5"
             >
               <Code2 className="size-3.5" /> {showJsonLd ? "Hide" : "View"} JSON-LD
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
+              variant="ghost"
               onClick={copyJsonLd}
-              className="text-xs inline-flex items-center justify-center gap-1.5 text-muted-foreground hover:text-foreground"
+              className="h-auto gap-1.5 px-0 py-0 text-xs font-normal text-muted-foreground hover:bg-transparent hover:text-foreground [&_svg]:size-3.5"
             >
               <Copy className="size-3.5" /> Copy JSON-LD
-            </button>
+            </Button>
           </div>
           {showJsonLd && (
             <pre className="text-[11px] bg-muted/60 border border-border rounded-xl p-4 overflow-auto max-h-96">

@@ -7,6 +7,15 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+
+// Full-height selection cards: Button gives them the shared focus/cursor
+// behaviour, but the layout is card-shaped, so the inline-flex/centring/gap
+// from the base variant are overridden here. The leading icon's size-5 is
+// restored by scoping to the first span only — a blanket [&_svg]:size-5 would
+// also inflate the trailing ArrowRight, which stays size-4.
+const cardClass =
+  "group flex h-auto min-h-44 flex-col items-start justify-start gap-0 whitespace-normal rounded-xl border border-border bg-card p-5 text-left font-normal hover:border-primary hover:bg-primary/5 hover:text-foreground [&>span:first-child_svg]:size-5";
 
 export function AddRecipeDialog({
   open,
@@ -25,13 +34,14 @@ export function AddRecipeDialog({
           <DialogDescription>Choose how you want to add recipes to your library.</DialogDescription>
         </DialogHeader>
         <div className="grid gap-3 sm:grid-cols-3">
-          <button
+          <Button
             type="button"
+            variant="ghost"
             onClick={() => {
               onOpenChange(false);
               navigate({ to: "/recipes/library" });
             }}
-            className="group flex min-h-44 cursor-pointer flex-col rounded-xl border border-border bg-card p-5 text-left transition hover:border-primary hover:bg-primary/5"
+            className={cardClass}
           >
             <span className="grid size-11 place-items-center rounded-lg bg-secondary text-foreground">
               <Globe className="size-5" />
@@ -43,15 +53,16 @@ export function AddRecipeDialog({
             <span className="mt-auto inline-flex items-center gap-1 pt-4 text-sm font-medium text-primary">
               Browse <ArrowRight className="size-4 transition group-hover:translate-x-0.5" />
             </span>
-          </button>
+          </Button>
 
-          <button
+          <Button
             type="button"
+            variant="ghost"
             onClick={() => {
               onOpenChange(false);
               navigate({ to: "/recipes/upload" });
             }}
-            className="group flex min-h-44 cursor-pointer flex-col rounded-xl border border-border bg-card p-5 text-left transition hover:border-primary hover:bg-primary/5"
+            className={cardClass}
           >
             <span className="grid size-11 place-items-center rounded-lg bg-secondary text-foreground">
               <FileArchive className="size-5" />
@@ -63,15 +74,16 @@ export function AddRecipeDialog({
             <span className="mt-auto inline-flex items-center gap-1 pt-4 text-sm font-medium text-primary">
               Upload <ArrowRight className="size-4 transition group-hover:translate-x-0.5" />
             </span>
-          </button>
+          </Button>
 
-          <button
+          <Button
             type="button"
+            variant="ghost"
             onClick={() => {
               onOpenChange(false);
               navigate({ to: "/recipes/new" });
             }}
-            className="group flex min-h-44 cursor-pointer flex-col rounded-xl border border-border bg-card p-5 text-left transition hover:border-primary hover:bg-primary/5"
+            className={cardClass}
           >
             <span className="grid size-11 place-items-center rounded-lg bg-secondary text-foreground">
               <PencilLine className="size-5" />
@@ -83,7 +95,7 @@ export function AddRecipeDialog({
             <span className="mt-auto inline-flex items-center gap-1 pt-4 text-sm font-medium text-primary">
               Create <ArrowRight className="size-4 transition group-hover:translate-x-0.5" />
             </span>
-          </button>
+          </Button>
         </div>
       </DialogContent>
     </Dialog>

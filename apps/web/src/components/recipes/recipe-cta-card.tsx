@@ -3,6 +3,7 @@ import { ArrowRight, ArrowUpRight, type LucideIcon } from "lucide-react";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { RecipeLayout } from "@/components/recipes/recipe-layout";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 // A call-to-action tile shown at the end of a recipe list — e.g. "Add a new
 // recipe" (opens the add dialog) or "Contribute your recipe" (links out). It
@@ -40,9 +41,14 @@ function CtaShell({
     );
   }
   return (
-    <button type="button" onClick={cta.onClick} className={shared}>
+    <Button
+      type="button"
+      variant="ghost"
+      onClick={cta.onClick}
+      className={cn(shared, "h-auto hover:text-foreground")}
+    >
       {children}
-    </button>
+    </Button>
   );
 }
 
@@ -61,7 +67,10 @@ export function RecipeCtaCard({ cta, layout }: { cta: RecipeCta; layout: RecipeL
 
   if (layout === RecipeLayout.Compact) {
     return (
-      <CtaShell cta={cta} className="flex h-full min-h-24 items-center gap-3 rounded-lg p-3">
+      <CtaShell
+        cta={cta}
+        className="flex h-full min-h-24 items-center justify-start gap-3 rounded-lg p-3 [&>span:first-child_svg]:size-5"
+      >
         <span className="grid size-12 shrink-0 place-items-center rounded-md bg-secondary text-foreground">
           <Icon className="size-5" />
         </span>
@@ -79,7 +88,7 @@ export function RecipeCtaCard({ cta, layout }: { cta: RecipeCta; layout: RecipeL
     return (
       <CtaShell
         cta={cta}
-        className="flex min-h-24 flex-wrap items-center justify-center gap-x-4 gap-y-2 rounded-xl p-4 text-center"
+        className="flex min-h-24 flex-wrap items-center justify-center gap-x-4 gap-y-2 rounded-xl p-4 text-center [&>span:first-child_svg]:size-5"
       >
         <span className="grid size-11 shrink-0 place-items-center rounded-lg bg-secondary text-foreground">
           <Icon className="size-5" />
@@ -97,7 +106,7 @@ export function RecipeCtaCard({ cta, layout }: { cta: RecipeCta; layout: RecipeL
   return (
     <CtaShell
       cta={cta}
-      className="flex h-full min-h-72 flex-col items-center justify-center rounded-2xl p-6 text-center"
+      className="flex h-full min-h-72 flex-col items-center justify-center rounded-2xl p-6 text-center [&>span:first-child_svg]:size-6"
     >
       <span className="grid size-14 place-items-center rounded-full bg-secondary text-foreground">
         <Icon className="size-6" />

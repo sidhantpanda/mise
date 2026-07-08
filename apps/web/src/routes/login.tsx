@@ -2,6 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 import { useLogin } from "@/hooks/mutations";
 import { ApiError } from "@/lib/api";
 
@@ -60,13 +61,13 @@ function LoginPage() {
 
         {error && <p className="text-sm text-destructive">{error}</p>}
 
-        <button
+        <Button
           type="submit"
           disabled={login.isPending}
-          className="h-11 w-full rounded-full bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition disabled:opacity-60"
+          className="h-11 w-full rounded-full shadow-none hover:bg-primary hover:opacity-90 disabled:opacity-60"
         >
           {login.isPending ? "Signing in…" : "Sign in"}
-        </button>
+        </Button>
       </form>
 
       <p className="mt-6 text-center text-sm text-muted-foreground">

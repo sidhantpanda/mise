@@ -4,6 +4,7 @@ import { Home, UtensilsCrossed } from "lucide-react";
 import { useMe } from "@/hooks";
 import { useAcceptInvitation, useRejectInvitation } from "@/hooks/mutations";
 import { HouseholdSetupForm } from "@/components/household-setup-form";
+import { Button } from "@/components/ui/button";
 import type { PendingInvitation } from "common";
 import { AuthShell } from "./login";
 
@@ -49,13 +50,14 @@ function OnboardingPage() {
             />
           ))}
         </div>
-        <button
+        <Button
           type="button"
+          variant="ghost"
           onClick={() => setCreatingOwn(true)}
-          className="mt-6 w-full text-center text-sm text-muted-foreground hover:text-foreground"
+          className="mt-6 h-auto w-full py-0 text-sm font-normal text-muted-foreground hover:bg-transparent hover:text-foreground"
         >
           Or create your own instead
-        </button>
+        </Button>
       </AuthShell>
     );
   }
@@ -67,13 +69,14 @@ function OnboardingPage() {
     >
       <HouseholdSetupForm firstName={firstName} onCreated={() => navigate({ to: "/" })} />
       {invitations.length > 0 && (
-        <button
+        <Button
           type="button"
+          variant="ghost"
           onClick={() => setCreatingOwn(false)}
-          className="mt-6 w-full text-center text-sm text-muted-foreground hover:text-foreground"
+          className="mt-6 h-auto w-full py-0 text-sm font-normal text-muted-foreground hover:bg-transparent hover:text-foreground"
         >
           Back to invitations
-        </button>
+        </Button>
       )}
     </AuthShell>
   );
@@ -105,25 +108,26 @@ function InvitationCard({
         </div>
       </div>
       <div className="mt-3 flex gap-2">
-        <button
+        <Button
           type="button"
           disabled={busy}
           onClick={async () => {
             await accept.mutateAsync(invitation.id);
             onAccepted();
           }}
-          className="h-9 flex-1 rounded-full bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition disabled:opacity-60"
+          className="h-9 flex-1 rounded-full shadow-none hover:bg-primary hover:opacity-90 disabled:opacity-60"
         >
           {accept.isPending ? "Joining…" : "Accept"}
-        </button>
-        <button
+        </Button>
+        <Button
           type="button"
+          variant="ghost"
           disabled={busy}
           onClick={() => reject.mutate(invitation.id)}
-          className="h-9 px-4 rounded-full border border-border bg-card text-sm hover:bg-accent hover:text-accent-foreground transition disabled:opacity-60"
+          className="h-9 rounded-full border border-border bg-card px-4 font-normal hover:bg-accent hover:text-accent-foreground disabled:opacity-60"
         >
           Decline
-        </button>
+        </Button>
       </div>
     </div>
   );

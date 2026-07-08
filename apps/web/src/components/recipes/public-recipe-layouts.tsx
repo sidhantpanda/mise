@@ -28,6 +28,7 @@ import { publicRecipeSlug } from "@/hooks";
 import { useImportPublicRecipe } from "@/hooks/mutations";
 import type { PublicRecipeSummary } from "common";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 type LayoutViewProps = {
   recipes: PublicRecipeSummary[];
@@ -81,13 +82,13 @@ function ImportButton({
 
   const iconSize = size === "sm" ? "size-3.5" : "size-4";
   return (
-    <button
+    <Button
       type="button"
       onClick={onImport}
       disabled={importRecipe.isPending || imported}
       className={cn(
-        "inline-flex shrink-0 items-center justify-center gap-1.5 rounded-full bg-primary font-medium text-primary-foreground transition hover:opacity-90 disabled:opacity-60",
-        size === "sm" ? "h-8 px-4 text-xs" : "h-9 px-4 text-sm",
+        "shrink-0 gap-1.5 rounded-full shadow-none hover:bg-primary hover:opacity-90 disabled:opacity-60",
+        size === "sm" ? "h-8 px-4 text-xs [&_svg]:size-3.5" : "h-9 px-4 text-sm",
       )}
     >
       {imported ? (
@@ -103,7 +104,7 @@ function ImportButton({
           <Download className={iconSize} /> Import
         </>
       )}
-    </button>
+    </Button>
   );
 }
 
@@ -402,17 +403,18 @@ function SortableHead({
       }
       className={className}
     >
-      <button
+      <Button
         type="button"
+        variant="ghost"
         onClick={() => onSort(columnKey)}
         className={cn(
-          "inline-flex h-8 items-center gap-1.5 rounded-md text-left text-xs font-medium text-muted-foreground transition hover:text-foreground",
+          "h-8 gap-1.5 rounded-md p-0 text-left text-xs font-medium text-muted-foreground hover:bg-transparent hover:text-foreground [&_svg]:size-3.5",
           active && "text-foreground",
         )}
       >
         <span>{label}</span>
         <Icon className="size-3.5" />
-      </button>
+      </Button>
     </TableHead>
   );
 }

@@ -6,6 +6,7 @@ import { AppShell } from "@/components/AppShell";
 import { DateTimePicker } from "@/components/ui/date-time-picker";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 import { useAccessTokens } from "@/hooks";
 import type { CreatedAccessToken } from "common";
 import { useCreateAccessToken, useRevokeAccessToken } from "@/hooks/mutations";
@@ -110,13 +111,13 @@ function AccessTokensPage() {
               />
               Write access
             </label>
-            <button
+            <Button
               type="submit"
               disabled={createToken.isPending}
-              className="inline-flex h-9 items-center justify-center rounded-full bg-primary px-4 text-sm font-medium text-primary-foreground transition hover:opacity-90 disabled:opacity-60"
+              className="h-9 rounded-full px-4 shadow-none hover:bg-primary hover:opacity-90 disabled:opacity-60"
             >
               Create
-            </button>
+            </Button>
           </form>
         </section>
 
@@ -161,15 +162,17 @@ function AccessTokensPage() {
                       <td className="py-3 pr-4">{formatDateTime(token.createdAt)}</td>
                       <td className="py-3 pr-4">{formatDateTime(token.expiresAt)}</td>
                       <td className="py-3 text-right">
-                        <button
+                        <Button
                           type="button"
+                          variant="ghost"
+                          size="icon"
                           onClick={() => revoke(token.id, token.name)}
                           disabled={revokeToken.isPending}
-                          className="inline-flex size-8 items-center justify-center rounded-md text-muted-foreground transition hover:bg-destructive hover:text-destructive-foreground disabled:opacity-60"
+                          className="size-8 text-muted-foreground hover:bg-destructive hover:text-destructive-foreground disabled:opacity-60"
                           aria-label={`Revoke ${token.name}`}
                         >
                           <Trash2 className="size-4" />
-                        </button>
+                        </Button>
                       </td>
                     </tr>
                   ))}
@@ -202,21 +205,22 @@ function CreatedToken({ token, onDismiss }: { token: CreatedAccessToken; onDismi
           </code>
         </div>
         <div className="flex shrink-0 gap-2">
-          <button
+          <Button
             type="button"
             onClick={copy}
-            className="inline-flex h-9 items-center gap-1.5 rounded-full bg-primary px-4 text-sm font-medium text-primary-foreground transition hover:opacity-90"
+            className="h-9 gap-1.5 rounded-full px-4 shadow-none hover:bg-primary hover:opacity-90"
           >
             <Copy className="size-4" />
             Copy
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
+            variant="ghost"
             onClick={onDismiss}
-            className="inline-flex h-9 items-center rounded-full border border-border bg-card px-4 text-sm transition hover:bg-accent hover:text-accent-foreground"
+            className="h-9 rounded-full border border-border bg-card px-4 font-normal hover:bg-accent hover:text-accent-foreground"
           >
             Dismiss
-          </button>
+          </Button>
         </div>
       </div>
     </section>

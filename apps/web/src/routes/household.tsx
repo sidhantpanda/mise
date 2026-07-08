@@ -14,6 +14,7 @@ import { useHousehold } from "@/hooks";
 import { useInvite, useRevokeInvite, useUpdateHousehold } from "@/hooks/mutations";
 import { toast } from "sonner";
 import { Download, Loader2, Mail, Settings, Shield, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { api, ApiError } from "@/lib/api";
 
 export const Route = createFileRoute("/household")({
@@ -104,13 +105,13 @@ function HouseholdPage() {
       title={hh.name}
       subtitle={`${hh.type} · ${hh.members.length} members`}
       actions={
-        <button
+        <Button
           onClick={openSettings}
-          className="inline-flex shrink-0 items-center justify-center gap-1.5 h-9 px-4 rounded-full bg-primary text-primary-foreground text-sm font-medium whitespace-nowrap hover:opacity-90 transition"
+          className="h-9 shrink-0 gap-1.5 rounded-full whitespace-nowrap shadow-none hover:bg-primary hover:opacity-90"
         >
           <Settings className="size-4" />
           Settings
-        </button>
+        </Button>
       }
     >
       <div className="grid lg:grid-cols-3 gap-6">
@@ -162,9 +163,12 @@ function HouseholdPage() {
                 className="w-full h-10 pl-9 pr-3 rounded-lg border border-input bg-background text-sm outline-none focus:ring-2 focus:ring-ring/40"
               />
             </div>
-            <button className="h-10 px-4 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:opacity-90">
+            <Button
+              type="submit"
+              className="h-10 rounded-lg px-4 shadow-none hover:bg-primary hover:opacity-90"
+            >
               Send
-            </button>
+            </Button>
           </form>
 
           {invitations.length > 0 && (
@@ -186,20 +190,23 @@ function HouseholdPage() {
                     </div>
                     <div className="flex shrink-0 items-center gap-2">
                       {inv.status === "Rejected" && (
-                        <button
+                        <Button
+                          variant="link"
                           onClick={() => invite.mutate(inv.email)}
-                          className="text-xs font-medium text-primary hover:underline"
+                          className="h-auto p-0 text-xs font-medium"
                         >
                           Invite again
-                        </button>
+                        </Button>
                       )}
-                      <button
+                      <Button
+                        variant="ghost"
+                        size="icon"
                         onClick={() => revoke.mutate(inv.id)}
-                        className="text-muted-foreground hover:text-destructive"
+                        className="size-auto p-0 text-muted-foreground hover:bg-transparent hover:text-destructive"
                         aria-label="Remove invitation"
                       >
                         <X className="size-4" />
-                      </button>
+                      </Button>
                     </div>
                   </li>
                 ))}
@@ -217,10 +224,10 @@ function HouseholdPage() {
             move your library elsewhere — the ZIP imports straight back into Mise.
           </p>
         </div>
-        <button
+        <Button
           onClick={downloadLibrary}
           disabled={downloading}
-          className="shrink-0 inline-flex items-center justify-center gap-2 h-10 px-5 rounded-full bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition disabled:opacity-60"
+          className="h-10 shrink-0 rounded-full px-5 shadow-none hover:bg-primary hover:opacity-90 disabled:opacity-60"
         >
           {downloading ? (
             <Loader2 className="size-4 animate-spin" />
@@ -228,7 +235,7 @@ function HouseholdPage() {
             <Download className="size-4" />
           )}
           {downloading ? "Preparing…" : "Download"}
-        </button>
+        </Button>
       </section>
 
       <section className="mt-6 bg-primary text-primary-foreground rounded-2xl p-4 sm:p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-5 sm:gap-6">
@@ -239,9 +246,9 @@ function HouseholdPage() {
             this household to a restaurant in settings.
           </p>
         </div>
-        <button className="shrink-0 h-10 px-5 rounded-full bg-accent text-accent-foreground text-sm font-medium hover:opacity-90">
+        <Button className="h-10 shrink-0 rounded-full bg-accent px-5 text-accent-foreground shadow-none hover:bg-accent hover:opacity-90">
           Convert
-        </button>
+        </Button>
       </section>
 
       <Dialog open={settingsOpen} onOpenChange={setSettingsOpen}>
@@ -259,20 +266,21 @@ function HouseholdPage() {
               <Input value={name} onChange={(e) => setName(e.target.value)} autoFocus />
             </div>
             <DialogFooter className="gap-2">
-              <button
+              <Button
                 type="button"
+                variant="ghost"
                 onClick={() => setSettingsOpen(false)}
-                className="h-10 px-5 rounded-full border border-border bg-card text-sm hover:bg-accent hover:text-accent-foreground transition"
+                className="h-10 rounded-full border border-border bg-card px-5 font-normal hover:bg-accent hover:text-accent-foreground"
               >
                 Cancel
-              </button>
-              <button
+              </Button>
+              <Button
                 type="submit"
                 disabled={updateHousehold.isPending}
-                className="h-10 px-6 rounded-full bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition disabled:opacity-60"
+                className="h-10 rounded-full px-6 shadow-none hover:bg-primary hover:opacity-90 disabled:opacity-60"
               >
                 {updateHousehold.isPending ? "Saving…" : "Save"}
-              </button>
+              </Button>
             </DialogFooter>
           </form>
         </DialogContent>

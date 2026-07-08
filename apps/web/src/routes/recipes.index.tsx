@@ -7,6 +7,7 @@ import { isRecipeLayout, RecipeLayout } from "@/components/recipes/recipe-layout
 import { RecipeLayoutSwitcher } from "@/components/recipes/recipe-layout-switcher";
 import { RecipeCtaCard } from "@/components/recipes/recipe-cta-card";
 import { RecipesLayout } from "@/components/recipes/recipe-layouts";
+import { Button } from "@/components/ui/button";
 import type { Recipe } from "common";
 import { useDebouncedValue, useRecipes, useRecipeSearch } from "@/hooks";
 
@@ -117,17 +118,18 @@ function RecipesPage() {
       >
         <div className="flex min-w-0 flex-1 gap-2 overflow-x-auto lg:flex-wrap lg:overflow-visible">
           {categories.map((c) => (
-            <button
+            <Button
               key={c}
+              variant="ghost"
               onClick={() => setCat(c)}
-              className={`h-7 shrink-0 rounded-full border px-3 text-xs font-medium transition sm:h-8 sm:px-3.5 ${
+              className={`h-7 shrink-0 rounded-full border px-3 text-xs font-medium sm:h-8 sm:px-3.5 ${
                 cat === c
-                  ? "bg-primary text-primary-foreground border-primary"
-                  : "bg-card border-border text-foreground/70 hover:border-foreground/30"
+                  ? "bg-primary text-primary-foreground border-primary hover:bg-primary hover:text-primary-foreground"
+                  : "bg-card border-border text-foreground/70 hover:border-foreground/30 hover:bg-card hover:text-foreground/70"
               }`}
             >
               {c}
-            </button>
+            </Button>
           ))}
         </div>
 
@@ -167,16 +169,17 @@ function RecipesPage() {
 
           {searching && search.hasNextPage && (
             <div className="flex justify-center py-8">
-              <button
+              <Button
                 type="button"
+                variant="ghost"
                 onClick={() => search.fetchNextPage()}
                 disabled={search.isFetchingNextPage}
-                className="h-10 px-6 rounded-full border border-border bg-card text-sm hover:bg-accent hover:text-accent-foreground transition disabled:opacity-50"
+                className="h-10 rounded-full border border-border bg-card px-6 font-normal hover:bg-accent hover:text-accent-foreground disabled:opacity-50"
               >
                 {search.isFetchingNextPage
                   ? "Loading…"
                   : `Load more (${searchTotal - filtered.length} more)`}
-              </button>
+              </Button>
             </div>
           )}
         </>

@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 import { useCreatePantry, useUpdatePantry } from "@/hooks/mutations";
 import type { PantryItem } from "common";
 import { toast } from "sonner";
@@ -140,19 +141,20 @@ export function PantryItemDialog({
             <Input type="date" value={expires} onChange={(e) => setExpires(e.target.value)} />
           </Field>
           <DialogFooter className="gap-2">
-            <button
+            <Button
               type="button"
+              variant="ghost"
               onClick={() => onOpenChange(false)}
-              className="h-10 px-5 rounded-full border border-border bg-card text-sm hover:bg-accent hover:text-accent-foreground transition"
+              className="h-10 rounded-full border border-border bg-card px-5 font-normal hover:bg-accent hover:text-accent-foreground"
             >
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
               type="submit"
-              className="h-10 px-6 rounded-full bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition"
+              className="h-10 rounded-full px-6 shadow-none hover:bg-primary hover:opacity-90"
             >
               {item ? "Save" : "Add"}
-            </button>
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>

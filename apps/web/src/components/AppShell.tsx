@@ -16,6 +16,7 @@ import type { AuthUser, Household } from "common";
 import { useMe } from "@/hooks";
 import { useLogout } from "@/hooks/mutations";
 import { HouseholdSwitcher } from "@/components/household-switcher";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import {
@@ -158,13 +159,15 @@ function MobileNav({
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <button
+        <Button
           type="button"
-          className="mt-0.5 grid size-9 shrink-0 place-items-center rounded-full border border-border bg-card text-foreground transition hover:bg-accent hover:text-accent-foreground md:hidden"
+          variant="ghost"
+          size="icon"
+          className="mt-0.5 size-9 shrink-0 rounded-full border border-border bg-card text-foreground hover:bg-accent hover:text-accent-foreground md:hidden [&_svg]:size-5"
           aria-label="Open navigation"
         >
           <Menu className="size-5" />
-        </button>
+        </Button>
       </SheetTrigger>
       <SheetContent
         side="left"
@@ -261,16 +264,18 @@ function SidebarContent({
           <div className="text-sm font-medium truncate">{user.name}</div>
           <div className="text-[11px] text-muted-foreground truncate">{user.email}</div>
         </div>
-        <button
+        <Button
           type="button"
+          variant="ghost"
+          size="icon"
           onClick={onLogout}
           disabled={logout.isPending}
           title="Sign out"
-          className="grid size-8 shrink-0 place-items-center rounded-md text-muted-foreground transition hover:bg-sidebar-accent hover:text-foreground disabled:opacity-50"
+          className="size-8 shrink-0 text-muted-foreground hover:bg-sidebar-accent hover:text-foreground"
           aria-label="Sign out"
         >
           <LogOut className="size-4" />
-        </button>
+        </Button>
       </div>
     </>
   );
@@ -323,12 +328,12 @@ export function PrimaryButton({
   onClick?: () => void;
 }) {
   return (
-    <button
+    <Button
       onClick={onClick}
-      className="inline-flex shrink-0 items-center justify-center gap-1.5 h-9 px-4 rounded-full bg-primary text-primary-foreground text-sm font-medium whitespace-nowrap hover:opacity-90 transition"
+      className="h-9 shrink-0 gap-1.5 rounded-full whitespace-nowrap shadow-none hover:bg-primary hover:opacity-90"
     >
       <Plus className="size-4" />
       {children}
-    </button>
+    </Button>
   );
 }

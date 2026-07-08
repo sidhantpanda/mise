@@ -5,6 +5,7 @@ import { AppShell, SearchBar } from "@/components/AppShell";
 import { PublicRecipesLayout } from "@/components/recipes/public-recipe-layouts";
 import { isRecipeLayout, RecipeLayout } from "@/components/recipes/recipe-layout";
 import { RecipeLayoutSwitcher } from "@/components/recipes/recipe-layout-switcher";
+import { Button } from "@/components/ui/button";
 import { usePublicLibrary } from "@/hooks";
 
 export const Route = createFileRoute("/recipes/library")({
@@ -111,17 +112,18 @@ function PublicLibraryPage() {
         >
           <div className="flex min-w-0 flex-1 gap-2 overflow-x-auto lg:flex-wrap lg:overflow-visible">
             {cuisines.map((c) => (
-              <button
+              <Button
                 key={c}
+                variant="ghost"
                 onClick={() => setCuisine(c)}
-                className={`h-7 shrink-0 rounded-full border px-3 text-xs font-medium transition sm:h-8 sm:px-3.5 ${
+                className={`h-7 shrink-0 rounded-full border px-3 text-xs font-medium sm:h-8 sm:px-3.5 ${
                   cuisine === c
-                    ? "bg-primary text-primary-foreground border-primary"
-                    : "bg-card border-border text-foreground/70 hover:border-foreground/30"
+                    ? "bg-primary text-primary-foreground border-primary hover:bg-primary hover:text-primary-foreground"
+                    : "bg-card border-border text-foreground/70 hover:border-foreground/30 hover:bg-card hover:text-foreground/70"
                 }`}
               >
                 {c}
-              </button>
+              </Button>
             ))}
           </div>
 
@@ -144,13 +146,14 @@ function PublicLibraryPage() {
           <p className="mt-1 text-sm text-muted-foreground">
             {library.error instanceof Error ? library.error.message : "Please try again shortly."}
           </p>
-          <button
+          <Button
             type="button"
+            variant="ghost"
             onClick={() => library.refetch()}
-            className="mt-5 h-9 rounded-full border border-border bg-card px-5 text-sm hover:bg-accent hover:text-accent-foreground transition"
+            className="mt-5 h-9 rounded-full border border-border bg-card px-5 font-normal hover:bg-accent hover:text-accent-foreground"
           >
             Retry
-          </button>
+          </Button>
         </div>
       ) : filtered.length === 0 ? (
         <div className="py-20 text-center text-muted-foreground">

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 import { Plus, Trash2, Sparkles } from "lucide-react";
 import type { Recipe, RecipeInstruction } from "common";
 import { useCreateRecipe, useUpdateRecipe } from "@/hooks/mutations";
@@ -290,14 +291,15 @@ export function RecipeForm({
           </p>
         </div>
 
-        <button
+        <Button
           type="button"
+          variant="ghost"
           onClick={tryImportJsonLd}
-          className="w-full inline-flex items-center justify-center gap-2 min-h-10 rounded-lg border border-dashed border-border bg-secondary/40 px-3 py-2 hover:bg-secondary text-sm transition"
+          className="h-auto min-h-10 w-full gap-2 rounded-lg border border-dashed border-border bg-secondary/40 px-3 py-2 font-normal hover:bg-secondary"
         >
           <Sparkles className="size-4 shrink-0 text-accent" />
           <span>Paste JSON-LD from clipboard to autofill</span>
-        </button>
+        </Button>
 
         <Field label="Name">
           <Input
@@ -375,21 +377,22 @@ export function RecipeForm({
             Add ingredients and method steps, then save to your library.
           </p>
           <div className="mt-5 flex flex-col gap-2">
-            <button
+            <Button
               type="submit"
               disabled={saving}
-              className="h-10 px-6 rounded-full bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition disabled:opacity-60"
+              className="h-10 rounded-full px-6 shadow-none hover:bg-primary hover:opacity-90 disabled:opacity-60"
             >
               {saving ? "Saving…" : recipe ? "Save changes" : "Add recipe"}
-            </button>
+            </Button>
             {onCancel && (
-              <button
+              <Button
                 type="button"
+                variant="ghost"
                 onClick={onCancel}
-                className="h-10 px-5 rounded-full border border-border bg-card text-sm hover:bg-accent hover:text-accent-foreground transition"
+                className="h-10 rounded-full border border-border bg-card px-5 font-normal hover:bg-accent hover:text-accent-foreground"
               >
                 Cancel
-              </button>
+              </Button>
             )}
           </div>
         </div>
@@ -470,24 +473,27 @@ function RepeatList({
                 className="min-w-0 flex-1"
               />
             )}
-            <button
+            <Button
               type="button"
+              variant="ghost"
+              size="icon"
               onClick={() => onRemove(i)}
-              className="mt-1 size-9 shrink-0 grid place-items-center rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition"
+              className="mt-1 size-9 shrink-0 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
             >
               <Trash2 className="size-4" />
-            </button>
+            </Button>
           </div>
         ))}
       </div>
-      <button
+      <Button
         type="button"
+        variant="link"
         onClick={onAdd}
-        className="inline-flex items-center gap-1.5 text-sm text-primary hover:underline"
+        className="h-auto justify-start gap-1.5 p-0 font-normal"
       >
         <Plus className="size-4" /> Add{" "}
         {label.toLowerCase().endsWith("s") ? label.toLowerCase().slice(0, -1) : label.toLowerCase()}
-      </button>
+      </Button>
     </div>
   );
 }

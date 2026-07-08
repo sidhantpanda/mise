@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 import { type PlannedMeal } from "common";
 import { useDebouncedValue, useMe, useRecipes, useRecipeSearch } from "@/hooks";
 import { useCreateMeal, useUpdateMeal, useDeleteMeal } from "@/hooks/mutations";
@@ -114,18 +115,19 @@ export function PlanMealDialog({
               </Label>
               <div className="grid grid-cols-2 gap-1 min-[420px]:grid-cols-4 sm:grid-cols-2 xl:grid-cols-4">
                 {mealTypes.map((mt) => (
-                  <button
+                  <Button
                     key={mt}
                     onClick={() => setMealType(mt)}
                     type="button"
-                    className={`h-9 rounded-md px-2 text-xs font-medium transition ${
+                    variant="ghost"
+                    className={`h-9 rounded-md px-2 text-xs font-medium ${
                       mealType === mt
-                        ? "bg-primary text-primary-foreground"
-                        : "bg-secondary hover:bg-secondary/70"
+                        ? "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground"
+                        : "bg-secondary hover:bg-secondary/70 hover:text-foreground"
                     }`}
                   >
                     {mt}
-                  </button>
+                  </Button>
                 ))}
               </div>
             </div>
@@ -151,11 +153,12 @@ export function PlanMealDialog({
                 </div>
               )}
               {filtered.map((r) => (
-                <button
+                <Button
                   key={r.identifier}
                   type="button"
+                  variant="ghost"
                   onClick={() => setRecipeId(r.identifier)}
-                  className={`w-full text-left flex items-center gap-3 p-2.5 hover:bg-secondary/60 transition ${
+                  className={`flex h-auto w-full items-center justify-start gap-3 rounded-none p-2.5 text-left font-normal hover:bg-secondary/60 ${
                     recipeId === r.identifier ? "bg-primary/10" : ""
                   }`}
                 >
@@ -169,17 +172,18 @@ export function PlanMealDialog({
                   {recipeId === r.identifier && (
                     <span className="text-xs text-primary font-medium">Selected</span>
                   )}
-                </button>
+                </Button>
               ))}
               {searching && search.hasNextPage && (
-                <button
+                <Button
                   type="button"
+                  variant="ghost"
                   onClick={() => search.fetchNextPage()}
                   disabled={search.isFetchingNextPage}
-                  className="w-full p-2.5 text-center text-xs font-medium text-primary hover:bg-secondary/60 transition disabled:opacity-50"
+                  className="h-auto w-full rounded-none p-2.5 text-xs font-medium text-primary hover:bg-secondary/60 disabled:opacity-50"
                 >
                   {search.isFetchingNextPage ? "Loading…" : "Load more"}
-                </button>
+                </Button>
               )}
             </div>
           </div>
@@ -218,32 +222,34 @@ export function PlanMealDialog({
 
         <DialogFooter className="gap-2">
           {meal && (
-            <button
+            <Button
               type="button"
+              variant="ghost"
               onClick={async () => {
                 await deleteMeal.mutateAsync(meal.identifier);
                 toast.success("Meal removed");
                 onOpenChange(false);
               }}
-              className="h-10 px-5 mr-auto rounded-full text-sm text-destructive hover:bg-destructive/10 transition"
+              className="mr-auto h-10 rounded-full px-5 font-normal text-destructive hover:bg-destructive/10 hover:text-destructive"
             >
               Remove
-            </button>
+            </Button>
           )}
-          <button
+          <Button
             type="button"
+            variant="ghost"
             onClick={() => onOpenChange(false)}
-            className="h-10 px-5 rounded-full border border-border bg-card text-sm hover:bg-accent hover:text-accent-foreground transition"
+            className="h-10 rounded-full border border-border bg-card px-5 font-normal hover:bg-accent hover:text-accent-foreground"
           >
             Cancel
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
             onClick={submit}
-            className="h-10 px-6 rounded-full bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition"
+            className="h-10 rounded-full px-6 shadow-none hover:bg-primary hover:opacity-90"
           >
             {meal ? "Save" : "Add meal"}
-          </button>
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
