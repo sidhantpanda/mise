@@ -7,6 +7,7 @@ import { useMe, useRecipes, recipesQueryOptions } from "@/hooks";
 import { useDeleteRecipe, useAddFromRecipe } from "@/hooks/mutations";
 import { serverApi } from "@/lib/api";
 import { recipeMetaTags } from "@/lib/recipe-meta";
+import { recipeDisplayImage } from "@/lib/recipe-image";
 import {
   Clock,
   ChefHat,
@@ -162,7 +163,11 @@ function RecipePage() {
       <div className="grid lg:grid-cols-5 gap-8">
         <div className="lg:col-span-3">
           <div className="rounded-2xl overflow-hidden bg-card border border-border">
-            <img src={r.image[0]} alt={r.name} className="w-full aspect-16/10 object-cover" />
+            <img
+              src={recipeDisplayImage(r)}
+              alt={r.name}
+              className="w-full aspect-16/10 object-cover"
+            />
           </div>
 
           <p className="text-base sm:text-lg text-muted-foreground mt-6 leading-relaxed">
@@ -685,7 +690,7 @@ function RelatedStrip({ currentId, recipes }: { currentId: string; recipes: Reci
             className="group rounded-xl overflow-hidden bg-card border border-border hover:shadow-md transition"
           >
             <img
-              src={r.image[0]}
+              src={recipeDisplayImage(r)}
               alt={r.name}
               className="w-full aspect-4/3 object-cover group-hover:scale-105 transition-transform duration-500"
             />

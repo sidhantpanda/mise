@@ -3,6 +3,7 @@ import { RecipeGridCard, RecipeEyebrow, RecipeStats } from "@/components/recipes
 import { RecipeLayout } from "@/components/recipes/recipe-layout";
 import { RecipeCtaCard, type RecipeCta } from "@/components/recipes/recipe-cta-card";
 import { RecipeTable } from "@/components/recipes/recipe-table";
+import { recipeDisplayImage } from "@/lib/recipe-image";
 import type { Recipe } from "common";
 
 export function RecipesLayout({
@@ -45,7 +46,7 @@ function CompactGrid({ recipes, cta }: { recipes: Recipe[]; cta?: RecipeCta }) {
         >
           <div className="h-24 w-24 shrink-0 overflow-hidden">
             <img
-              src={recipe.image[0]}
+              src={recipeDisplayImage(recipe)}
               alt={recipe.name}
               className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
             />
@@ -78,7 +79,7 @@ function RecipeList({ recipes, cta }: { recipes: Recipe[]; cta?: RecipeCta }) {
         >
           <div className="aspect-4/3 overflow-hidden rounded-lg sm:h-24 sm:aspect-auto">
             <img
-              src={recipe.image[0]}
+              src={recipeDisplayImage(recipe)}
               alt={recipe.name}
               className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
             />

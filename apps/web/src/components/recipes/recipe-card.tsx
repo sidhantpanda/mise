@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { Clock, Star, Users } from "lucide-react";
 import { formatDuration, type Recipe } from "common";
 import { cn } from "@/lib/utils";
+import { recipeDisplayImage } from "@/lib/recipe-image";
 
 export function RecipeGridCard({ recipe }: { recipe: Recipe }) {
   return (
@@ -12,7 +13,7 @@ export function RecipeGridCard({ recipe }: { recipe: Recipe }) {
     >
       <div className="aspect-[4/3] overflow-hidden">
         <img
-          src={recipe.image[0]}
+          src={recipeDisplayImage(recipe)}
           alt={recipe.name}
           className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
         />

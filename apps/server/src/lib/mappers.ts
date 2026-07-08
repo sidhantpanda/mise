@@ -9,9 +9,6 @@ import { asString, compactObject, isRecord, normalizeRecipeInstructions } from "
 // These output shapes mirror the types in packages/common/src/models.ts exactly
 // so the frontend can consume API responses without remapping.
 
-const DEFAULT_RECIPE_IMAGE =
-  "https://images.unsplash.com/photo-1495521821757-a1efb6729352?w=1200&q=80";
-
 type Nutrition = {
   "@type": "NutritionInformation";
   calories?: string;
@@ -50,7 +47,7 @@ export function toRecipeDTO(r: PrismaRecipe & { createdBy?: { displayName: strin
     identifier: r.id,
     name: r.name || asString(schemaJson.name) || "",
     description: r.description || asString(schemaJson.description) || "",
-    image: r.image.length ? r.image : [DEFAULT_RECIPE_IMAGE],
+    image: r.image,
     author: {
       "@type": "Person" as const,
       identifier: r.createdById ?? undefined,

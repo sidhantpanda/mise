@@ -222,9 +222,10 @@ export function RecipeForm({
     const prep = minutesToISO(form.prepTime);
     const cook = minutesToISO(form.cookTime);
     const total = `PT${parseInt(form.prepTime || "0") + parseInt(form.cookTime || "0") || 0}M`;
-    const image = form.image
-      ? [form.image]
-      : ["https://images.unsplash.com/photo-1495521821757-a1efb6729352?w=1200&q=80"];
+    // Leave empty rather than writing a stock placeholder into the record —
+    // display surfaces (listing, detail page) fill in a deterministic
+    // placeholder from the name when there's no real image.
+    const image = form.image ? [form.image] : [];
     const keywords = form.keywords
       .split(",")
       .map((k) => k.trim())

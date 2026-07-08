@@ -13,6 +13,7 @@ import { formatDuration, isoDurationToMinutes, type Recipe } from "common";
 import { RecipeCtaTableRow, type RecipeCta } from "@/components/recipes/recipe-cta-card";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { recipeDisplayImage } from "@/lib/recipe-image";
 
 enum RecipeTableSortKey {
   Recipe = "recipe",
@@ -95,7 +96,7 @@ export function RecipeTable({ recipes, cta }: { recipes: Recipe[]; cta?: RecipeC
                   className="group flex min-w-72 items-center gap-3"
                 >
                   <img
-                    src={recipe.image[0]}
+                    src={recipeDisplayImage(recipe)}
                     alt={recipe.name}
                     className="size-12 shrink-0 rounded-md object-cover"
                   />
