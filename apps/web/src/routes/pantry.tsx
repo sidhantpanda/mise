@@ -10,12 +10,12 @@ import { Refrigerator, Snowflake, Archive } from "lucide-react";
 export const Route = createFileRoute("/pantry")({
   head: () => ({
     meta: [
-      { title: "Pantry — Mise" },
+      { title: "Pantry - Mise" },
       {
         name: "description",
         content: "Track what you have on hand across pantry, fridge, and freezer.",
       },
-      { property: "og:title", content: "Pantry — Mise" },
+      { property: "og:title", content: "Pantry - Mise" },
       {
         property: "og:description",
         content: "Track what you have on hand across pantry, fridge, and freezer.",
@@ -171,7 +171,7 @@ function PantryPage() {
                         {days}d
                       </span>
                     ) : (
-                      <span className="text-muted-foreground">—</span>
+                      <span className="text-muted-foreground">-</span>
                     )}
                   </td>
                 </tr>

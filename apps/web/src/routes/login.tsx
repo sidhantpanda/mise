@@ -9,7 +9,7 @@ import { ApiError } from "@/lib/api";
 export const Route = createFileRoute("/login")({
   head: () => ({
     meta: [
-      { title: "Sign in — Mise" },
+      { title: "Sign in - Mise" },
       { name: "description", content: "Sign in to your Mise kitchen." },
     ],
   }),

@@ -20,15 +20,15 @@ import { api, ApiError } from "@/lib/api";
 export const Route = createFileRoute("/household")({
   head: () => ({
     meta: [
-      { title: "Household — Mise" },
+      { title: "Household - Mise" },
       {
         name: "description",
-        content: "Manage your household or restaurant team — invite members, assign roles.",
+        content: "Manage your household or restaurant team - invite members, assign roles.",
       },
-      { property: "og:title", content: "Household — Mise" },
+      { property: "og:title", content: "Household - Mise" },
       {
         property: "og:description",
-        content: "Manage your household or restaurant team — invite members, assign roles.",
+        content: "Manage your household or restaurant team - invite members, assign roles.",
       },
     ],
   }),
@@ -221,7 +221,7 @@ function HouseholdPage() {
           <h3 className="text-display text-2xl">Download all recipe library</h3>
           <p className="text-sm text-muted-foreground mt-1 max-w-xl">
             Export every recipe in {hh.name} as a ZIP of Schema.org JSON-LD files. Keep a backup or
-            move your library elsewhere — the ZIP imports straight back into Mise.
+            move your library elsewhere - the ZIP imports straight back into Mise.
           </p>
         </div>
         <Button
@@ -242,7 +242,7 @@ function HouseholdPage() {
         <div className="min-w-0">
           <h3 className="text-display text-2xl">Running a restaurant?</h3>
           <p className="text-sm text-primary-foreground/80 mt-1 max-w-xl">
-            Mise supports multi-entity workspaces with role-based access — chefs, prep, FOH. Switch
+            Mise supports multi-entity workspaces with role-based access - chefs, prep, FOH. Switch
             this household to a restaurant in settings.
           </p>
         </div>

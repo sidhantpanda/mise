@@ -9,7 +9,7 @@ import { AuthShell, Field } from "./login";
 export const Route = createFileRoute("/signup")({
   head: () => ({
     meta: [
-      { title: "Create account — Mise" },
+      { title: "Create account - Mise" },
       { name: "description", content: "Create your Mise kitchen account." },
     ],
   }),
@@ -40,7 +40,7 @@ function SignupPage() {
   };
 
   return (
-    <AuthShell title="Create your kitchen" subtitle="Recipes, meal plans, pantry — in one place.">
+    <AuthShell title="Create your kitchen" subtitle="Recipes, meal plans, pantry in one place.">
       <form onSubmit={submit} className="space-y-4">
         <Field label="Name">
           <Input

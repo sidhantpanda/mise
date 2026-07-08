@@ -14,12 +14,12 @@ import { useDebouncedValue, useRecipes, useRecipeSearch } from "@/hooks";
 export const Route = createFileRoute("/recipes/")({
   head: () => ({
     meta: [
-      { title: "Recipes — Mise" },
+      { title: "Recipes - Mise" },
       {
         name: "description",
         content: "Your full recipe library, stored as Schema.org Recipe JSON-LD for portability.",
       },
-      { property: "og:title", content: "Recipes — Mise" },
+      { property: "og:title", content: "Recipes - Mise" },
       {
         property: "og:description",
         content: "Your full recipe library, stored as Schema.org Recipe JSON-LD for portability.",

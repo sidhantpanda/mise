@@ -11,7 +11,7 @@ import { AuthShell } from "./login";
 export const Route = createFileRoute("/onboarding")({
   head: () => ({
     meta: [
-      { title: "Set up your kitchen — Mise" },
+      { title: "Set up your kitchen - Mise" },
       { name: "description", content: "Create your household or restaurant." },
     ],
   }),
@@ -31,7 +31,7 @@ function OnboardingPage() {
     );
   }
   if (me.isError || !me.data) return <Navigate to="/login" />;
-  // Already onboarded (incl. just-accepted an invite) — nothing to do here.
+  // Already onboarded (incl. just-accepted an invite) - nothing to do here.
   if (me.data.household) return <Navigate to="/" />;
 
   const firstName = me.data.user.name.split(" ")[0];

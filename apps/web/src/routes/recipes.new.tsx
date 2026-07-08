@@ -7,9 +7,9 @@ import type { Recipe } from "common";
 export const Route = createFileRoute("/recipes/new")({
   head: () => ({
     meta: [
-      { title: "New Recipe — Mise" },
+      { title: "New Recipe - Mise" },
       { name: "description", content: "Create a new Schema.org-native recipe." },
-      { property: "og:title", content: "New Recipe — Mise" },
+      { property: "og:title", content: "New Recipe - Mise" },
       { property: "og:description", content: "Create a new Schema.org-native recipe." },
     ],
   }),

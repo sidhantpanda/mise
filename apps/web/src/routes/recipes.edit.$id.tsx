@@ -8,7 +8,7 @@ import type { Recipe } from "common";
 export const Route = createFileRoute("/recipes/edit/$id")({
   head: () => ({
     meta: [
-      { title: "Edit Recipe — Mise" },
+      { title: "Edit Recipe - Mise" },
       { name: "description", content: "Edit recipe details." },
     ],
   }),

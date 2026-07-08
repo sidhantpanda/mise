@@ -11,12 +11,12 @@ import { ShoppingItemDialog } from "@/components/shopping-item-dialog";
 export const Route = createFileRoute("/shopping-list")({
   head: () => ({
     meta: [
-      { title: "Shopping List — Mise" },
+      { title: "Shopping List - Mise" },
       {
         name: "description",
         content: "An auto-generated shopping list rolled up from your meal plan.",
       },
-      { property: "og:title", content: "Shopping List — Mise" },
+      { property: "og:title", content: "Shopping List - Mise" },
       {
         property: "og:description",
         content: "An auto-generated shopping list rolled up from your meal plan.",

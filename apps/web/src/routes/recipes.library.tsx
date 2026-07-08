@@ -11,12 +11,12 @@ import { usePublicLibrary } from "@/hooks";
 export const Route = createFileRoute("/recipes/library")({
   head: () => ({
     meta: [
-      { title: "Public library — Mise" },
+      { title: "Public library - Mise" },
       {
         name: "description",
         content: "Browse the public recipe library and import recipes into your household.",
       },
-      { property: "og:title", content: "Public library — Mise" },
+      { property: "og:title", content: "Public library - Mise" },
       {
         property: "og:description",
         content: "Browse the public recipe library and import recipes into your household.",

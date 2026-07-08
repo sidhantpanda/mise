@@ -32,7 +32,7 @@ export const Route = createFileRoute("/recipes/library_/view")({
   },
   head: ({ loaderData }) => ({
     meta: recipeMetaTags(loaderData, {
-      title: "Public recipe — Mise",
+      title: "Public recipe - Mise",
       description: "Preview a public library recipe before importing it.",
     }),
   }),
@@ -150,7 +150,7 @@ function PublicRecipePreviewPage() {
               <Meta
                 icon={<Users className="size-4" />}
                 label="Yield"
-                value={r.recipeYield || "—"}
+                value={r.recipeYield || "-"}
               />
               {r.aggregateRating && (
                 <Meta

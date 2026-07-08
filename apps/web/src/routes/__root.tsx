@@ -70,7 +70,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
 
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient;
-  // Set only during SSR, scoped to that one request — see router.tsx.
+  // Set only during SSR, scoped to that one request - see router.tsx.
   request?: Request;
 }>()({
   head: () => ({
@@ -80,14 +80,14 @@ export const Route = createRootRouteWithContext<{
         name: "viewport",
         content: "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no",
       },
-      { title: "Mise — Recipes, Meal Plans, Pantry" },
+      { title: "Mise - Recipes, Meal Plans, Pantry" },
       {
         name: "description",
         content:
           "Mise is a Schema.org-native kitchen OS for households and restaurants: recipes, meal plans, pantry, and shopping in one place.",
       },
       { name: "author", content: "Mise" },
-      { property: "og:title", content: "Mise — Kitchen OS" },
+      { property: "og:title", content: "Mise - Kitchen OS" },
       {
         property: "og:description",
         content:

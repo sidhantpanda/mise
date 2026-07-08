@@ -9,9 +9,9 @@ import { Button } from "@/components/ui/button";
 export const Route = createFileRoute("/meal-plan")({
   head: () => ({
     meta: [
-      { title: "Meal Plan — Mise" },
+      { title: "Meal Plan - Mise" },
       { name: "description", content: "Your week, planned. Add recipes to any day or meal slot." },
-      { property: "og:title", content: "Meal Plan — Mise" },
+      { property: "og:title", content: "Meal Plan - Mise" },
       {
         property: "og:description",
         content: "Plan the week's meals across breakfast, lunch, and dinner.",

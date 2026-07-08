@@ -7,12 +7,12 @@ import { Clock, AlertTriangle, ArrowUpRight, Sparkles } from "lucide-react";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Dashboard — Mise" },
+      { title: "Dashboard - Mise" },
       {
         name: "description",
         content: "Today's meals, low pantry items, and what to buy at a glance.",
       },
-      { property: "og:title", content: "Dashboard — Mise" },
+      { property: "og:title", content: "Dashboard - Mise" },
       {
         property: "og:description",
         content: "Today's meals, low pantry items, and what to buy at a glance.",
