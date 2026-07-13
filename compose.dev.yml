@@ -3,20 +3,18 @@ services:
     image: postgres:16
     container_name: mise-postgres
     restart: unless-stopped
-    env_file: .env
+    # Everything defaults to `mise` so no .env is needed; override in .env if
+    # you want different credentials (and set DATABASE_URL to match).
     environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
-    # Listen on POSTGRES_PORT so it's the single source of truth for the port.
-    # If you change it, update DATABASE_URL in .env to match (host-side dev uses it).
-    command: ["-p", "${POSTGRES_PORT:-5432}"]
+      POSTGRES_USER: ${POSTGRES_USER:-mise}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-mise}
+      POSTGRES_DB: ${POSTGRES_DB:-mise}
     ports:
-      - "${POSTGRES_PORT:-5432}:${POSTGRES_PORT:-5432}"
+      - "${POSTGRES_PORT:-5432}:5432"
     volumes:
       - ./data/postgres:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB} -p ${POSTGRES_PORT:-5432}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-mise} -d ${POSTGRES_DB:-mise}"]
       interval: 5s
       timeout: 5s
       retries: 10

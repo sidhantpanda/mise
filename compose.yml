@@ -9,29 +9,18 @@ services:
         condition: service_healthy
       meilisearch:
         condition: service_started
-    # Pull everything from the root .env into the container. Anything set under
-    # `environment:` below still wins (Compose precedence: environment > env_file),
-    # which is how the container-network DATABASE_URL overrides the localhost one.
-    env_file: .env
+    env_file:
+      - path: .env
+        required: false
     environment:
       NODE_ENV: production
-      # The runtime image ships the Prisma CLI, so the app syncs the schema
-      # itself on boot (createDatabaseIfMissing + `prisma db push`).
       AUTO_MIGRATE: "true"
-      # Inside the compose network Postgres is reached by its service name, not
-      # localhost — so build the URL from the same POSTGRES_* vars Postgres uses.
-      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:${POSTGRES_PORT:-5432}/${POSTGRES_DB}
-      JWT_SECRET: ${JWT_SECRET}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-mise}:${POSTGRES_PASSWORD:-mise}@postgres:5432/${POSTGRES_DB:-mise}
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required — put it in .env next to this file (generate one with `openssl rand -hex 32`)}
       WEB_ORIGIN: ${WEB_ORIGIN:-http://localhost:3000}
-      # The web SSR process fetches back to the API in-container to prime data
-      # (e.g. a recipe's page title). This is the API's internal address — always
-      # localhost:3000 in the bundled image, never the public WEB_ORIGIN, which a
-      # loopback fetch can't reach behind a reverse proxy. Override only if the
-      # API front door is moved off :3000.
       SERVER_URL: ${SERVER_URL:-http://localhost:3000}
-      # Meilisearch is reached by its compose service name inside the network.
       MEILI_URL: http://meilisearch:7700
-      MEILI_MASTER_KEY: ${MEILI_MASTER_KEY}
+      MEILI_MASTER_KEY: ${MEILI_MASTER_KEY:-mise-default-meili-master-key}
     ports:
       - "${APP_PORT:-3000}:3000"
     healthcheck:
@@ -51,20 +40,14 @@ services:
     image: postgres:16
     container_name: mise-postgres
     restart: unless-stopped
-    env_file: .env
     environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
-    # Listen on POSTGRES_PORT so it's the single source of truth for the port:
-    # the mapping, the app's DATABASE_URL and the healthcheck all use it.
-    command: ["-p", "${POSTGRES_PORT:-5432}"]
-    ports:
-      - "${POSTGRES_PORT:-5432}:${POSTGRES_PORT:-5432}"
+      POSTGRES_USER: ${POSTGRES_USER:-mise}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-mise}
+      POSTGRES_DB: ${POSTGRES_DB:-mise}
     volumes:
       - postgres-data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB} -p ${POSTGRES_PORT:-5432}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-mise} -d ${POSTGRES_DB:-mise}"]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -74,18 +57,12 @@ services:
     container_name: mise-meilisearch
     restart: unless-stopped
     environment:
-      # Production Meilisearch requires a master key of at least 16 bytes — set
-      # MEILI_MASTER_KEY in .env (it also authenticates the app's requests).
-      MEILI_MASTER_KEY: ${MEILI_MASTER_KEY}
+      MEILI_MASTER_KEY: ${MEILI_MASTER_KEY:-mise-default-meili-master-key}
       MEILI_ENV: production
       MEILI_NO_ANALYTICS: "true"
     volumes:
       - meili-data:/meili_data
 
 volumes:
-  # Named volume for Postgres data — managed by Docker (see `docker volume ls`),
-  # survives `docker compose down`, removed only with `docker compose down -v`.
   postgres-data:
-  # Meilisearch index storage. Rebuildable from Postgres on boot, but persisting
-  # it avoids a full reindex on every restart.
   meili-data:

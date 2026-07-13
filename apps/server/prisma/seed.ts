@@ -10,7 +10,10 @@ dotenv.config({
 });
 
 const prisma = new PrismaClient({
-  adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL }),
+  adapter: new PrismaPg({
+    // Default matches compose.dev.yml (keep in sync with src/env.ts).
+    connectionString: process.env.DATABASE_URL ?? "postgresql://mise:mise@localhost:5432/mise",
+  }),
 });
 
 const DEMO_EMAIL = "demo@mise.app";

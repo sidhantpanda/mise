@@ -1,15 +1,26 @@
 ![Logo](docs/mise-logo.png)
 
-# Mise — Kitchen Companion Hub
+# Mise
 
+**Your kitchen, organized.** Mise is a self-hosted kitchen companion for households
+and restaurants: recipes, meal plans, pantry, and a shopping list in one place —
+with your data stored in an open format you can take anywhere.
 
+- 📖 **Recipes** — stored as standard [Schema.org Recipe](https://schema.org/Recipe)
+  JSON-LD, so your collection is portable to and from any compliant tool. Import
+  from the community [public library](https://github.com/sidhantpanda/mise-public)
+  or add your own.
+- 🗓️ **Meal planning** — plan the week, then generate a shopping list from it.
+- 🧺 **Pantry & shopping list** — know what you have and what you need.
+- 🔍 **Full-text search** — instant recipe search powered by Meilisearch.
+- 👨‍👩‍👧 **Households** — multiple members share one kitchen; onboarding supports
+  households and restaurants.
+- 🤖 **MCP server** — connect Claude or other LLM clients and say "send this
+  recipe to Mise". See [docs/mcp.md](docs/mcp.md).
+- 🔌 **REST API** — every feature is API-first; interactive OpenAPI docs ship
+  with the app at `/api/docs`.
 
-Mise is a Schema.org‑native kitchen OS for households and restaurants: recipes, meal
-plans, pantry, and a shopping list in one place. Recipes are stored in standard
-[Schema.org Recipe](https://schema.org/Recipe) JSON‑LD, so data is portable to and from
-any compliant tool.
-
-See the [Roadmap](ROADMAP.md) for what's planned next.
+See the [Roadmap](ROADMAP.md) for what's coming next.
 
 ## Screenshots
 
@@ -29,251 +40,164 @@ See the [Roadmap](ROADMAP.md) for what's planned next.
 
 ![Meal plan](docs/meal-plan.png)
 
-## Run with docker compose
+## Quick start (Docker Compose)
 
-1. Copy [compose.yml](compose.yml)
-2. Copy [.env.example](.env.example) to `.env`
-3. Run `docker compose up -d`
-
-## Prerequisites
-
-- **Node.js** 20+ (developed on 24) — for local development
-- **pnpm** 9+ (developed on 11 — `corepack enable` will provide it)
-- **Docker** (for the database in dev, and to build/run the app in production)
-
-## First‑time setup (development)
+One variable is all you need — everything else has working defaults:
 
 ```bash
-# 1. Create your local env file (dev defaults work out of the box)
-cp .env.example .env
-
-# 2. Start PostgreSQL (+ Adminer) for local dev, in the background
-docker compose -f compose.dev.yml up -d
-
-# 3. Install dependencies (also generates the Prisma client)
-pnpm install
+mkdir mise && cd mise
+curl -fsSLO https://raw.githubusercontent.com/sidhantpanda/mise/main/compose.yml
+echo "JWT_SECRET=$(openssl rand -hex 32)" > .env
+docker compose up -d
 ```
 
-In development the app **creates the database and tables on startup** if they don't
-exist, so you never have to run migrations manually. Pick **one** of the two options
-below for the database.
+Open **http://localhost:3000**, create your account, and you're cooking.
 
-**Option A — start empty (tables only, no data):**
+The stack is three containers: the Mise app (API + web on one port), Postgres,
+and Meilisearch. Postgres and Meilisearch are **not** published to the host —
+they're only reachable inside the compose network, which is why you don't need
+to configure credentials for them.
+
+### Serving on your own domain
+
+Set `WEB_ORIGIN` in `.env` to the URL you'll open Mise at:
 
 ```bash
-# Create all required tables without any demo data.
-pnpm db:push
-
-# ...or skip this entirely — the tables are created automatically the first
-# time you start the app (e.g. via `pnpm dev`).
+WEB_ORIGIN=https://mise.example.com
 ```
 
-You'll start with a clean slate; create your first account from the app's signup
-screen (name / email / password), then the onboarding flow lets you create your
-household or restaurant.
+That's the only switch: an `https://` origin automatically gets `Secure` auth
+cookies (put Mise behind any TLS-terminating reverse proxy), while an `http://`
+origin (LAN or homelab without TLS) automatically doesn't — no cookie flags to
+remember.
 
-**Option B — seed demo data (recommended for a first look):**
+### Updating
+
+The compose file pulls the latest image on every start:
 
 ```bash
-# A sample household with recipes, meal plan, pantry, and shopping list.
+docker compose up -d
+```
+
+Your data lives in named Docker volumes (`postgres-data`, `meili-data`) and
+survives updates and `docker compose down`. Only `docker compose down -v`
+deletes it.
+
+## Configuration
+
+Everything is optional except `JWT_SECRET`. Set values in the `.env` file next
+to `compose.yml` (see [.env.example](.env.example) for the full annotated list).
+
+| Variable | Default | Purpose |
+|----------|---------|---------|
+| `JWT_SECRET` | — **(required)** | Signs login cookies. Generate with `openssl rand -hex 32` |
+| `WEB_ORIGIN` | `http://localhost:3000` | The URL you open Mise at. `https://` origins get `Secure` cookies automatically |
+| `APP_PORT` | `3000` | Host port the app is published on |
+| `POSTGRES_USER` / `POSTGRES_PASSWORD` / `POSTGRES_DB` | `mise` | Database credentials (internal to the compose network) |
+| `MEILI_MASTER_KEY` | a built-in default | Meilisearch key (internal to the compose network) |
+| `COOKIE_SECURE` | inferred from `WEB_ORIGIN` | Force the cookie `Secure` flag on/off, e.g. HTTPS at the proxy with an `http://` `WEB_ORIGIN` |
+| `PUBLIC_LIBRARY_URL` | official Mise library | Point recipe importing at your own `list.json` catalog |
+
+Running the image outside Compose? It needs `DATABASE_URL` and `JWT_SECRET`,
+and syncs its own schema on boot (disable with `AUTO_MIGRATE=false`).
+
+## Contributing & local development
+
+### Prerequisites
+
+- **Node.js** 20+ (developed on 24)
+- **pnpm** 9+ (`corepack enable` provides it)
+- **Docker** (for the dev database and search)
+
+### Setup
+
+No `.env` needed — dev defaults are built in:
+
+```bash
+pnpm install     # installs deps + generates the Prisma client
+pnpm dev:db      # terminal 1 — Postgres, Adminer, Meilisearch
+pnpm dev         # terminal 2 — API (:3000) + web with HMR
+```
+
+Open **http://localhost:3000**. The app creates the database and tables on
+first boot, so there are no migrations to run.
+
+Want demo data for a first look?
+
+```bash
 pnpm db:seed
 ```
 
-After seeding you can sign in with:
+Then sign in with **`demo@mise.app`** / **`password`**. (Seeding wipes and
+recreates only the demo household — other accounts are untouched. Skip it to
+start with a clean slate and the signup screen.)
 
-> **Email:** `demo@mise.app`  **Password:** `password`
+> Only need to override something (say, a different Postgres port)? Copy
+> [.env.example](.env.example) to `.env` and uncomment the line — every
+> variable is documented there.
 
-> **Note:** `pnpm db:seed` is destructive for the demo account — it wipes and
-> recreates the demo household each run. It does not touch other accounts you've
-> created. Choose Option A if you want a truly empty database.
+### How it runs
 
-## Development
-
-Run the dev database in one terminal and both apps in another:
-
-```bash
-pnpm dev:db          # terminal 1 — Postgres + Adminer (or omit if already running)
-pnpm dev             # terminal 2 — API front door (:3000) + web SSR (:4000)
-```
-
-Then open **http://localhost:3000**.
-
-`pnpm dev` runs both apps with hot reload via `concurrently`: the API server on `3000`
-proxies the Vite dev server on `4000`, so the whole app (including HMR) is available on
-`3000`. You can also run them individually:
-
-```bash
-pnpm --filter server dev
-pnpm --filter web dev
-```
-
-### Environment variables
-
-All config lives in the root `.env`, which is read by **both** Compose and the apps (via
-dotenv). The defaults target the local dev database.
-
-| Variable | Purpose |
-|----------|---------|
-| `POSTGRES_USER` / `POSTGRES_PASSWORD` / `POSTGRES_DB` / `POSTGRES_PORT` | Postgres container + credentials (`POSTGRES_PORT` is the single source of truth for the port) |
-| `ADMINER_PORT` | Port for the Adminer database UI (default `8080`) |
-| `APP_PORT` | Host port the bundled app is published on in production Compose (default `3000`) |
-| `DATABASE_URL` | Prisma connection string (host‑side dev; in Compose the app builds its own from `POSTGRES_*`) |
-| `JWT_SECRET` | Signing secret for auth cookies (**change in production**) |
-| `SERVER_PORT` | API port — set to `3000` by the run scripts (the front door) |
-| `WEB_URL` | Where the API proxies the frontend (default `http://localhost:4000`) |
-| `WEB_ORIGIN` | Browser‑facing origin, used for CORS |
-| `AUTO_MIGRATE` | Set to `false` to skip the boot‑time schema sync (the production image does this) |
-| `VITE_API_URL` | Optional — the web app calls the API same‑origin by default; set only to target a different origin |
+`pnpm dev` starts both apps with hot reload: the API server on `:3000` is the
+front door — it serves `/api` and proxies everything else to the Vite dev
+server on `:4000` (HMR included), so the whole app lives on **one port** in dev
+and prod alike. In production the same API proxies the built SSR frontend
+instead.
 
 ### Common commands
 
 | Command | What it does |
 |---------|--------------|
 | `pnpm dev` | Run API + web together with hot reload |
-| `pnpm dev:db` | Start the dev Postgres + Adminer |
+| `pnpm dev:db` | Start dev Postgres + Adminer + Meilisearch |
 | `pnpm build` | Production build of both apps |
-| `pnpm start` | Run the built apps locally (API `:3000` + web `:4000`) |
+| `pnpm start` | Run the built apps locally |
 | `pnpm lint` | Lint all packages |
-| `pnpm format` | Prettier‑format the repo |
-| `pnpm db:create` | Create the database if it's missing (for fresh containers) |
+| `pnpm format` | Prettier-format the repo |
 | `pnpm db:push` | Push the Prisma schema to the database |
 | `pnpm db:seed` | Seed demo data |
-| `pnpm db:studio` | Open Prisma Studio to browse the database |
+| `pnpm db:studio` | Browse the database with Prisma Studio |
 
-Package‑specific scripts (e.g. `pnpm --filter web typecheck`,
+Package-specific scripts (e.g. `pnpm --filter web typecheck`,
 `pnpm --filter server typecheck`) are also available.
 
 ### Database
 
-The schema is defined in `apps/server/prisma/schema.prisma`. After changing it, push the
-changes and regenerate the client:
-
-```bash
-pnpm db:push
-```
-
-Postgres data is bind-mounted to `./data/postgres` (gitignored). To reset the dev
-database completely (wipes all data):
+The schema lives in `apps/server/prisma/schema.prisma` — after changing it, run
+`pnpm db:push`. Dev data is bind-mounted to `./data/postgres` (gitignored); to
+reset it completely:
 
 ```bash
 docker compose -f compose.dev.yml down
-rm -rf ./data/postgres
+rm -rf ./data/postgres ./data/meili
 pnpm dev:db
 ```
 
-### Browsing the database (Adminer)
+`pnpm dev:db` also serves [Adminer](https://www.adminer.org/) at
+**http://localhost:8080** — log in with System `PostgreSQL`, server `postgres`,
+and `mise` / `mise` / `mise` as the username / password / database (or your
+`POSTGRES_*` overrides).
 
-`pnpm dev:db` also starts [Adminer](https://www.adminer.org/), a lightweight database UI,
-at **http://localhost:8080**. Log in with:
+### Tech notes
 
-| Field | Value |
-|-------|-------|
-| System | PostgreSQL |
-| Server | `postgres` (pre-filled) |
-| Username | `kitchen` (`POSTGRES_USER`) |
-| Password | `kitchen` (`POSTGRES_PASSWORD`) |
-| Database | `kitchen` (`POSTGRES_DB`) |
-
-(`pnpm db:studio` is also available if you prefer Prisma Studio.)
-
-## Production deployment
-
-The whole app ships as a single Docker image (API + SSR frontend served on one port),
-built by the multi-stage `Dockerfile`. `compose.yml` runs it together with Postgres, a
-one-shot schema-migration step, and Adminer.
-
-### How the stack is wired
-
-- **`app`** — the bundled image. The API is the front door on port `3000` (serves `/api`
-  and proxies the built-in SSR frontend). Published on `${APP_PORT}` (default `3000`).
-- **`migrate`** — a one-shot service that runs `prisma db push` to sync the schema, then
-  exits. The app image ships **without** the Prisma CLI, so migrations run here; the app
-  waits for this to finish before starting.
-- **`postgres`** — the database (data persisted in `./data/postgres`).
-- **`adminer`** — optional database UI on `${ADMINER_PORT}` (default `8080`).
-
-### First-time start
-
-```bash
-# 1. Create and edit the env file: set a strong JWT_SECRET, a real POSTGRES_PASSWORD,
-#    and WEB_ORIGIN to your public URL.
-cp .env.example .env
-
-# 2. Build the image and start everything (Postgres → migrate → app).
-docker compose up -d --build
-```
-
-The `migrate` step creates the tables, then the app starts. Visit
-**http://localhost:3000** (or your `APP_PORT`).
-
-### Reload the app after a `git pull`
-
-```bash
-git pull
-docker compose up -d --build
-```
-
-This rebuilds the image, re-runs `migrate` (applying any schema changes), and recreates
-the `app` container. Unchanged services (Postgres, Adminer) keep running. To restart the
-app **without** rebuilding (e.g. only an env change):
-
-```bash
-docker compose up -d app          # or: docker compose restart app
-```
-
-### Run only the database migration
-
-```bash
-# Rebuild the migrate image first if the schema changed, then apply it.
-docker compose build migrate
-docker compose run --rm migrate
-```
-
-`prisma db push` is idempotent, so this is safe to run repeatedly.
-
-### Other operations
-
-| Command | What it does |
-|---------|--------------|
-| `docker compose logs -f app` | Tail the app logs (API + web) |
-| `docker compose ps` | Show service status / health |
-| `docker compose restart app` | Restart the app without rebuilding |
-| `docker compose down` | Stop the stack (Postgres data persists in `./data/postgres`) |
-| `docker compose down && rm -rf ./data/postgres && docker compose up -d --build` | Full reset — **wipes the database** |
-
-### Production notes
-
-- The runtime image sets `AUTO_MIGRATE=false`, so the app never migrates on boot —
-  schema changes are applied only by the `migrate` step. If you run the image **outside**
-  Compose (`docker run …`), apply the schema yourself first (run the `migrate` service or
-  a `prisma db push` from an image that has the CLI).
-- Set `JWT_SECRET` and the database credentials to real secrets — the `.env` defaults are
-  for local dev only.
-- Auth cookies are marked `Secure` in production, so serve the app over **HTTPS** (e.g.
-  behind a TLS-terminating reverse proxy) or the browser will drop the login cookie.
-- `docker compose` also builds a `kitchen-companion-hub:build` image used **only** by the
-  one-shot `migrate` service; the deployed runtime image is the smaller
-  `kitchen-companion-hub:latest`.
-
-## Tech notes
-
-- **Single port / proxy:** the API server is the entry point in both dev and prod. It
-  serves `/api` and proxies everything else to the web server — in dev that's the Vite
-  dev server (with HMR); in prod it's the SSR server serving the pre-built app. No proxy
-  config is needed in Vite.
-- **SSR + auth:** protected pages render a loading state during SSR and fetch on the
-  client after hydration, so no session cookie is forwarded through the SSR server.
-  `/login` and `/signup` are public and fully server‑rendered.
+- **Single port / proxy:** the API server is the entry point in both dev and
+  prod. It serves `/api` and proxies everything else to the web server — the
+  Vite dev server in dev, the SSR server in prod. No proxy config in Vite.
+- **SSR + auth:** protected pages render a loading state during SSR and fetch
+  on the client after hydration, so no session cookie passes through the SSR
+  server. `/login` and `/signup` are public and fully server-rendered.
+- **Search is best-effort:** if Meilisearch is unreachable, the app still runs —
+  search reports unavailable and the index reconciles from Postgres on the next
+  boot.
 - **Prisma 7** uses driver adapters; the connection URL lives in
-  `apps/server/prisma.config.ts` (which loads the shared root `.env`), not in
-  `schema.prisma`.
-- Recipes, pantry items, and meals are exchanged in their Schema.org shapes end‑to‑end,
-  so the API responses map directly onto the frontend types.
+  `apps/server/prisma.config.ts`, not in `schema.prisma`.
+- Recipes, pantry items, and meals are exchanged in their Schema.org shapes
+  end-to-end, so API responses map directly onto the frontend types.
 
 ## License
 
-Licensed under the [Elastic License 2.0](LICENSE.txt) (ELv2). In short: you're free
-to use, copy, modify, and self‑host this software — including inside a business —
-provided you keep the copyright/license notices intact. You may **not** provide it to
-third parties as a hosted or managed service. This is a source‑available license, not
-an OSI‑approved open‑source license.
+Licensed under the [Elastic License 2.0](LICENSE.txt) (ELv2). In short: you're
+free to use, copy, modify, and self-host this software — including inside a
+business — provided you keep the copyright/license notices intact. You may
+**not** provide it to third parties as a hosted or managed service. This is a
+source-available license, not an OSI-approved open-source license.

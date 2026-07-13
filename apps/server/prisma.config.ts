@@ -11,7 +11,8 @@ dotenv.config({ path: path.resolve(dir, "../../.env") });
 export default defineConfig({
   schema: path.join("prisma", "schema.prisma"),
   datasource: {
-    url: process.env.DATABASE_URL,
+    // Default matches compose.dev.yml (keep in sync with src/env.ts).
+    url: process.env.DATABASE_URL ?? "postgresql://mise:mise@localhost:5432/mise",
   },
   migrations: {
     seed: "tsx prisma/seed.ts",
