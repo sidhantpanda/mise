@@ -15,8 +15,9 @@ with your data stored in an open format you can take anywhere.
 - 🔍 **Full-text search** — instant recipe search powered by Meilisearch.
 - 👨‍👩‍👧 **Households** — multiple members share one kitchen; onboarding supports
   households and restaurants.
-- 🤖 **MCP server** — connect Claude or other LLM clients and say "send this
-  recipe to Mise". See [docs/mcp.md](docs/mcp.md).
+- 🤖 **Works with Claude & ChatGPT** — connect Mise as an MCP connector and talk
+  to your kitchen: "send this recipe to Mise", "what's for dinner Thursday?",
+  "add the missing ingredients to my list". See [docs/mcp.md](docs/mcp.md).
 - 🔌 **REST API** — every feature is API-first; interactive OpenAPI docs ship
   with the app at `/api/docs`.
 
@@ -71,6 +72,24 @@ cookies (put Mise behind any TLS-terminating reverse proxy), while an `http://`
 origin (LAN or homelab without TLS) automatically doesn't — no cookie flags to
 remember.
 
+### Connect it to Claude or ChatGPT
+
+Once Mise is on a public HTTPS URL, add it as a **custom connector** in Claude
+(Settings → Connectors) or ChatGPT, pointing at:
+
+```
+https://mise.example.com/mcp
+```
+
+You'll be sent to Mise to sign in, pick which household the assistant may act on,
+and approve — no tokens to copy. Then you can say _"send this recipe to Mise"_,
+_"what's on the meal plan this week?"_, or _"we're out of butter"_, and the
+assistant can search recipes, plan meals, and manage your pantry and shopping
+list. Full tool list and auth details: [docs/mcp.md](docs/mcp.md).
+
+> This is the one feature that needs `WEB_ORIGIN` to be right — it's the OAuth
+> issuer, so it must be the public URL you actually open Mise at.
+
 ### Updating
 
 The compose file pulls the latest image on every start:
@@ -88,15 +107,15 @@ deletes it.
 Everything is optional except `JWT_SECRET`. Set values in the `.env` file next
 to `compose.yml` (see [.env.example](.env.example) for the full annotated list).
 
-| Variable | Default | Purpose |
-|----------|---------|---------|
-| `JWT_SECRET` | — **(required)** | Signs login cookies. Generate with `openssl rand -hex 32` |
-| `WEB_ORIGIN` | `http://localhost:3000` | The URL you open Mise at. `https://` origins get `Secure` cookies automatically |
-| `APP_PORT` | `3000` | Host port the app is published on |
-| `POSTGRES_USER` / `POSTGRES_PASSWORD` / `POSTGRES_DB` | `mise` | Database credentials (internal to the compose network) |
-| `MEILI_MASTER_KEY` | a built-in default | Meilisearch key (internal to the compose network) |
-| `COOKIE_SECURE` | inferred from `WEB_ORIGIN` | Force the cookie `Secure` flag on/off, e.g. HTTPS at the proxy with an `http://` `WEB_ORIGIN` |
-| `PUBLIC_LIBRARY_URL` | official Mise library | Point recipe importing at your own `list.json` catalog |
+| Variable                                              | Default                    | Purpose                                                                                                                          |
+| ----------------------------------------------------- | -------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| `JWT_SECRET`                                          | — **(required)**           | Signs login cookies. Generate with `openssl rand -hex 32`                                                                        |
+| `WEB_ORIGIN`                                          | `http://localhost:3000`    | The URL you open Mise at. `https://` origins get `Secure` cookies automatically, and it's the OAuth issuer for the MCP connector |
+| `APP_PORT`                                            | `3000`                     | Host port the app is published on                                                                                                |
+| `POSTGRES_USER` / `POSTGRES_PASSWORD` / `POSTGRES_DB` | `mise`                     | Database credentials (internal to the compose network)                                                                           |
+| `MEILI_MASTER_KEY`                                    | a built-in default         | Meilisearch key (internal to the compose network)                                                                                |
+| `COOKIE_SECURE`                                       | inferred from `WEB_ORIGIN` | Force the cookie `Secure` flag on/off, e.g. HTTPS at the proxy with an `http://` `WEB_ORIGIN`                                    |
+| `PUBLIC_LIBRARY_URL`                                  | official Mise library      | Point recipe importing at your own `list.json` catalog                                                                           |
 
 Running the image outside Compose? It needs `DATABASE_URL` and `JWT_SECRET`,
 and syncs its own schema on boot (disable with `AUTO_MIGRATE=false`).
@@ -146,17 +165,17 @@ instead.
 
 ### Common commands
 
-| Command | What it does |
-|---------|--------------|
-| `pnpm dev` | Run API + web together with hot reload |
-| `pnpm dev:db` | Start dev Postgres + Adminer + Meilisearch |
-| `pnpm build` | Production build of both apps |
-| `pnpm start` | Run the built apps locally |
-| `pnpm lint` | Lint all packages |
-| `pnpm format` | Prettier-format the repo |
-| `pnpm db:push` | Push the Prisma schema to the database |
-| `pnpm db:seed` | Seed demo data |
-| `pnpm db:studio` | Browse the database with Prisma Studio |
+| Command          | What it does                               |
+| ---------------- | ------------------------------------------ |
+| `pnpm dev`       | Run API + web together with hot reload     |
+| `pnpm dev:db`    | Start dev Postgres + Adminer + Meilisearch |
+| `pnpm build`     | Production build of both apps              |
+| `pnpm start`     | Run the built apps locally                 |
+| `pnpm lint`      | Lint all packages                          |
+| `pnpm format`    | Prettier-format the repo                   |
+| `pnpm db:push`   | Push the Prisma schema to the database     |
+| `pnpm db:seed`   | Seed demo data                             |
+| `pnpm db:studio` | Browse the database with Prisma Studio     |
 
 Package-specific scripts (e.g. `pnpm --filter web typecheck`,
 `pnpm --filter server typecheck`) are also available.

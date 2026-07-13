@@ -5,7 +5,12 @@ import cors from "cors";
 import { env } from "./env.js";
 import { ensureDatabase } from "./startup/ensureDatabase.js";
 import { ensureSearch } from "./startup/ensureSearch.js";
-import { requireAuth, requireHousehold, requireSessionAuth } from "./middleware/auth.js";
+import {
+  oauthProtectedResource,
+  requireAuth,
+  requireHousehold,
+  requireSessionAuth,
+} from "./middleware/auth.js";
 import { errorHandler, notFound } from "./middleware/error.js";
 import { authRouter } from "./routes/auth.js";
 import { accessTokensRouter } from "./routes/accessTokens.js";
@@ -13,6 +18,7 @@ import { householdsRouter } from "./routes/households.js";
 import { invitationsRouter } from "./routes/invitations.js";
 import { recipesRouter } from "./routes/recipes.js";
 import { publicLibraryRouter } from "./routes/publicLibrary.js";
+import { oauthRouter, wellKnownRouter } from "./routes/oauth.js";
 import { mealsRouter } from "./routes/meals.js";
 import { shoppingRouter } from "./routes/shopping.js";
 import { pantryRouter } from "./routes/pantry.js";
@@ -30,8 +36,31 @@ export async function createApiApp(): Promise<express.Express> {
   await ensureSearch();
 
   const app = express();
-  app.use(cors({ origin: env.WEB_ORIGIN, credentials: true }));
+
+  // Two CORS policies. The web app is a credentialed same-origin caller, so it gets a
+  // strict allowlist. The MCP endpoint and the OAuth machinery in front of it are
+  // consumed by third-party clients (claude.ai, chatgpt.com) from origins we can't
+  // enumerate — they authenticate with a Bearer token rather than cookies, so an open,
+  // credential-less policy is safe there and is what makes browser-based MCP clients
+  // work at all. `WWW-Authenticate` must be exposed or the client can't read the
+  // challenge that starts the OAuth flow.
+  const appCors = cors({ origin: env.WEB_ORIGIN, credentials: true });
+  const publicCors = cors({
+    origin: true,
+    credentials: false,
+    exposedHeaders: ["WWW-Authenticate", "Mcp-Session-Id"],
+    allowedHeaders: ["Authorization", "Content-Type", "Mcp-Session-Id", "Mcp-Protocol-Version"],
+  });
+  const isPublicEndpoint = (path: string) =>
+    path === "/mcp" ||
+    path.startsWith("/.well-known/") ||
+    /^\/oauth\/(token|register|revoke)$/.test(path);
+  app.use((req, res, next) => (isPublicEndpoint(req.path) ? publicCors : appCors)(req, res, next));
+
   app.use(express.json());
+  // OAuth clients post form-encoded bodies to /oauth/token and /oauth/register, and
+  // the consent screen is a plain HTML form.
+  app.use(express.urlencoded({ extended: false }));
   app.use(cookieParser());
 
   app.get("/api/health", (_req, res) => res.json({ ok: true }));
@@ -49,11 +78,19 @@ export async function createApiApp(): Promise<express.Express> {
   app.use("/api/pantry", requireAuth, requireHousehold, pantryRouter);
   app.use("/api/household", requireAuth, requireHousehold, requireSessionAuth, householdRouter);
 
+  // OAuth 2.1 authorization server: discovery documents, dynamic client registration,
+  // and the authorize/token/revoke endpoints that let an MCP client offer a one-click
+  // "Connect to Mise" button. All public — /oauth/authorize authenticates the user with
+  // the normal session cookie. See docs/mcp.md.
+  app.use("/.well-known", wellKnownRouter);
+  app.use("/oauth", oauthRouter);
+
   // Model Context Protocol endpoint (Streamable HTTP). Authenticated with the same
-  // Bearer access tokens as the REST API; per-tool scope is enforced inside the MCP
-  // server. Lets LLM clients (Claude, ChatGPT) act on a household — e.g. "send this
-  // recipe to Mise". See docs/mcp.md.
-  app.all("/mcp", requireAuth, requireHousehold, handleMcpRequest);
+  // Bearer access tokens as the REST API — issued either by the OAuth flow above or
+  // created by hand in settings; per-tool scope is enforced inside the MCP server.
+  // Lets LLM clients (Claude, ChatGPT) act on a household — e.g. "send this recipe to
+  // Mise". oauthProtectedResource makes its 401 advertise where to authenticate.
+  app.all("/mcp", oauthProtectedResource, requireAuth, requireHousehold, handleMcpRequest);
 
   app.use("/api", notFound);
   app.use(errorHandler);

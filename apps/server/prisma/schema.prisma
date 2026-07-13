@@ -50,10 +50,12 @@ model User {
   createdAt         DateTime          @default(now())
   updatedAt         DateTime          @updatedAt
   memberships       HouseholdMember[]
-  createdHouseholds Household[]       @relation("HouseholdCreatedBy")
-  createdRecipes    Recipe[]          @relation("RecipeCreatedBy")
+  createdHouseholds Household[]              @relation("HouseholdCreatedBy")
+  createdRecipes    Recipe[]                 @relation("RecipeCreatedBy")
   accessTokens      AccessToken[]
-  activeHousehold   Household?        @relation("ActiveHousehold", fields: [activeHouseholdId], references: [id], onDelete: SetNull)
+  oauthCodes        OAuthAuthorizationCode[]
+  oauthRefreshTokens OAuthRefreshToken[]
+  activeHousehold   Household?               @relation("ActiveHousehold", fields: [activeHouseholdId], references: [id], onDelete: SetNull)
 }
 
 model Household {
@@ -71,27 +73,103 @@ model Household {
   shopping       ShoppingItem[]
   pantry         PantryItem[]
   accessTokens   AccessToken[]
+  oauthCodes     OAuthAuthorizationCode[]
+  oauthRefreshTokens OAuthRefreshToken[]
   activeForUsers User[]            @relation("ActiveHousehold")
 }
 
+// A bearer credential for the API and the MCP endpoint. Created two ways: by the
+// user in settings (a personal token they paste somewhere), or by the OAuth flow
+// on behalf of a connected client — `oauthClientId` distinguishes the latter, and
+// OAuth-issued tokens expire and are renewed with an OAuthRefreshToken.
 model AccessToken {
-  id          String    @id @default(uuid())
-  userId      String
-  householdId String
-  name        String
-  tokenHash   String    @unique
-  tokenPrefix String
-  scopes      String[]  @default(["read"])
-  lastUsedAt  DateTime?
-  expiresAt   DateTime?
-  revokedAt   DateTime?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  household   Household @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  id            String       @id @default(uuid())
+  userId        String
+  householdId   String
+  name          String
+  tokenHash     String       @unique
+  tokenPrefix   String
+  scopes        String[]     @default(["read"])
+  oauthClientId String?
+  lastUsedAt    DateTime?
+  expiresAt     DateTime?
+  revokedAt     DateTime?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  user          User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  household     Household    @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  oauthClient   OAuthClient? @relation(fields: [oauthClientId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([householdId])
+}
+
+// --- OAuth 2.1 authorization server (MCP "Connect" flow) ---
+//
+// Mise is both the resource server (/mcp) and the authorization server. MCP
+// clients (Claude, ChatGPT) register themselves through Dynamic Client
+// Registration, drive an authorization-code + PKCE flow against /oauth/authorize,
+// and exchange the code at /oauth/token for an AccessToken above.
+
+model OAuthClient {
+  id                      String                   @id @default(uuid())
+  clientName              String
+  redirectUris            String[]
+  grantTypes              String[]                 @default(["authorization_code", "refresh_token"])
+  responseTypes           String[]                 @default(["code"])
+  scopes                  String[]                 @default(["read", "write"])
+  // "none" for public clients (PKCE only) — what Claude and ChatGPT register as.
+  tokenEndpointAuthMethod String                   @default("none")
+  clientSecretHash        String?
+  clientUri               String?
+  logoUri                 String?
+  createdAt               DateTime                 @default(now())
+  codes                   OAuthAuthorizationCode[]
+  refreshTokens           OAuthRefreshToken[]
+  accessTokens            AccessToken[]
+}
+
+// Single-use, short-lived code handed to the client's redirect_uri after the user
+// approves the consent screen. Stored hashed; `consumedAt` makes replay detectable.
+model OAuthAuthorizationCode {
+  id                  String      @id @default(uuid())
+  codeHash            String      @unique
+  clientId            String
+  userId              String
+  householdId         String
+  scopes              String[]
+  redirectUri         String
+  codeChallenge       String
+  codeChallengeMethod String      @default("S256")
+  resource            String?
+  expiresAt           DateTime
+  consumedAt          DateTime?
+  createdAt           DateTime    @default(now())
+  client              OAuthClient @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  user                User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  household           Household   @relation(fields: [householdId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+// Rotating refresh token: redeeming one revokes it and its access token, and
+// issues a fresh pair.
+model OAuthRefreshToken {
+  id            String      @id @default(uuid())
+  tokenHash     String      @unique
+  clientId      String
+  userId        String
+  householdId   String
+  scopes        String[]
+  accessTokenId String?
+  expiresAt     DateTime
+  revokedAt     DateTime?
+  createdAt     DateTime    @default(now())
+  client        OAuthClient @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  household     Household   @relation(fields: [householdId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 model HouseholdMember {

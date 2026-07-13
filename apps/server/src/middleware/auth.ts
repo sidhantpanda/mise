@@ -2,7 +2,26 @@ import type { NextFunction, Request, Response } from "express";
 import { COOKIE_NAME, verifyToken } from "../lib/auth.js";
 import { hashAccessToken } from "../lib/accessTokens.js";
 import { getActiveHouseholdId } from "../lib/household.js";
+import { protectedResourceMetadataUrl } from "../lib/oauth.js";
 import { prisma } from "../prisma.js";
+
+// Marks a route as an OAuth protected resource. Its 401s then carry the
+// `WWW-Authenticate` challenge that points an MCP client at our resource metadata —
+// the entry point of the whole discovery chain that ends in a "Connect" button.
+export function oauthProtectedResource(req: Request, _res: Response, next: NextFunction): void {
+  req.oauthResourceMetadataUrl = protectedResourceMetadataUrl();
+  next();
+}
+
+function unauthorized(req: Request, res: Response, error: string, description: string): void {
+  if (req.oauthResourceMetadataUrl) {
+    res.set(
+      "WWW-Authenticate",
+      `Bearer error="${error}", error_description="${description}", resource_metadata="${req.oauthResourceMetadataUrl}"`,
+    );
+  }
+  res.status(401).json({ error: description });
+}
 
 // Authenticates the request and attaches the user's primary household id (empty
 // string when they have none yet). Async rejections propagate to the Express 5
@@ -15,7 +34,9 @@ export async function requireAuth(req: Request, res: Response, next: NextFunctio
     });
     const now = new Date();
     if (!token || token.revokedAt || (token.expiresAt && token.expiresAt <= now)) {
-      res.status(401).json({ error: "Invalid access token" });
+      // "invalid_token" is what tells an OAuth client to refresh and retry rather
+      // than give up — OAuth access tokens expire on a 24h clock.
+      unauthorized(req, res, "invalid_token", "Invalid or expired access token");
       return;
     }
 
@@ -41,7 +62,7 @@ export async function requireAuth(req: Request, res: Response, next: NextFunctio
   const token = req.cookies?.[COOKIE_NAME] as string | undefined;
   const payload = token ? verifyToken(token) : null;
   if (!payload) {
-    res.status(401).json({ error: "Not authenticated" });
+    unauthorized(req, res, "invalid_token", "Not authenticated");
     return;
   }
   req.user = { id: payload.id, householdId: (await getActiveHouseholdId(payload.id)) ?? "" };
