@@ -21,8 +21,6 @@ with your data stored in an open format you can take anywhere.
 - 🔌 **REST API** — every feature is API-first; interactive OpenAPI docs ship
   with the app at `/api/docs`.
 
-See the [Roadmap](ROADMAP.md) for what's coming next.
-
 ## Screenshots
 
 ### Dashboard
