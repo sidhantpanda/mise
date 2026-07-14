@@ -18,7 +18,15 @@ permissions:
   packages: write # required to push to GHCR with GITHUB_TOKEN
 
 jobs:
+  # Gates every image publish on the full test suite passing for this exact
+  # commit — the whole reason test.yml exists. Runs test.yml's jobs as if they
+  # were defined right here (a "reusable workflow" call), so `needs: [test]`
+  # below actually blocks the build until lint/unit/integration/e2e are green.
+  test:
+    uses: ./.github/workflows/test.yml
+
   build:
+    needs: [test]
     strategy:
       fail-fast: false
       matrix:

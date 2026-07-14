@@ -4,7 +4,11 @@ packages:
 allowBuilds:
   '@prisma/client': true
   '@prisma/engines': true
+  cpu-features: true
   esbuild: true
+  msw: true
   prisma: true
+  protobufjs: true
+  ssh2: true
 minimumReleaseAgeExclude:
   - vite@8.1.1

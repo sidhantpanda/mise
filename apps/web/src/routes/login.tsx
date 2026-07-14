@@ -1,8 +1,8 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { Field } from "@/components/field";
 import { useLogin } from "@/hooks/mutations";
 import { ApiError } from "@/lib/api";
 
@@ -105,15 +105,6 @@ export function AuthShell({
         </div>
         <div className="bg-card border border-border rounded-2xl p-6 sm:p-8">{children}</div>
       </div>
-    </div>
-  );
-}
-
-export function Field({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div className="space-y-1.5">
-      <Label className="text-[11px] uppercase tracking-wider text-muted-foreground">{label}</Label>
-      {children}
     </div>
   );
 }

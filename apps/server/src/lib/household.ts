@@ -107,10 +107,12 @@ export function userDTO(user: {
 // The full session payload returned by signup/login/me: the active household (or
 // null during onboarding), every household the user belongs to (switcher), and
 // any pending invitations addressed to them.
-export async function buildMe(userId: string) {
+export async function buildMe(userId: string, householdId?: string) {
   const user = await prisma.user.findUnique({ where: { id: userId } });
   if (!user) throw new AppError(401, "Not authenticated");
-  const activeId = await getActiveHouseholdId(userId);
+  // requireAuth sets householdId to "" (not undefined) for a user still in
+  // onboarding, so this must be `||`, not `??`, to fall through to the lookup.
+  const activeId = householdId || (await getActiveHouseholdId(userId));
   return {
     user: userDTO(user),
     household: activeId ? await getHouseholdDTO(activeId) : null,

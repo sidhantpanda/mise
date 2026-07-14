@@ -150,7 +150,7 @@ export function buildMcpServer(ctx: McpAuthContext): McpServer {
       },
     },
     tool(async (args: { householdId: string }) => {
-      requireScope(ctx, "read");
+      requireScope(ctx, "write");
       const householdId = await resolveHousehold(ctx, args.householdId);
       if (!ctx.tokenId) {
         throw new ToolError("This connection's household cannot be changed.");
@@ -182,7 +182,15 @@ export function buildMcpServer(ctx: McpAuthContext): McpServer {
         "fields (name, ingredients, steps) and/or a full Schema.org Recipe JSON-LD object " +
         "via schemaJson. Use this whenever the user asks to send, save, or add a recipe to Mise.",
       inputSchema: {
-        name: z.string().describe("Recipe title. Required unless it is present inside schemaJson."),
+        // Optional at the schema level so a caller can send a complete Schema.org
+        // recipe as schemaJson alone (the "send this recipe to Mise" flow). Marking it
+        // required here would make the SDK reject that body before createRecipe could
+        // pull the name out of schemaJson; createRecipe still errors if there is no
+        // name in either place.
+        name: z
+          .string()
+          .optional()
+          .describe("Recipe title. Required unless it is present inside schemaJson."),
         description: z.string().optional().describe("Short description of the dish."),
         recipeIngredient: z
           .array(z.string())
@@ -374,16 +382,25 @@ export function buildMcpServer(ctx: McpAuthContext): McpServer {
       const meals = await prisma.plannedMeal.findMany({
         where: { householdId, date: { gte: args.startDate, lte: endDate } },
         orderBy: [{ date: "asc" }, { mealType: "asc" }],
-        include: { recipe: { select: { id: true, name: true, recipeYield: true } } },
+        include: {
+          recipe: { select: { id: true, name: true, recipeYield: true, householdId: true } },
+        },
       });
 
       return json({
         startDate: args.startDate,
         endDate,
-        meals: meals.map((meal) => ({
-          ...toMealDTO(meal),
-          recipe: meal.recipe ?? null,
-        })),
+        // The write paths now check recipeId against the household before saving, but
+        // this re-checks the join anyway: it's defense in depth against rows written
+        // before that fix, which could still point at a foreign recipe. householdId is
+        // stripped before it leaves this function — it's an internal id, not tool output.
+        meals: meals.map((meal) => {
+          const recipe =
+            meal.recipe?.householdId === householdId
+              ? { id: meal.recipe.id, name: meal.recipe.name, recipeYield: meal.recipe.recipeYield }
+              : null;
+          return { ...toMealDTO(meal), recipe };
+        }),
       });
     }),
   );

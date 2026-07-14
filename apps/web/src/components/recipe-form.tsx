@@ -3,6 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { Field } from "@/components/field";
 import { Plus, Trash2, Sparkles } from "lucide-react";
 import type { Recipe, RecipeInstruction } from "common";
 import { useCreateRecipe, useUpdateRecipe } from "@/hooks/mutations";
@@ -420,15 +421,6 @@ export function RecipeForm({
         />
       </div>
     </form>
-  );
-}
-
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div className="space-y-1.5">
-      <Label className="text-[11px] uppercase tracking-wider text-muted-foreground">{label}</Label>
-      {children}
-    </div>
   );
 }
 

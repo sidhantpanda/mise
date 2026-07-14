@@ -10,6 +10,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { Field } from "@/components/field";
 import { type PlannedMeal } from "common";
 import { useDebouncedValue, useMe, useRecipes, useRecipeSearch } from "@/hooks";
 import { useCreateMeal, useUpdateMeal, useDeleteMeal } from "@/hooks/mutations";
@@ -103,12 +104,9 @@ export function PlanMealDialog({
 
         <div className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div className="space-y-1.5">
-              <Label className="text-[11px] uppercase tracking-wider text-muted-foreground">
-                Date
-              </Label>
+            <Field label="Date">
               <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
-            </div>
+            </Field>
             <div className="space-y-1.5">
               <Label className="text-[11px] uppercase tracking-wider text-muted-foreground">
                 Meal
@@ -189,21 +187,15 @@ export function PlanMealDialog({
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div className="space-y-1.5">
-              <Label className="text-[11px] uppercase tracking-wider text-muted-foreground">
-                Servings
-              </Label>
+            <Field label="Servings">
               <Input
                 type="number"
                 min={1}
                 value={servings}
                 onChange={(e) => setServings(parseInt(e.target.value) || 1)}
               />
-            </div>
-            <div className="space-y-1.5">
-              <Label className="text-[11px] uppercase tracking-wider text-muted-foreground">
-                Cook
-              </Label>
+            </Field>
+            <Field label="Cook">
               <select
                 value={assignee || ""}
                 onChange={(e) => setAssignee(e.target.value || undefined)}
@@ -216,7 +208,7 @@ export function PlanMealDialog({
                   </option>
                 ))}
               </select>
-            </div>
+            </Field>
           </div>
         </div>
 

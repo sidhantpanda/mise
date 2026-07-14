@@ -7,8 +7,8 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { Field } from "@/components/field";
 import { useCreatePantry, useUpdatePantry } from "@/hooks/mutations";
 import type { PantryItem } from "common";
 import { toast } from "sonner";
@@ -159,14 +159,5 @@ export function PantryItemDialog({
         </form>
       </DialogContent>
     </Dialog>
-  );
-}
-
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div className="space-y-1.5">
-      <Label className="text-[11px] uppercase tracking-wider text-muted-foreground">{label}</Label>
-      {children}
-    </div>
   );
 }

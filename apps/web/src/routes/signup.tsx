@@ -2,9 +2,10 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Field } from "@/components/field";
 import { useSignup } from "@/hooks/mutations";
 import { ApiError } from "@/lib/api";
-import { AuthShell, Field } from "./login";
+import { AuthShell } from "./login";
 
 export const Route = createFileRoute("/signup")({
   head: () => ({

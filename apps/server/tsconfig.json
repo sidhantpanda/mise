@@ -16,5 +16,5 @@
     "noFallthroughCasesInSwitch": true,
     "verbatimModuleSyntax": false
   },
-  "include": ["src/**/*.ts", "prisma/**/*.ts", "eslint.config.js"]
+  "include": ["src/**/*.ts", "prisma/**/*.ts", "test/**/*.ts", "eslint.config.js"]
 }

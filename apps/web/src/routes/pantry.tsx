@@ -4,6 +4,7 @@ import { AppShell, PrimaryButton, SearchBar } from "@/components/AppShell";
 import type { PantryItem } from "common";
 import { usePantry } from "@/hooks";
 import { PantryItemDialog } from "@/components/pantry-item-dialog";
+import { PantryDeleteButton } from "@/components/pantry-delete-button";
 import { Button } from "@/components/ui/button";
 import { Refrigerator, Snowflake, Archive } from "lucide-react";
 
@@ -97,9 +98,12 @@ function PantryPage() {
                   <h2 className="font-medium leading-tight wrap-break-word">{p.name}</h2>
                   <p className="text-xs text-muted-foreground mt-1">{p.category}</p>
                 </div>
-                <span className="shrink-0 inline-flex items-center gap-1.5 text-xs px-2 py-0.5 rounded-full bg-secondary">
-                  {p.location}
-                </span>
+                <div className="flex shrink-0 items-center gap-2">
+                  <span className="inline-flex items-center gap-1.5 text-xs px-2 py-0.5 rounded-full bg-secondary">
+                    {p.location}
+                  </span>
+                  <PantryDeleteButton id={p.identifier} name={p.name} />
+                </div>
               </div>
               <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
                 <div>
@@ -138,6 +142,7 @@ function PantryPage() {
               <th className="text-left px-5 py-3">Quantity</th>
               <th className="text-left px-5 py-3">Location</th>
               <th className="text-left px-5 py-3">Expires</th>
+              <th className="px-5 py-3" />
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
@@ -173,6 +178,9 @@ function PantryPage() {
                     ) : (
                       <span className="text-muted-foreground">-</span>
                     )}
+                  </td>
+                  <td className="px-5 py-3.5 text-right">
+                    <PantryDeleteButton id={p.identifier} name={p.name} />
                   </td>
                 </tr>
               );

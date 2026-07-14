@@ -9,12 +9,12 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { useHousehold } from "@/hooks";
 import { useInvite, useRevokeInvite, useUpdateHousehold } from "@/hooks/mutations";
 import { toast } from "sonner";
 import { Download, Loader2, Mail, Settings, Shield, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Field } from "@/components/field";
 import { api, ApiError } from "@/lib/api";
 
 export const Route = createFileRoute("/household")({
@@ -259,12 +259,9 @@ function HouseholdPage() {
             </DialogTitle>
           </DialogHeader>
           <form onSubmit={saveSettings} className="space-y-4">
-            <div className="space-y-1.5">
-              <Label className="text-[11px] uppercase tracking-wider text-muted-foreground">
-                {hh.type === "Restaurant" ? "Restaurant name" : "Household name"}
-              </Label>
+            <Field label={hh.type === "Restaurant" ? "Restaurant name" : "Household name"}>
               <Input value={name} onChange={(e) => setName(e.target.value)} autoFocus />
-            </div>
+            </Field>
             <DialogFooter className="gap-2">
               <Button
                 type="button"

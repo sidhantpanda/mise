@@ -107,6 +107,10 @@ function ShoppingPage() {
                           setShoppingChecked.mutate({ ids: [it.id], checked: !it.checked })
                         }
                         disabled={setShoppingChecked.isPending}
+                        // Purely a checkmark toggle with no text or icon when unchecked, so it
+                        // has no accessible name to select by; there's nothing else on the
+                        // page this could be confused with.
+                        data-testid="shopping-item-toggle"
                         className={`size-6 shrink-0 rounded-full border-2 hover:bg-transparent [&_svg]:size-3.5 ${
                           it.checked
                             ? "bg-primary border-primary text-primary-foreground hover:bg-primary"

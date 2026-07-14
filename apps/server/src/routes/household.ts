@@ -18,12 +18,24 @@ householdRouter.patch("/", async (req, res) => {
 
 householdRouter.post("/invitations", async (req, res) => {
   const { email } = householdInviteSchema.parse(req.body);
+  const householdId = req.user!.householdId;
+
+  // email is already lowercased by householdInviteSchema; emails are stored
+  // lowercased too, so this is a direct lookup.
+  const existingUser = await prisma.user.findUnique({ where: { email }, select: { id: true } });
+  if (existingUser) {
+    const membership = await prisma.householdMember.findUnique({
+      where: { householdId_userId: { householdId, userId: existingUser.id } },
+    });
+    if (membership) throw new AppError(409, "That person is already a member of this household");
+  }
+
   await prisma.invitation.upsert({
-    where: { householdId_email: { householdId: req.user!.householdId, email } },
-    create: { householdId: req.user!.householdId, email },
+    where: { householdId_email: { householdId, email } },
+    create: { householdId, email },
     update: { sentAt: new Date(), status: "Pending", acceptedAt: null },
   });
-  res.status(201).json(await getHouseholdDTO(req.user!.householdId));
+  res.status(201).json(await getHouseholdDTO(householdId));
 });
 
 householdRouter.delete("/invitations/:id", async (req, res) => {

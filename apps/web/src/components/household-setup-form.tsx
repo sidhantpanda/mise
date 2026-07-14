@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Home, UtensilsCrossed } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { Field } from "@/components/field";
 import { cn } from "@/lib/utils";
 import { useCreateHousehold } from "@/hooks/mutations";
 import { ApiError } from "@/lib/api";
@@ -74,10 +74,7 @@ export function HouseholdSetupForm({
         ))}
       </div>
 
-      <div className="space-y-1.5">
-        <Label className="text-[11px] uppercase tracking-wider text-muted-foreground">
-          {type === "Restaurant" ? "Restaurant name" : "Household name"}
-        </Label>
+      <Field label={type === "Restaurant" ? "Restaurant name" : "Household name"}>
         <Input
           value={value}
           onChange={(e) => {
@@ -87,7 +84,7 @@ export function HouseholdSetupForm({
           placeholder={suggested}
           autoFocus
         />
-      </div>
+      </Field>
 
       {error && <p className="text-sm text-destructive">{error}</p>}
 

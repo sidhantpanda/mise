@@ -7,8 +7,8 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { Field } from "@/components/field";
 import { useCreateShopping, useUpdateShopping } from "@/hooks/mutations";
 import type { ShoppingItem } from "common";
 import { toast } from "sonner";
@@ -84,32 +84,23 @@ export function ShoppingItemDialog({
           </DialogTitle>
         </DialogHeader>
         <form onSubmit={submit} className="space-y-4">
-          <div className="space-y-1.5">
-            <Label className="text-[11px] uppercase tracking-wider text-muted-foreground">
-              Item
-            </Label>
+          <Field label="Item">
             <Input
               value={name}
               onChange={(e) => setName(e.target.value)}
               autoFocus
               placeholder="e.g. Heirloom tomatoes"
             />
-          </div>
+          </Field>
           <div className="grid grid-cols-1 min-[420px]:grid-cols-2 gap-3">
-            <div className="space-y-1.5">
-              <Label className="text-[11px] uppercase tracking-wider text-muted-foreground">
-                Quantity
-              </Label>
+            <Field label="Quantity">
               <Input
                 value={quantity}
                 onChange={(e) => setQuantity(e.target.value)}
                 placeholder="500 g"
               />
-            </div>
-            <div className="space-y-1.5">
-              <Label className="text-[11px] uppercase tracking-wider text-muted-foreground">
-                Category
-              </Label>
+            </Field>
+            <Field label="Category">
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
@@ -119,7 +110,7 @@ export function ShoppingItemDialog({
                   <option key={c}>{c}</option>
                 ))}
               </select>
-            </div>
+            </Field>
           </div>
           <DialogFooter className="gap-2">
             <Button
