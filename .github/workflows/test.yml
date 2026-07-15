@@ -30,6 +30,11 @@ jobs:
           node-version: 22
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      # typecheck resolves `common` from its build output and `@prisma/client` from
+      # the generated client, so both must exist first — same prerequisites the
+      # unit/integration jobs set up.
+      - run: pnpm --filter common build
+      - run: pnpm --filter server exec prisma generate
       - run: pnpm lint
       - run: pnpm -r typecheck
 
