@@ -104,6 +104,23 @@ describe("meals CRUD", () => {
     expect(res.body.assignee).toBe(member.id);
   });
 
+  it("treats an empty-string assignee as unassigned rather than storing it", async () => {
+    const user = await withHousehold();
+    const recipe = await makeRecipe(user.household.id as string);
+
+    const res = await user.agent
+      .post("/api/meals")
+      .send({ date: "2026-02-01", mealType: "Dinner", recipeId: recipe.id, assignee: "" })
+      .expect(201);
+    expect(res.body.assignee).toBeUndefined();
+
+    const stored = await prisma.plannedMeal.findFirst({
+      where: { id: res.body.identifier as string },
+      select: { assigneeId: true },
+    });
+    expect(stored?.assigneeId).toBeNull();
+  });
+
   it("clears the assignment when PATCH sends assignee: null", async () => {
     const user = await withHousehold();
     const member = await makeUser();

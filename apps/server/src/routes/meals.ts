@@ -49,7 +49,9 @@ mealsRouter.post("/", requireWriteAuth, async (req, res) => {
       mealType: input.mealType,
       recipeId: input.recipeId,
       servings: input.servings,
-      assigneeId: input.assignee ?? null,
+      // `|| null`, not `?? null`: an empty-string assignee means "unassigned" (the
+      // membership check above skips it), so store null rather than persisting "".
+      assigneeId: input.assignee || null,
     },
   });
   res.status(201).json(toMealDTO(meal));
@@ -73,7 +75,7 @@ mealsRouter.patch("/:id", requireWriteAuth, async (req, res) => {
       mealType: input.mealType,
       recipeId: input.recipeId,
       servings: input.servings,
-      ...(input.assignee !== undefined ? { assigneeId: input.assignee } : {}),
+      ...(input.assignee !== undefined ? { assigneeId: input.assignee || null } : {}),
     },
   });
   res.json(toMealDTO(meal));

@@ -1,20 +1,29 @@
 import { CalendarIcon, X } from "lucide-react";
+import type { AriaAttributes } from "react";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 
-type DateTimePickerProps = {
+// `id` and the aria props let a wrapping <Field> associate its <Label> with the
+// trigger button (a labelable element), so the picker has a programmatic label
+// like every other form control. Without this the "Expires" field's label points
+// at nothing.
+type DateTimePickerProps = Pick<AriaAttributes, "aria-invalid" | "aria-describedby"> & {
   value: Date | null;
   onChange: (value: Date | null) => void;
   placeholder?: string;
+  id?: string;
 };
 
 export function DateTimePicker({
   value,
   onChange,
   placeholder = "Pick date and time",
+  id,
+  "aria-invalid": ariaInvalid,
+  "aria-describedby": ariaDescribedby,
 }: DateTimePickerProps) {
   const timeValue = value ? `${pad(value.getHours())}:${pad(value.getMinutes())}` : "";
 
@@ -39,6 +48,9 @@ export function DateTimePicker({
         <PopoverTrigger asChild>
           <Button
             type="button"
+            id={id}
+            aria-invalid={ariaInvalid}
+            aria-describedby={ariaDescribedby}
             variant="outline"
             className={cn(
               "h-9 min-w-0 flex-1 justify-start rounded-md bg-transparent px-3 text-left font-normal",
