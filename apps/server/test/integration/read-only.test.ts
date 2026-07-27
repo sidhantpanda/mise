@@ -5,7 +5,7 @@ import { makeAccessToken } from "../helpers/factories.js";
 
 setUpClient();
 
-// A demo account whose credentials are published: signs up and builds a
+// A read-only account whose credentials are published: signs up and builds a
 // household normally, then gets flagged read-only. Everything it did before the
 // flag stays put — the flag only governs what it can do next.
 async function readOnlyActor(): Promise<SignedUpUserWithHousehold> {
@@ -119,6 +119,150 @@ describe("read-only accounts: bearer tokens", () => {
       .send({ name: "Blocked Soup" })
       .expect(403);
     await user.agent.get("/api/recipes").set("authorization", `Bearer ${raw}`).expect(200);
+  });
+});
+
+// The invite path is how a read-only account gets into a household at all: it
+// cannot create one, so answering an invitation is deliberately exempt from the
+// write guard.
+describe("read-only accounts: joining a household by invitation", () => {
+  it("can accept an invitation and lands in the household read-only", async () => {
+    const owner = await withHousehold({ householdName: "Owner Kitchen" });
+    const guest = await withHousehold();
+    const guestMe = guest.me.user as { id: string; email: string };
+    await prisma.user.update({ where: { id: guestMe.id }, data: { isReadOnly: true } });
+
+    await owner.agent
+      .post("/api/household/invitations")
+      .send({ email: guestMe.email })
+      .expect(201);
+    const pending = await guest.agent.get("/api/auth/me").expect(200);
+    const invitationId = pending.body.invitations[0].id as string;
+
+    await guest.agent.post(`/api/invitations/${invitationId}/accept`).expect(200);
+
+    const me = await guest.agent.get("/api/auth/me").expect(200);
+    expect(me.body.household.name).toBe("Owner Kitchen");
+    // In the household, and still unable to touch anything in it.
+    await guest.agent.post("/api/recipes").send({ name: "Nope" }).expect(403);
+  });
+
+  it("can decline an invitation", async () => {
+    const owner = await withHousehold();
+    const guest = await withHousehold();
+    const guestMe = guest.me.user as { id: string; email: string };
+    await prisma.user.update({ where: { id: guestMe.id }, data: { isReadOnly: true } });
+
+    await owner.agent
+      .post("/api/household/invitations")
+      .send({ email: guestMe.email })
+      .expect(201);
+    const pending = await guest.agent.get("/api/auth/me").expect(200);
+
+    await guest.agent
+      .post(`/api/invitations/${pending.body.invitations[0].id}/reject`)
+      .expect(200);
+  });
+});
+
+describe("Viewer role", () => {
+  // Invites a fresh user as a Viewer and returns their agent, already in the
+  // inviter's household.
+  async function viewerOf(owner: SignedUpUserWithHousehold): Promise<SignedUpUserWithHousehold> {
+    const guest = await withHousehold();
+    const guestMe = guest.me.user as { email: string };
+    await owner.agent
+      .post("/api/household/invitations")
+      .send({ email: guestMe.email, role: "Viewer" })
+      .expect(201);
+    const pending = await guest.agent.get("/api/auth/me").expect(200);
+    await guest.agent.post(`/api/invitations/${pending.body.invitations[0].id}/accept`).expect(200);
+    return guest;
+  }
+
+  it("defaults an invite with no role to Member", async () => {
+    const owner = await withHousehold();
+    const res = await owner.agent
+      .post("/api/household/invitations")
+      .send({ email: "plain@example.test" })
+      .expect(201);
+    expect(res.body.invitations.at(-1).role).toBe("Member");
+  });
+
+  it("records the requested role on the invitation", async () => {
+    const owner = await withHousehold();
+    const res = await owner.agent
+      .post("/api/household/invitations")
+      .send({ email: "viewer@example.test", role: "Viewer" })
+      .expect(201);
+    expect(res.body.invitations.at(-1).role).toBe("Viewer");
+  });
+
+  it("rejects Owner as an invitable role", async () => {
+    const owner = await withHousehold();
+    await owner.agent
+      .post("/api/household/invitations")
+      .send({ email: "usurper@example.test", role: "Owner" })
+      .expect(400);
+  });
+
+  it("joins as a Viewer member", async () => {
+    const owner = await withHousehold();
+    const viewer = await viewerOf(owner);
+    const household = await viewer.agent.get("/api/household").expect(200);
+    const me = viewer.me.user as { id: string };
+    const membership = household.body.members.find((m: { id: string }) => m.id === me.id);
+    expect(membership.role).toBe("Viewer");
+  });
+
+  it("reads household data but cannot change it", async () => {
+    const owner = await withHousehold();
+    await owner.agent.post("/api/recipes").send({ name: "Owner Soup" }).expect(201);
+    const viewer = await viewerOf(owner);
+
+    const recipes = await viewer.agent.get("/api/recipes").expect(200);
+    expect(recipes.body.some((r: { name: string }) => r.name === "Owner Soup")).toBe(true);
+
+    const res = await viewer.agent.post("/api/recipes").send({ name: "Viewer Soup" }).expect(403);
+    expect(res.body.readOnly).toBe(true);
+    await viewer.agent.post("/api/meals").send({ date: "2026-01-01", mealType: "Dinner" }).expect(403);
+    await viewer.agent.post("/api/shopping").send({ name: "Salt" }).expect(403);
+    await viewer.agent.post("/api/pantry").send({ name: "Flour" }).expect(403);
+  });
+
+  it("cannot invite anyone or rename the household", async () => {
+    const owner = await withHousehold();
+    const viewer = await viewerOf(owner);
+    await viewer.agent.patch("/api/household").send({ name: "Renamed" }).expect(403);
+    await viewer.agent
+      .post("/api/household/invitations")
+      .send({ email: "friend@example.test" })
+      .expect(403);
+  });
+
+  it("can switch away from the household it only views", async () => {
+    const owner = await withHousehold();
+    const viewer = await viewerOf(owner);
+    const ownHousehold = viewer.household as { id: string };
+    // Accepting moved them into the owner's kitchen; they must be able to get back.
+    await viewer.agent
+      .post("/api/households/active")
+      .send({ householdId: ownHousehold.id })
+      .expect(200);
+    await viewer.agent.post("/api/recipes").send({ name: "Back Home Soup" }).expect(201);
+  });
+
+  // Unlike User.isReadOnly, a Viewer membership is scoped to one household —
+  // the same account stays a full owner of its own.
+  it("still writes freely in its own household", async () => {
+    const owner = await withHousehold();
+    const viewer = await viewerOf(owner);
+    const own = await viewer.agent
+      .post("/api/households")
+      .send({ name: "Viewer's Own Kitchen", type: "Household" })
+      .expect(201);
+    expect(own.body.name).toBe("Viewer's Own Kitchen");
+    await viewer.agent.post("/api/recipes").send({ name: "My Own Soup" }).expect(201);
   });
 });
 

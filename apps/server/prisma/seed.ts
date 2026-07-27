@@ -20,7 +20,7 @@ const DEMO_EMAIL = "demo@mise.app";
 const DEMO_PASSWORD = "password";
 
 // A read-only account, safe to publish. It sits in the same household as the
-// demo users so a visitor lands on a furnished kitchen, but every write is
+// seeded users so a visitor lands on a furnished kitchen, but every write is
 // rejected server-side (see requireWriteAuth).
 const VIEWER_EMAIL = "viewer@mise.app";
 const VIEWER_PASSWORD = "viewer";

@@ -32,7 +32,7 @@ describe("useInvite", () => {
     );
     const { result } = renderHook(() => useInvite(), { wrapper });
 
-    result.current.mutate("friend@example.com");
+    result.current.mutate({ email: "friend@example.com" });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(qc.getQueryData(keys.household)).toEqual({ id: "h1", name: "Kitchen" });
@@ -46,7 +46,7 @@ describe("useInvite", () => {
     );
     const { result } = renderHook(() => useInvite(), { wrapper });
 
-    result.current.mutate("friend@example.com");
+    result.current.mutate({ email: "friend@example.com" });
 
     await waitFor(() => expect(result.current.isError).toBe(true));
     expect(qc.getQueryData(keys.household)).toBeUndefined();

@@ -3,7 +3,7 @@ import { useIsReadOnly } from "@/hooks/read-only";
 import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
-const DEFAULT_LABEL = "This is a read-only demo account";
+const DEFAULT_LABEL = "This is a read-only account";
 
 type WriteGuardProps = {
   /** A single focusable control that accepts a `disabled` prop. */

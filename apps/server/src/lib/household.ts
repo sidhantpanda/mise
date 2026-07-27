@@ -84,6 +84,9 @@ export async function getHouseholdDTO(householdId: string) {
     invitations: household.invitations.map((inv) => ({
       id: inv.id,
       email: inv.email,
+      // Narrowed from MemberRole: the invite endpoint only ever writes a role
+      // from INVITABLE_ROLES, so an invitation row is never Owner.
+      role: inv.role as Exclude<typeof inv.role, "Owner">,
       status: inv.status,
       sentAt: inv.sentAt.toISOString().slice(0, 10),
     })),

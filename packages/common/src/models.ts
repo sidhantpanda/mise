@@ -5,6 +5,7 @@
  */
 import type {
   HouseholdType,
+  InvitableRole,
   InvitationStatus,
   MealType,
   MemberRole,
@@ -110,6 +111,8 @@ export interface Household {
   invitations: {
     id: string;
     email: string;
+    /** Never Owner — an invite can only grant a role from INVITABLE_ROLES. */
+    role: InvitableRole;
     status: Exclude<InvitationStatus, "Accepted">;
     sentAt: string;
   }[];

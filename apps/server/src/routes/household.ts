@@ -19,7 +19,7 @@ householdRouter.patch("/", requireWriteAuth, async (req, res) => {
 });
 
 householdRouter.post("/invitations", requireWriteAuth, async (req, res) => {
-  const { email } = householdInviteSchema.parse(req.body);
+  const { email, role } = householdInviteSchema.parse(req.body);
   const householdId = req.user!.householdId;
 
   // email is already lowercased by householdInviteSchema; emails are stored
@@ -32,10 +32,12 @@ householdRouter.post("/invitations", requireWriteAuth, async (req, res) => {
     if (membership) throw new AppError(409, "That person is already a member of this household");
   }
 
+  // Re-inviting an address updates the role too, so a mistaken invite can be
+  // corrected by simply sending it again.
   await prisma.invitation.upsert({
     where: { householdId_email: { householdId, email } },
-    create: { householdId, email },
-    update: { sentAt: new Date(), status: "Pending", acceptedAt: null },
+    create: { householdId, email, role },
+    update: { sentAt: new Date(), status: "Pending", acceptedAt: null, role },
   });
   res.status(201).json(await getHouseholdDTO(householdId));
 });

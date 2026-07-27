@@ -1,12 +1,15 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
-import type { Household } from "common";
+import type { Household, InvitableRole } from "common";
 import { keys, meKey } from "../keys";
 
 export function useInvite() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (email: string) => api.post<Household>("/household/invitations", { email }),
+    // `role` is optional; the server defaults it to Member, which is what every
+    // invite did before roles were selectable.
+    mutationFn: ({ email, role }: { email: string; role?: InvitableRole }) =>
+      api.post<Household>("/household/invitations", { email, role }),
     onSuccess: (data) => qc.setQueryData(keys.household, data),
   });
 }

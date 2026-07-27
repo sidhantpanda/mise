@@ -5,8 +5,12 @@
 export const HOUSEHOLD_TYPES = ["Household", "Restaurant"] as const;
 export type HouseholdType = (typeof HOUSEHOLD_TYPES)[number];
 
-export const MEMBER_ROLES = ["Owner", "Admin", "Member"] as const;
+export const MEMBER_ROLES = ["Owner", "Admin", "Member", "Viewer"] as const;
 export type MemberRole = (typeof MEMBER_ROLES)[number];
+
+/** Roles an existing member may hand out on an invite — Owner is not transferable. */
+export const INVITABLE_ROLES = ["Member", "Admin", "Viewer"] as const;
+export type InvitableRole = (typeof INVITABLE_ROLES)[number];
 
 export const INVITATION_STATUSES = ["Pending", "Accepted", "Rejected"] as const;
 export type InvitationStatus = (typeof INVITATION_STATUSES)[number];

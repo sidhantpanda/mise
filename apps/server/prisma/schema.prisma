@@ -19,6 +19,9 @@ enum MemberRole {
   Owner
   Admin
   Member
+  // Read-only within this household: sees everything, changes nothing. Distinct
+  // from User.isReadOnly, which locks an entire account across every household.
+  Viewer
 }
 
 enum MealType {
@@ -46,7 +49,7 @@ model User {
   displayName       String
   passwordHash      String
   avatarColor       String?
-  // A demo/viewer account: every mutating request is rejected, whichever
+  // A read-only account: every mutating request is rejected, whichever
   // household it is acting in. Account-level too — no token creation, no new
   // households, no invites — so publishing its credentials stays safe.
   isReadOnly        Boolean           @default(false)

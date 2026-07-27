@@ -2,6 +2,14 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { WriteGuard } from "@/components/write-guard";
+import { INVITABLE_ROLES, type InvitableRole } from "common";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Dialog,
   DialogContent,
@@ -43,6 +51,7 @@ function HouseholdPage() {
   const revoke = useRevokeInvite();
   const updateHousehold = useUpdateHousehold();
   const [email, setEmail] = useState("");
+  const [inviteRole, setInviteRole] = useState<InvitableRole>("Member");
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [name, setName] = useState("");
   const [downloading, setDownloading] = useState(false);
@@ -63,9 +72,10 @@ function HouseholdPage() {
     e.preventDefault();
     if (!email.includes("@")) return;
     try {
-      await invite.mutateAsync(email);
+      await invite.mutateAsync({ email, role: inviteRole });
       setEmail("");
-      toast.success("Invitation sent");
+      setInviteRole("Member");
+      toast.success(inviteRole === "Viewer" ? "Read-only invitation sent" : "Invitation sent");
     } catch {
       toast.error("Couldn't send the invitation.");
     }
@@ -155,25 +165,52 @@ function HouseholdPage() {
           <p className="text-sm text-muted-foreground mb-4">
             Add cooks, family, or co-workers to {hh.name}.
           </p>
-          <form onSubmit={send} className="flex flex-col gap-2 min-[420px]:flex-row">
-            <div className="relative flex-1">
-              <Mail className="size-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-              <input
-                type="email"
-                placeholder="name@email.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full h-10 pl-9 pr-3 rounded-lg border border-input bg-background text-sm outline-none focus:ring-2 focus:ring-ring/40"
-              />
-            </div>
-            <WriteGuard>
-              <Button
-                type="submit"
-                className="h-10 rounded-lg px-4 shadow-none hover:bg-primary hover:opacity-90"
+          <form onSubmit={send} className="flex flex-col gap-2">
+            <div className="flex flex-col gap-2 min-[420px]:flex-row">
+              <div className="relative flex-1">
+                <Mail className="size-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                <input
+                  type="email"
+                  placeholder="name@email.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full h-10 pl-9 pr-3 rounded-lg border border-input bg-background text-sm outline-none focus:ring-2 focus:ring-ring/40"
+                />
+              </div>
+              <Select
+                value={inviteRole}
+                onValueChange={(value) => setInviteRole(value as InvitableRole)}
               >
-                Send
-              </Button>
-            </WriteGuard>
+                <SelectTrigger
+                  className="h-10 w-full rounded-lg min-[420px]:w-36"
+                  aria-label="Role"
+                >
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {INVITABLE_ROLES.map((role) => (
+                    <SelectItem key={role} value={role}>
+                      {role === "Viewer" ? "Viewer (read-only)" : role}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <WriteGuard>
+                <Button
+                  type="submit"
+                  className="h-10 rounded-lg px-4 shadow-none hover:bg-primary hover:opacity-90"
+                >
+                  Send
+                </Button>
+              </WriteGuard>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              {inviteRole === "Viewer"
+                ? "Viewers can browse recipes, the meal plan, and lists, but can't change anything."
+                : inviteRole === "Admin"
+                  ? "Admins can edit everything in this household and invite others."
+                  : "Members can add and edit recipes, meals, and lists."}
+            </p>
           </form>
 
           {invitations.length > 0 && (
@@ -190,6 +227,7 @@ function HouseholdPage() {
                     <div className="min-w-0">
                       <div className="font-medium break-all">{inv.email}</div>
                       <div className="text-[11px] text-muted-foreground">
+                        {inv.role === "Viewer" ? "Viewer (read-only)" : inv.role} ·{" "}
                         {inv.status === "Rejected" ? "Declined" : `Sent ${inv.sentAt}`}
                       </div>
                     </div>
@@ -198,7 +236,7 @@ function HouseholdPage() {
                         <WriteGuard side="left">
                           <Button
                             variant="link"
-                            onClick={() => invite.mutate(inv.email)}
+                            onClick={() => invite.mutate({ email: inv.email, role: inv.role })}
                             className="h-auto p-0 text-xs font-medium"
                           >
                             Invite again

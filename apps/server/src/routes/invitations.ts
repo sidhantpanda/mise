@@ -2,10 +2,15 @@ import { Router } from "express";
 import { prisma } from "../prisma.js";
 import { AppError } from "../lib/AppError.js";
 import { routeParam } from "../lib/request.js";
-import { requireWriteAuth } from "../middleware/auth.js";
 
 // Respond to invitations addressed to the authenticated user. Mounted behind
 // requireAuth only (a household-less user needs to accept from onboarding).
+//
+// Deliberately NOT write-guarded, unlike every other mutating route. Answering
+// an invitation is a membership decision about your own account, not an edit to
+// a household's contents — and it is the only way a read-only account can be
+// placed in a household at all, since it cannot create one. A read-only member
+// still can't touch a single recipe, meal or list item once it is inside.
 export const invitationsRouter = Router();
 
 // Loads the invitation and verifies it's a pending invite addressed to the
@@ -23,7 +28,7 @@ async function loadOwnPendingInvitation(invitationId: string, userId: string) {
   return invitation;
 }
 
-invitationsRouter.post("/:id/accept", requireWriteAuth, async (req, res) => {
+invitationsRouter.post("/:id/accept", async (req, res) => {
   const userId = req.user!.id;
   const invitation = await loadOwnPendingInvitation(
     routeParam(req.params.id, "Invitation id"),
@@ -51,7 +56,7 @@ invitationsRouter.post("/:id/accept", requireWriteAuth, async (req, res) => {
   res.json({ ok: true });
 });
 
-invitationsRouter.post("/:id/reject", requireWriteAuth, async (req, res) => {
+invitationsRouter.post("/:id/reject", async (req, res) => {
   const invitation = await loadOwnPendingInvitation(
     routeParam(req.params.id, "Invitation id"),
     req.user!.id,

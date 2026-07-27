@@ -325,21 +325,23 @@ oauthRouter.post("/authorize", async (req, res) => {
   const membership = householdId
     ? await prisma.householdMember.findUnique({
         where: { householdId_userId: { householdId, userId } },
-        select: { householdId: true },
+        select: { householdId: true, role: true },
       })
     : null;
   if (!membership) {
     return res.status(400).type("html").send(renderErrorPage("Pick a household you belong to."));
   }
 
-  // A read-only account can consent to a connection, but never to a write-capable
-  // one — otherwise the published demo login would be a way to mint a token that
-  // writes through /mcp, straight past requireWriteAuth.
+  // A read-only account — or a Viewer in the household being connected — can
+  // consent to a connection, but never to a write-capable one. Otherwise a
+  // published read-only login would be a way to mint a token that writes
+  // through /mcp, straight past requireWriteAuth.
   const grantUser = await prisma.user.findUnique({
     where: { id: userId },
     select: { isReadOnly: true },
   });
-  const grantedScopes = grantUser?.isReadOnly ? scopes.filter((s) => s !== "write") : scopes;
+  const grantIsReadOnly = grantUser?.isReadOnly || membership.role === "Viewer";
+  const grantedScopes = grantIsReadOnly ? scopes.filter((s) => s !== "write") : scopes;
 
   const code = randomToken(32);
   await prisma.oAuthAuthorizationCode.create({

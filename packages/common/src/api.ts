@@ -10,7 +10,7 @@ export type AuthUser = {
   email: string;
   avatarColor: string;
   /**
-   * A demo/viewer account. The server rejects every mutating request from it;
+   * A read-only account. The server rejects every mutating request from it;
    * the UI mirrors that by disabling write controls rather than letting them
    * fail. Never trust this alone — it is a hint for rendering, not the guard.
    */

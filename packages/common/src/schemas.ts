@@ -3,7 +3,13 @@
  * with these; the web app can reuse them for client-side form validation.
  */
 import { z } from "zod";
-import { ACCESS_TOKEN_SCOPES, HOUSEHOLD_TYPES, MEAL_TYPES, PANTRY_LOCATIONS } from "./enums.js";
+import {
+  ACCESS_TOKEN_SCOPES,
+  HOUSEHOLD_TYPES,
+  INVITABLE_ROLES,
+  MEAL_TYPES,
+  PANTRY_LOCATIONS,
+} from "./enums.js";
 import { isRecord } from "./schema-json.js";
 
 // --- auth ---
@@ -33,7 +39,11 @@ export const householdUpdateSchema = z.object({
   type: z.enum(HOUSEHOLD_TYPES).optional(),
 });
 
-export const householdInviteSchema = z.object({ email: z.string().trim().toLowerCase().email() });
+// Omitting `role` keeps the pre-existing behaviour: a full read-write Member.
+export const householdInviteSchema = z.object({
+  email: z.string().trim().toLowerCase().email(),
+  role: z.enum(INVITABLE_ROLES).default("Member"),
+});
 
 // --- access tokens ---
 
