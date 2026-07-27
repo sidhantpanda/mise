@@ -20,10 +20,13 @@ export async function handleMcpRequest(req: Request, res: Response): Promise<voi
     void transport.close();
   });
 
+  // A read-only account loses "write" here regardless of what its token carries,
+  // which also demotes tokens minted before the account was flagged.
+  const scopes = req.auth?.scopes ?? [];
   const server = buildMcpServer({
     userId: req.user!.id,
     householdId: req.user!.householdId,
-    scopes: req.auth?.scopes ?? [],
+    scopes: req.user!.isReadOnly ? scopes.filter((s) => s !== "write") : scopes,
     tokenId: req.auth?.tokenId,
   });
 

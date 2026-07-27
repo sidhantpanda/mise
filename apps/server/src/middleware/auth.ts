@@ -31,6 +31,7 @@ export async function requireAuth(req: Request, res: Response, next: NextFunctio
   if (bearer) {
     const token = await prisma.accessToken.findUnique({
       where: { tokenHash: hashAccessToken(bearer) },
+      include: { user: { select: { isReadOnly: true } } },
     });
     const now = new Date();
     if (!token || token.revokedAt || (token.expiresAt && token.expiresAt <= now)) {
@@ -53,7 +54,11 @@ export async function requireAuth(req: Request, res: Response, next: NextFunctio
       where: { id: token.id },
       data: { lastUsedAt: now },
     });
-    req.user = { id: token.userId, householdId: token.householdId };
+    req.user = {
+      id: token.userId,
+      householdId: token.householdId,
+      isReadOnly: token.user.isReadOnly,
+    };
     req.auth = { type: "accessToken", tokenId: token.id, scopes: token.scopes };
     next();
     return;
@@ -65,14 +70,33 @@ export async function requireAuth(req: Request, res: Response, next: NextFunctio
     unauthorized(req, res, "invalid_token", "Not authenticated");
     return;
   }
-  req.user = { id: payload.id, householdId: (await getActiveHouseholdId(payload.id)) ?? "" };
+  const user = await prisma.user.findUnique({
+    where: { id: payload.id },
+    select: { isReadOnly: true },
+  });
+  if (!user) {
+    unauthorized(req, res, "invalid_token", "Not authenticated");
+    return;
+  }
+  req.user = {
+    id: payload.id,
+    householdId: (await getActiveHouseholdId(payload.id)) ?? "",
+    isReadOnly: user.isReadOnly,
+  };
   req.auth = { type: "session", scopes: ["read", "write"] };
   next();
 }
 
-// Guards writes for access-token callers. Session-authenticated web users keep
-// full access; integrations need an explicit "write" scope.
+// The single gate every mutating route passes through. Two independent reasons
+// to reject: the account itself is read-only (a published demo login), or the
+// caller is an integration holding a token without "write" scope. The account
+// check comes first — a read-only user must not be able to mint themselves a
+// write-scoped token and walk around it.
 export function requireWriteAuth(req: Request, res: Response, next: NextFunction): void {
+  if (req.user?.isReadOnly) {
+    res.status(403).json({ error: "This is a read-only account", readOnly: true });
+    return;
+  }
   if (req.auth?.type === "accessToken" && !req.auth.scopes.includes("write")) {
     res.status(403).json({ error: "Access token is read-only" });
     return;

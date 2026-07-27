@@ -4,6 +4,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Field } from "@/components/field";
+import { WriteGuard } from "@/components/write-guard";
 import { Plus, Trash2, Sparkles } from "lucide-react";
 import type { Recipe, RecipeInstruction } from "common";
 import { useCreateRecipe, useUpdateRecipe } from "@/hooks/mutations";
@@ -379,13 +380,15 @@ export function RecipeForm({
             Add ingredients and method steps, then save to your library.
           </p>
           <div className="mt-5 flex flex-col gap-2">
-            <Button
-              type="submit"
-              disabled={saving}
-              className="h-10 rounded-full px-6 shadow-none hover:bg-primary hover:opacity-90 disabled:opacity-60"
-            >
-              {saving ? "Saving…" : recipe ? "Save changes" : "Add recipe"}
-            </Button>
+            <WriteGuard className="w-full" side="top">
+              <Button
+                type="submit"
+                disabled={saving}
+                className="h-10 w-full rounded-full px-6 shadow-none hover:bg-primary hover:opacity-90 disabled:opacity-60"
+              >
+                {saving ? "Saving…" : recipe ? "Save changes" : "Add recipe"}
+              </Button>
+            </WriteGuard>
             {onCancel && (
               <Button
                 type="button"

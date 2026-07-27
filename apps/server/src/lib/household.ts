@@ -95,12 +95,14 @@ export function userDTO(user: {
   displayName: string;
   email: string;
   avatarColor: string | null;
+  isReadOnly: boolean;
 }) {
   return {
     id: user.id,
     name: user.displayName,
     email: user.email,
     avatarColor: user.avatarColor ?? "oklch(0.62 0.16 42)",
+    isReadOnly: user.isReadOnly,
   };
 }
 

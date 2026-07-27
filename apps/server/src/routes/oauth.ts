@@ -332,6 +332,15 @@ oauthRouter.post("/authorize", async (req, res) => {
     return res.status(400).type("html").send(renderErrorPage("Pick a household you belong to."));
   }
 
+  // A read-only account can consent to a connection, but never to a write-capable
+  // one — otherwise the published demo login would be a way to mint a token that
+  // writes through /mcp, straight past requireWriteAuth.
+  const grantUser = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { isReadOnly: true },
+  });
+  const grantedScopes = grantUser?.isReadOnly ? scopes.filter((s) => s !== "write") : scopes;
+
   const code = randomToken(32);
   await prisma.oAuthAuthorizationCode.create({
     data: {
@@ -339,7 +348,7 @@ oauthRouter.post("/authorize", async (req, res) => {
       clientId: client.id,
       userId,
       householdId,
-      scopes,
+      scopes: grantedScopes,
       redirectUri: params.redirectUri,
       codeChallenge: params.codeChallenge,
       codeChallengeMethod: "S256",

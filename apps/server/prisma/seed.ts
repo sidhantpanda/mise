@@ -19,6 +19,12 @@ const prisma = new PrismaClient({
 const DEMO_EMAIL = "demo@mise.app";
 const DEMO_PASSWORD = "password";
 
+// A read-only account, safe to publish. It sits in the same household as the
+// demo users so a visitor lands on a furnished kitchen, but every write is
+// rejected server-side (see requireWriteAuth).
+const VIEWER_EMAIL = "viewer@mise.app";
+const VIEWER_PASSWORD = "viewer";
+
 type SeedRecipe = {
   key: string;
   name: string;
@@ -309,7 +315,7 @@ async function main() {
       where: { id: { in: previous.memberships.map((m) => m.householdId) } },
     });
     await prisma.user.deleteMany({
-      where: { email: { in: [DEMO_EMAIL, "theo@mise.app", "sasha@mise.app"] } },
+      where: { email: { in: [DEMO_EMAIL, "theo@mise.app", "sasha@mise.app", VIEWER_EMAIL] } },
     });
   }
 
@@ -323,6 +329,15 @@ async function main() {
   const sasha = await prisma.user.create({
     data: { email: "sasha@mise.app", displayName: "Sasha Lin", passwordHash, avatarColor: "oklch(0.58 0.14 140)" },
   });
+  const viewer = await prisma.user.create({
+    data: {
+      email: VIEWER_EMAIL,
+      displayName: "Guest",
+      passwordHash: await bcrypt.hash(VIEWER_PASSWORD, 10),
+      avatarColor: "oklch(0.6 0.15 280)",
+      isReadOnly: true,
+    },
+  });
   const userIds: Record<string, string> = { ava: ava.id, theo: theo.id, sasha: sasha.id };
 
   const household = await prisma.household.create({
@@ -334,6 +349,7 @@ async function main() {
           { userId: ava.id, role: "Owner" },
           { userId: theo.id, role: "Admin" },
           { userId: sasha.id, role: "Member" },
+          { userId: viewer.id, role: "Member" },
         ],
       },
       invitations: { create: [{ email: "noah@marlow.co" }] },
@@ -398,7 +414,8 @@ async function main() {
   });
 
   console.log(`Seeded household "${household.name}" with ${recipes.length} recipes.`);
-  console.log(`Demo login: ${DEMO_EMAIL} / ${DEMO_PASSWORD}`);
+  console.log(`Demo login:   ${DEMO_EMAIL} / ${DEMO_PASSWORD}`);
+  console.log(`Viewer login: ${VIEWER_EMAIL} / ${VIEWER_PASSWORD} (read-only, safe to publish)`);
 }
 
 main()

@@ -29,6 +29,7 @@ import { useImportPublicRecipe } from "@/hooks/mutations";
 import type { PublicRecipeSummary } from "common";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { WriteGuard } from "@/components/write-guard";
 
 type LayoutViewProps = {
   recipes: PublicRecipeSummary[];
@@ -82,29 +83,31 @@ function ImportButton({
 
   const iconSize = size === "sm" ? "size-3.5" : "size-4";
   return (
-    <Button
-      type="button"
-      onClick={onImport}
-      disabled={importRecipe.isPending || imported}
-      className={cn(
-        "shrink-0 gap-1.5 rounded-full shadow-none hover:bg-primary hover:opacity-90 disabled:opacity-60",
-        size === "sm" ? "h-8 px-4 text-xs [&_svg]:size-3.5" : "h-9 px-4 text-sm",
-      )}
-    >
-      {imported ? (
-        <>
-          <Check className={iconSize} /> Imported
-        </>
-      ) : importRecipe.isPending ? (
-        <>
-          <Loader2 className={cn(iconSize, "animate-spin")} /> Importing
-        </>
-      ) : (
-        <>
-          <Download className={iconSize} /> Import
-        </>
-      )}
-    </Button>
+    <WriteGuard>
+      <Button
+        type="button"
+        onClick={onImport}
+        disabled={importRecipe.isPending || imported}
+        className={cn(
+          "shrink-0 gap-1.5 rounded-full shadow-none hover:bg-primary hover:opacity-90 disabled:opacity-60",
+          size === "sm" ? "h-8 px-4 text-xs [&_svg]:size-3.5" : "h-9 px-4 text-sm",
+        )}
+      >
+        {imported ? (
+          <>
+            <Check className={iconSize} /> Imported
+          </>
+        ) : importRecipe.isPending ? (
+          <>
+            <Loader2 className={cn(iconSize, "animate-spin")} /> Importing
+          </>
+        ) : (
+          <>
+            <Download className={iconSize} /> Import
+          </>
+        )}
+      </Button>
+    </WriteGuard>
   );
 }
 

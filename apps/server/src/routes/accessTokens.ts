@@ -8,6 +8,7 @@ import {
   tokenPrefix,
 } from "../lib/accessTokens.js";
 import { routeParam } from "../lib/request.js";
+import { requireWriteAuth } from "../middleware/auth.js";
 import { prisma } from "../prisma.js";
 
 export const accessTokensRouter = Router();
@@ -21,7 +22,7 @@ accessTokensRouter.get("/", async (req, res) => {
   res.json(tokens.map(toAccessTokenDTO));
 });
 
-accessTokensRouter.post("/", async (req, res) => {
+accessTokensRouter.post("/", requireWriteAuth, async (req, res) => {
   if (!req.user!.householdId) throw new AppError(403, "No active household");
   const input = accessTokenCreateSchema.parse(req.body);
   const token = generateAccessToken();
@@ -41,7 +42,7 @@ accessTokensRouter.post("/", async (req, res) => {
   res.status(201).json({ ...toAccessTokenDTO(accessToken), token });
 });
 
-accessTokensRouter.delete("/:id", async (req, res) => {
+accessTokensRouter.delete("/:id", requireWriteAuth, async (req, res) => {
   const id = routeParam(req.params.id, "Access token id");
   const token = await prisma.accessToken.findFirst({
     where: { id, userId: req.user!.id },

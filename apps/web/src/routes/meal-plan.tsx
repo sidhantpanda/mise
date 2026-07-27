@@ -4,6 +4,7 @@ import { AppShell, PrimaryButton } from "@/components/AppShell";
 import { type PlannedMeal } from "common";
 import { useMe, useMeals, useRecipes } from "@/hooks";
 import { PlanMealDialog } from "@/components/plan-meal-dialog";
+import { WriteGuard } from "@/components/write-guard";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/meal-plan")({
@@ -95,13 +96,15 @@ function MealPlanPage() {
                                 />
                               </Link>
                               <div className="min-w-0 flex-1">
-                                <Button
-                                  variant="ghost"
-                                  onClick={() => setEditing(m)}
-                                  className="block h-auto w-full justify-start truncate p-0 text-left text-xs font-medium leading-tight hover:bg-transparent hover:underline"
-                                >
-                                  {r.name}
-                                </Button>
+                                <WriteGuard className="w-full" side="top">
+                                  <Button
+                                    variant="ghost"
+                                    onClick={() => setEditing(m)}
+                                    className="block h-auto w-full justify-start truncate p-0 text-left text-xs font-medium leading-tight hover:bg-transparent hover:underline"
+                                  >
+                                    {r.name}
+                                  </Button>
+                                </WriteGuard>
                                 <div className="text-[10px] text-muted-foreground mt-0.5">
                                   {m.servings} serv
                                 </div>
@@ -121,13 +124,15 @@ function MealPlanPage() {
                           </div>
                         );
                       })}
-                      <Button
-                        variant="ghost"
-                        onClick={() => setCreating({ date: iso, mealType: mt })}
-                        className="h-10 w-full rounded-lg border border-dashed border-border text-xs font-normal text-muted-foreground hover:border-foreground/30 hover:bg-transparent hover:text-foreground"
-                      >
-                        + Add
-                      </Button>
+                      <WriteGuard className="w-full" side="top">
+                        <Button
+                          variant="ghost"
+                          onClick={() => setCreating({ date: iso, mealType: mt })}
+                          className="h-10 w-full rounded-lg border border-dashed border-border text-xs font-normal text-muted-foreground hover:border-foreground/30 hover:bg-transparent hover:text-foreground"
+                        >
+                          + Add
+                        </Button>
+                      </WriteGuard>
                     </div>
                   );
                 })}

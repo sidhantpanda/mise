@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { AppShell } from "@/components/AppShell";
+import { WriteGuard } from "@/components/write-guard";
 import {
   Dialog,
   DialogContent,
@@ -105,13 +106,15 @@ function HouseholdPage() {
       title={hh.name}
       subtitle={`${hh.type} · ${hh.members.length} members`}
       actions={
-        <Button
-          onClick={openSettings}
-          className="h-9 shrink-0 gap-1.5 rounded-full whitespace-nowrap shadow-none hover:bg-primary hover:opacity-90"
-        >
-          <Settings className="size-4" />
-          Settings
-        </Button>
+        <WriteGuard>
+          <Button
+            onClick={openSettings}
+            className="h-9 shrink-0 gap-1.5 rounded-full whitespace-nowrap shadow-none hover:bg-primary hover:opacity-90"
+          >
+            <Settings className="size-4" />
+            Settings
+          </Button>
+        </WriteGuard>
       }
     >
       <div className="grid lg:grid-cols-3 gap-6">
@@ -163,12 +166,14 @@ function HouseholdPage() {
                 className="w-full h-10 pl-9 pr-3 rounded-lg border border-input bg-background text-sm outline-none focus:ring-2 focus:ring-ring/40"
               />
             </div>
-            <Button
-              type="submit"
-              className="h-10 rounded-lg px-4 shadow-none hover:bg-primary hover:opacity-90"
-            >
-              Send
-            </Button>
+            <WriteGuard>
+              <Button
+                type="submit"
+                className="h-10 rounded-lg px-4 shadow-none hover:bg-primary hover:opacity-90"
+              >
+                Send
+              </Button>
+            </WriteGuard>
           </form>
 
           {invitations.length > 0 && (
@@ -190,23 +195,27 @@ function HouseholdPage() {
                     </div>
                     <div className="flex shrink-0 items-center gap-2">
                       {inv.status === "Rejected" && (
-                        <Button
-                          variant="link"
-                          onClick={() => invite.mutate(inv.email)}
-                          className="h-auto p-0 text-xs font-medium"
-                        >
-                          Invite again
-                        </Button>
+                        <WriteGuard side="left">
+                          <Button
+                            variant="link"
+                            onClick={() => invite.mutate(inv.email)}
+                            className="h-auto p-0 text-xs font-medium"
+                          >
+                            Invite again
+                          </Button>
+                        </WriteGuard>
                       )}
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => revoke.mutate(inv.id)}
-                        className="size-auto p-0 text-muted-foreground hover:bg-transparent hover:text-destructive"
-                        aria-label="Remove invitation"
-                      >
-                        <X className="size-4" />
-                      </Button>
+                      <WriteGuard side="left">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => revoke.mutate(inv.id)}
+                          className="size-auto p-0 text-muted-foreground hover:bg-transparent hover:text-destructive"
+                          aria-label="Remove invitation"
+                        >
+                          <X className="size-4" />
+                        </Button>
+                      </WriteGuard>
                     </div>
                   </li>
                 ))}
@@ -246,9 +255,11 @@ function HouseholdPage() {
             this household to a restaurant in settings.
           </p>
         </div>
-        <Button className="h-10 shrink-0 rounded-full bg-accent px-5 text-accent-foreground shadow-none hover:bg-accent hover:opacity-90">
-          Convert
-        </Button>
+        <WriteGuard side="top">
+          <Button className="h-10 shrink-0 rounded-full bg-accent px-5 text-accent-foreground shadow-none hover:bg-accent hover:opacity-90">
+            Convert
+          </Button>
+        </WriteGuard>
       </section>
 
       <Dialog open={settingsOpen} onOpenChange={setSettingsOpen}>

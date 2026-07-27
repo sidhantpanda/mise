@@ -6,6 +6,7 @@ import { AppShell } from "@/components/AppShell";
 import { DateTimePicker } from "@/components/ui/date-time-picker";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { WriteGuard } from "@/components/write-guard";
 import { Field } from "@/components/field";
 import { useAccessTokens } from "@/hooks";
 import type { CreatedAccessToken } from "common";
@@ -111,13 +112,15 @@ function AccessTokensPage() {
               />
               Write access
             </label>
-            <Button
-              type="submit"
-              disabled={createToken.isPending}
-              className="h-9 rounded-full px-4 shadow-none hover:bg-primary hover:opacity-90 disabled:opacity-60"
-            >
-              Create
-            </Button>
+            <WriteGuard>
+              <Button
+                type="submit"
+                disabled={createToken.isPending}
+                className="h-9 rounded-full px-4 shadow-none hover:bg-primary hover:opacity-90 disabled:opacity-60"
+              >
+                Create
+              </Button>
+            </WriteGuard>
           </form>
         </section>
 
@@ -162,17 +165,19 @@ function AccessTokensPage() {
                       <td className="py-3 pr-4">{formatDateTime(token.createdAt)}</td>
                       <td className="py-3 pr-4">{formatDateTime(token.expiresAt)}</td>
                       <td className="py-3 text-right">
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => revoke(token.id, token.name)}
-                          disabled={revokeToken.isPending}
-                          className="size-8 text-muted-foreground hover:bg-destructive hover:text-destructive-foreground disabled:opacity-60"
-                          aria-label={`Revoke ${token.name}`}
-                        >
-                          <Trash2 className="size-4" />
-                        </Button>
+                        <WriteGuard side="left">
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => revoke(token.id, token.name)}
+                            disabled={revokeToken.isPending}
+                            className="size-8 text-muted-foreground hover:bg-destructive hover:text-destructive-foreground disabled:opacity-60"
+                            aria-label={`Revoke ${token.name}`}
+                          >
+                            <Trash2 className="size-4" />
+                          </Button>
+                        </WriteGuard>
                       </td>
                     </tr>
                   ))}

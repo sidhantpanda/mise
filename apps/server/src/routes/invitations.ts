@@ -1,6 +1,8 @@
 import { Router } from "express";
 import { prisma } from "../prisma.js";
 import { AppError } from "../lib/AppError.js";
+import { routeParam } from "../lib/request.js";
+import { requireWriteAuth } from "../middleware/auth.js";
 
 // Respond to invitations addressed to the authenticated user. Mounted behind
 // requireAuth only (a household-less user needs to accept from onboarding).
@@ -21,9 +23,12 @@ async function loadOwnPendingInvitation(invitationId: string, userId: string) {
   return invitation;
 }
 
-invitationsRouter.post("/:id/accept", async (req, res) => {
+invitationsRouter.post("/:id/accept", requireWriteAuth, async (req, res) => {
   const userId = req.user!.id;
-  const invitation = await loadOwnPendingInvitation(req.params.id, userId);
+  const invitation = await loadOwnPendingInvitation(
+    routeParam(req.params.id, "Invitation id"),
+    userId,
+  );
 
   await prisma.$transaction(async (tx) => {
     // Idempotent: tolerate already being a member.
@@ -46,8 +51,11 @@ invitationsRouter.post("/:id/accept", async (req, res) => {
   res.json({ ok: true });
 });
 
-invitationsRouter.post("/:id/reject", async (req, res) => {
-  const invitation = await loadOwnPendingInvitation(req.params.id, req.user!.id);
+invitationsRouter.post("/:id/reject", requireWriteAuth, async (req, res) => {
+  const invitation = await loadOwnPendingInvitation(
+    routeParam(req.params.id, "Invitation id"),
+    req.user!.id,
+  );
   await prisma.invitation.update({ where: { id: invitation.id }, data: { status: "Rejected" } });
   res.json({ ok: true });
 });

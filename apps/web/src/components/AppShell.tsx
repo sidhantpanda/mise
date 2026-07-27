@@ -16,6 +16,7 @@ import type { AuthUser, Household } from "common";
 import { useMe } from "@/hooks";
 import { useLogout } from "@/hooks/mutations";
 import { HouseholdSwitcher } from "@/components/household-switcher";
+import { WriteGuard } from "@/components/write-guard";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
@@ -320,6 +321,8 @@ export function SearchBar({
   );
 }
 
+// The page-level "create" action. Every use of it starts a write, so it carries
+// its own read-only guard rather than making each page remember to add one.
 export function PrimaryButton({
   children,
   onClick,
@@ -328,12 +331,14 @@ export function PrimaryButton({
   onClick?: () => void;
 }) {
   return (
-    <Button
-      onClick={onClick}
-      className="h-9 shrink-0 gap-1.5 rounded-full whitespace-nowrap shadow-none hover:bg-primary hover:opacity-90"
-    >
-      <Plus className="size-4" />
-      {children}
-    </Button>
+    <WriteGuard>
+      <Button
+        onClick={onClick}
+        className="h-9 shrink-0 gap-1.5 rounded-full whitespace-nowrap shadow-none hover:bg-primary hover:opacity-90"
+      >
+        <Plus className="size-4" />
+        {children}
+      </Button>
+    </WriteGuard>
   );
 }

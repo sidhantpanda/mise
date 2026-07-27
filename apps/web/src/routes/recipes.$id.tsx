@@ -1,5 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
+import { WriteGuard } from "@/components/write-guard";
+import { useIsReadOnly } from "@/hooks/read-only";
 import { Button } from "@/components/ui/button";
 import { RecipeMethod } from "@/components/recipes/recipe-method";
 import { formatDuration, type Recipe } from "common";
@@ -62,6 +64,7 @@ function RecipePage() {
   const recipes = recipesQuery.data ?? [];
   const r = recipes.find((x) => x.identifier === id);
   const currentUserId = useMe().data?.user.id;
+  const readOnly = useIsReadOnly();
   const deleteRecipe = useDeleteRecipe();
   const addFromRecipe = useAddFromRecipe();
   const navigate = useNavigate();
@@ -136,21 +139,36 @@ function RecipePage() {
           >
             <Download className="size-4" /> Export
           </Button>
-          <Link
-            to="/recipes/edit/$id"
-            params={{ id: r.identifier }}
-            className="inline-flex shrink-0 items-center justify-center gap-1.5 h-9 px-4 rounded-full border border-input bg-card text-sm whitespace-nowrap hover:bg-accent hover:text-accent-foreground transition"
-          >
-            <Pencil className="size-4" /> Edit
-          </Link>
-          <Button
-            variant="ghost"
-            onClick={onDelete}
-            className="h-9 shrink-0 gap-1.5 rounded-full border border-input bg-card px-4 font-normal whitespace-nowrap hover:bg-destructive hover:text-destructive-foreground"
-            aria-label="Delete recipe"
-          >
-            <Trash2 className="size-4" />
-          </Button>
+          {/* Edit is a router Link, not a Button, so it can't take `disabled` —
+              a read-only account gets an inert span with the same shape. */}
+          {readOnly ? (
+            <WriteGuard>
+              <Button
+                variant="ghost"
+                className="h-9 shrink-0 gap-1.5 rounded-full border border-input bg-card px-4 font-normal whitespace-nowrap"
+              >
+                <Pencil className="size-4" /> Edit
+              </Button>
+            </WriteGuard>
+          ) : (
+            <Link
+              to="/recipes/edit/$id"
+              params={{ id: r.identifier }}
+              className="inline-flex shrink-0 items-center justify-center gap-1.5 h-9 px-4 rounded-full border border-input bg-card text-sm whitespace-nowrap hover:bg-accent hover:text-accent-foreground transition"
+            >
+              <Pencil className="size-4" /> Edit
+            </Link>
+          )}
+          <WriteGuard>
+            <Button
+              variant="ghost"
+              onClick={onDelete}
+              className="h-9 shrink-0 gap-1.5 rounded-full border border-input bg-card px-4 font-normal whitespace-nowrap hover:bg-destructive hover:text-destructive-foreground"
+              aria-label="Delete recipe"
+            >
+              <Trash2 className="size-4" />
+            </Button>
+          </WriteGuard>
           <Link
             to="/recipes"
             className="inline-flex shrink-0 items-center justify-center gap-1.5 h-9 px-4 rounded-full border border-input bg-card text-sm whitespace-nowrap hover:bg-accent hover:text-accent-foreground transition"
@@ -265,18 +283,22 @@ function RecipePage() {
             </ul>
 
             <div className="mt-6 grid grid-cols-1 min-[420px]:grid-cols-2 gap-2">
-              <Button
-                onClick={() => setPlanning(true)}
-                className="h-10 gap-1.5 rounded-full whitespace-nowrap shadow-none hover:bg-primary hover:opacity-90"
-              >
-                <CalendarPlus className="size-4" /> Add to plan
-              </Button>
-              <Button
-                onClick={onAddToShopping}
-                className="h-10 gap-1.5 rounded-full bg-accent text-accent-foreground whitespace-nowrap shadow-none hover:bg-accent hover:opacity-90"
-              >
-                <ShoppingBasket className="size-4" /> To shopping
-              </Button>
+              <WriteGuard side="top">
+                <Button
+                  onClick={() => setPlanning(true)}
+                  className="h-10 gap-1.5 rounded-full whitespace-nowrap shadow-none hover:bg-primary hover:opacity-90"
+                >
+                  <CalendarPlus className="size-4" /> Add to plan
+                </Button>
+              </WriteGuard>
+              <WriteGuard side="top">
+                <Button
+                  onClick={onAddToShopping}
+                  className="h-10 gap-1.5 rounded-full bg-accent text-accent-foreground whitespace-nowrap shadow-none hover:bg-accent hover:opacity-90"
+                >
+                  <ShoppingBasket className="size-4" /> To shopping
+                </Button>
+              </WriteGuard>
             </div>
           </div>
 

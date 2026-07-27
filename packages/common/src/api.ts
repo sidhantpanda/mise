@@ -9,6 +9,12 @@ export type AuthUser = {
   name: string;
   email: string;
   avatarColor: string;
+  /**
+   * A demo/viewer account. The server rejects every mutating request from it;
+   * the UI mirrors that by disabling write controls rather than letting them
+   * fail. Never trust this alone — it is a hint for rendering, not the guard.
+   */
+  isReadOnly: boolean;
 };
 
 /** Session payload returned by /auth/signup, /auth/login and /auth/me. */

@@ -4,6 +4,7 @@ import { AlertTriangle, ArrowLeft, CheckCircle2, FileJson, UploadCloud } from "l
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
+import { WriteGuard } from "@/components/write-guard";
 import { useUploadRecipes } from "@/hooks/mutations";
 import type { RecipeUploadResult } from "common";
 
@@ -104,15 +105,17 @@ function UploadRecipesPage() {
                   onChange={(event) => onFiles(event.target.files)}
                 />
               </label>
-              <Button
-                type="button"
-                onClick={submit}
-                disabled={!file || uploadRecipes.isPending}
-                className="h-10 gap-2 rounded-full px-6 shadow-none hover:bg-primary hover:opacity-90 disabled:opacity-60"
-              >
-                <UploadCloud className="size-4" />
-                {uploadRecipes.isPending ? "Uploading..." : "Upload"}
-              </Button>
+              <WriteGuard>
+                <Button
+                  type="button"
+                  onClick={submit}
+                  disabled={!file || uploadRecipes.isPending}
+                  className="h-10 gap-2 rounded-full px-6 shadow-none hover:bg-primary hover:opacity-90 disabled:opacity-60"
+                >
+                  <UploadCloud className="size-4" />
+                  {uploadRecipes.isPending ? "Uploading..." : "Upload"}
+                </Button>
+              </WriteGuard>
             </div>
 
             {file && (

@@ -1,5 +1,6 @@
 import { Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { WriteGuard } from "@/components/write-guard";
 import { useDeletePantry } from "@/hooks/mutations";
 
 // Pulled out of pantry.tsx so it can be exercised in isolation: the route
@@ -9,17 +10,19 @@ export function PantryDeleteButton({ id, name }: { id: string; name: string }) {
   const deleteItem = useDeletePantry();
 
   return (
-    <Button
-      variant="ghost"
-      size="icon"
-      onClick={(e) => {
-        e.stopPropagation();
-        deleteItem.mutate(id);
-      }}
-      className="size-auto p-0 text-muted-foreground hover:bg-transparent hover:text-destructive"
-      aria-label={`Remove ${name}`}
-    >
-      <Trash2 className="size-4" />
-    </Button>
+    <WriteGuard side="left">
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={(e) => {
+          e.stopPropagation();
+          deleteItem.mutate(id);
+        }}
+        className="size-auto p-0 text-muted-foreground hover:bg-transparent hover:text-destructive"
+        aria-label={`Remove ${name}`}
+      >
+        <Trash2 className="size-4" />
+      </Button>
+    </WriteGuard>
   );
 }

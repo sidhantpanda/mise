@@ -46,6 +46,10 @@ model User {
   displayName       String
   passwordHash      String
   avatarColor       String?
+  // A demo/viewer account: every mutating request is rejected, whichever
+  // household it is acting in. Account-level too — no token creation, no new
+  // households, no invites — so publishing its credentials stays safe.
+  isReadOnly        Boolean           @default(false)
   activeHouseholdId String?
   createdAt         DateTime          @default(now())
   updatedAt         DateTime          @updatedAt
