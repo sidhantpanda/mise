@@ -213,8 +213,9 @@ and `mise` / `mise` / `mise` as the username / password / database (or your
 
 ## License
 
-Licensed under the [Elastic License 2.0](LICENSE.txt) (ELv2). In short: you're
-free to use, copy, modify, and self-host this software — including inside a
-business — provided you keep the copyright/license notices intact. You may
-**not** provide it to third parties as a hosted or managed service. This is a
-source-available license, not an OSI-approved open-source license.
+Licensed under the [GNU Affero General Public License v3.0 or later](LICENSE.txt)
+(AGPL-3.0-or-later), an OSI-approved open-source license. In short: you're free
+to use, copy, modify, and self-host this software — including inside a business
+— provided you keep the copyright/license notices intact. If you modify Mise and
+offer it to others over a network, you must make your modified source available
+to those users under the same license.

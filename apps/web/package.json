@@ -2,7 +2,7 @@
   "name": "web",
   "private": true,
   "sideEffects": false,
-  "license": "Elastic-2.0",
+  "license": "AGPL-3.0-or-later",
   "type": "module",
   "scripts": {
     "dev": "cross-env PORT=4000 tsx watch server.ts",
