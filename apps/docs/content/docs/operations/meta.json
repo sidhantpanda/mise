@@ -1,0 +1,4 @@
+{
+  "title": "Operations",
+  "pages": ["index", "configuration", "reverse-proxy", "backups", "upgrading", "security"]
+}

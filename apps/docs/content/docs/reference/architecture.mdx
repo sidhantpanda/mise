@@ -1,0 +1,46 @@
+---
+title: Architecture
+description: How the Mise web app, API, database, and search service fit together.
+---
+
+Mise is a pnpm monorepo with three product packages and this documentation app.
+
+```text
+Browser
+   │
+   ▼
+Express API :3000 ─────► React SSR server :4000
+   │                              │
+   ├────────► PostgreSQL          └── Vite-built frontend
+   │
+   ├────────► Meilisearch
+   │
+   └────────► MCP + OAuth endpoints
+```
+
+## Workspace packages
+
+| Package | Responsibility |
+| --- | --- |
+| `apps/server` | Express API, Prisma, OAuth, MCP, and OpenAPI |
+| `apps/web` | React frontend, TanStack Router, and SSR runtime |
+| `apps/docs` | Next.js and Fumadocs documentation website |
+| `packages/common` | Shared schemas, models, and recipe utilities |
+
+## One public port
+
+The Express server is the public entry point in development and production. It
+handles API, OAuth, and MCP routes and proxies all other requests to the frontend
+server. This keeps cookies and browser API calls same-origin.
+
+## Data ownership
+
+PostgreSQL is authoritative. Meilisearch is a derived, eventually consistent index.
+Recipes use Schema.org shapes across server and frontend boundaries, reducing mapping
+between import, API, UI, and export representations.
+
+## Authentication
+
+Browser sessions use signed HTTP-only cookies. External callers use bearer access
+tokens. MCP adds OAuth 2.1 discovery, dynamic registration, PKCE authorization, and
+rotating refresh tokens over the same token model.

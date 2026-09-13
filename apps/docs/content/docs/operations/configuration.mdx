@@ -1,0 +1,61 @@
+---
+title: Configuration
+description: Complete environment variable reference for Mise.
+---
+
+Docker Compose reads variables from `.env` next to `compose.yml`. When running the
+image another way, pass the same values through the platform's environment or secret
+manager.
+
+## Application
+
+| Variable | Default | Purpose |
+| --- | --- | --- |
+| `JWT_SECRET` | Required | Signs authentication cookies. Generate with `openssl rand -hex 32`. |
+| `WEB_ORIGIN` | `http://localhost:3000` | Exact URL users open; also the OAuth issuer for MCP. |
+| `APP_PORT` | `3000` | Host port published by the reference Compose deployment. |
+| `COOKIE_SECURE` | Inferred | Overrides whether authentication cookies require HTTPS. |
+| `PUBLIC_LIBRARY_URL` | Official Mise library | URL of a compatible `list.json` recipe catalog. |
+| `AUTO_MIGRATE` | `true` in the image | Synchronizes the Prisma schema during startup. |
+
+## PostgreSQL
+
+| Variable | Default in Compose | Purpose |
+| --- | --- | --- |
+| `DATABASE_URL` | Constructed automatically | Full PostgreSQL connection URL used by the application. |
+| `POSTGRES_USER` | `mise` | Database user created by the Compose service. |
+| `POSTGRES_PASSWORD` | `mise` | Internal Compose database password. |
+| `POSTGRES_DB` | `mise` | Database name. |
+
+The reference Compose database is not published to the host, so its defaults are
+isolated inside the Compose network. Use stronger credentials whenever the database
+is reachable beyond that network.
+
+## Meilisearch
+
+| Variable | Default in Compose | Purpose |
+| --- | --- | --- |
+| `MEILI_URL` | `http://meilisearch:7700` | Search service URL used by the application. |
+| `MEILI_MASTER_KEY` | Included internal default | Key shared by Mise and Meilisearch. Must be at least 16 bytes. |
+
+## Development-only conveniences
+
+| Variable | Default | Purpose |
+| --- | --- | --- |
+| `POSTGRES_PORT` | `5432` | Host port for development PostgreSQL. |
+| `ADMINER_PORT` | `8080` | Host port for Adminer. |
+| `MEILI_PORT` | `7700` | Host port for development Meilisearch. |
+| `VITE_API_URL` | Empty | Makes the frontend call a different API origin. |
+
+## Origin and cookie behavior
+
+An `https://` `WEB_ORIGIN` automatically produces secure cookies. An `http://`
+origin supports local networks and homelabs without TLS. Do not include a trailing
+slash.
+
+```dotenv
+WEB_ORIGIN=https://mise.example.com
+```
+
+Changing the hostname without updating `WEB_ORIGIN` commonly causes sign-in and MCP
+OAuth failures.

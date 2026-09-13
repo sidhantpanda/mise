@@ -167,7 +167,9 @@ instead.
 | ---------------- | ------------------------------------------ |
 | `pnpm dev`       | Run API + web together with hot reload     |
 | `pnpm dev:db`    | Start dev Postgres + Adminer + Meilisearch |
-| `pnpm build`     | Production build of both apps              |
+| `pnpm docs:dev`  | Run the documentation website              |
+| `pnpm docs:build` | Build the documentation website            |
+| `pnpm build`      | Production build of all workspace apps     |
 | `pnpm start`     | Run the built apps locally                 |
 | `pnpm lint`      | Lint all packages                          |
 | `pnpm format`    | Prettier-format the repo                   |

@@ -1,0 +1,50 @@
+---
+title: Upgrading
+description: Update Mise while keeping a clear rollback path.
+---
+
+Read the release notes before upgrading, take a PostgreSQL backup, and keep the
+previous image tag available until the new version is verified.
+
+## Compose deployment
+
+```bash
+docker compose pull
+docker compose up -d
+docker compose ps
+docker compose logs --tail=100 mise
+```
+
+The reference image synchronizes the database schema on startup. Wait for the health
+check to pass before considering the upgrade complete.
+
+## Verify
+
+```bash
+curl --fail http://localhost:3000/api/health
+```
+
+Then sign in and check the dashboard, one recipe, recipe search, and the meal plan.
+
+## Roll back
+
+Rollback is safest when Compose uses explicit release tags. Change the image back to
+the previous tag and recreate the service:
+
+```bash
+docker compose pull mise
+docker compose up -d mise
+```
+
+Database changes may not always be backward-compatible. Consult release notes before
+rolling application code back across a schema change; restoring the pre-upgrade
+database backup may also be required.
+
+## Track `latest` or pin releases?
+
+- Use `latest` for low-risk personal installations where immediate updates are
+  desirable.
+- Pin a version for restaurants, shared servers, and installations with a maintenance
+  window.
+
+Never automate destructive volume replacement as part of an update.

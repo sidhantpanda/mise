@@ -1,0 +1,83 @@
+---
+title: Quick start
+description: Run Mise with Docker Compose in about five minutes.
+---
+
+Docker Compose is the recommended way to run Mise. It starts the application,
+PostgreSQL, and Meilisearch together and stores their data in persistent volumes.
+
+## Requirements
+
+- Docker Engine or Docker Desktop with Compose
+- An available TCP port (port `3000` by default)
+- About 1 GB of free memory for the complete stack
+
+## Start Mise
+
+Create a directory containing the Compose file and one secret:
+
+```bash
+mkdir mise && cd mise
+curl -fsSLO https://raw.githubusercontent.com/sidhantpanda/mise/main/compose.yml
+echo "JWT_SECRET=$(openssl rand -hex 32)" > .env
+docker compose up -d
+```
+
+Open [http://localhost:3000](http://localhost:3000), create an account, and set up
+your first household.
+
+Check that all three services are healthy:
+
+```bash
+docker compose ps
+```
+
+The application is the only service exposed to the host. PostgreSQL and
+Meilisearch stay inside the private Compose network.
+
+## Use a different port
+
+Add `APP_PORT` to `.env`:
+
+```dotenv
+APP_PORT=8080
+```
+
+Then recreate the application:
+
+```bash
+docker compose up -d
+```
+
+Open `http://localhost:8080`.
+
+## Use a public domain
+
+Set the exact public origin before putting Mise behind a TLS-terminating reverse
+proxy:
+
+```dotenv
+WEB_ORIGIN=https://mise.example.com
+```
+
+An `https://` origin automatically enables secure authentication cookies and is
+required for remote MCP clients. Continue with the
+[reverse proxy guide](/docs/operations/reverse-proxy).
+
+## Stop or update
+
+```bash
+# Stop the containers without deleting data
+docker compose down
+
+# Pull current images and recreate changed containers
+docker compose pull
+docker compose up -d
+```
+
+:::danger
+`docker compose down -v` deletes the PostgreSQL and Meilisearch volumes. Back up
+PostgreSQL before intentionally removing volumes.
+:::
+
+Next, take a short tour through [your first kitchen](/docs/getting-started/first-kitchen).

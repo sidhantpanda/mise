@@ -1,0 +1,30 @@
+---
+title: Recipes
+description: Create, import, search, and export a portable recipe collection.
+---
+
+Recipes are the durable center of Mise. Each recipe contains familiar cooking fields
+while retaining its Schema.org representation.
+
+## Add a recipe
+
+Use **Recipes → New recipe** to enter a recipe manually. Name and ingredients are the
+most important fields; preparation time, yield, nutrition, images, sections, and
+instructions can be added as available.
+
+To bring structured recipes from another system, upload or paste Schema.org Recipe
+JSON-LD. Mise also supports an optional public library catalog configured through
+`PUBLIC_LIBRARY_URL`.
+
+## Recipe instructions
+
+Instructions can be simple ordered steps or named sections containing steps. This
+maps to Schema.org `HowToStep` and `HowToSection`, so multi-part recipes do not need
+to be flattened.
+
+## Portability
+
+The household settings include an export of the recipe library. Keep this export
+with regular database backups when recipes are especially important.
+
+![A recipe detail page with ingredients and instructions](/screenshots/recipe-detail.webp)

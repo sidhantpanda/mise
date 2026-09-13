@@ -1,0 +1,51 @@
+---
+title: REST API
+description: Authenticate against and explore the Mise HTTP API.
+---
+
+Every Mise installation publishes its own OpenAPI 3.1 description and interactive
+Swagger UI:
+
+```text
+https://mise.example.com/api/openapi.json
+https://mise.example.com/api/docs
+```
+
+Use the endpoints from the installation you want to work with; this documentation
+site does not proxy private Mise data.
+
+## Authentication
+
+The browser uses the `mise_session` cookie. External tools should use a personal
+access token from **Access Tokens**:
+
+```bash
+curl https://mise.example.com/api/recipes \
+  -H 'Authorization: Bearer mise_…'
+```
+
+Tokens can have `read` and `write` scopes. A bearer token without `write` is rejected
+by mutating endpoints.
+
+## Workspace scope
+
+Access tokens are bound to a workspace. API responses never accept an arbitrary
+workspace ID as proof of access; membership and token grants are validated by the
+server.
+
+## Main resources
+
+| Resource | Base path |
+| --- | --- |
+| Health | `/api/health` |
+| Authentication | `/api/auth` |
+| Access tokens | `/api/auth/tokens` |
+| Workspaces | `/api/households` |
+| Recipes | `/api/recipes` |
+| Meals | `/api/meals` |
+| Shopping | `/api/shopping` |
+| Pantry | `/api/pantry` |
+| Public library | `/api/public-library` |
+
+The OpenAPI document from the running version is authoritative for parameters,
+request bodies, and response schemas.

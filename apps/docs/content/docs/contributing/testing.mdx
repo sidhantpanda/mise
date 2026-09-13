@@ -1,0 +1,54 @@
+---
+title: Testing
+description: Run and extend Mise's Vitest and Playwright test suites.
+---
+
+Mise uses four Vitest projects and a Playwright end-to-end layer.
+
+## Commands
+
+```bash
+pnpm test                 # all Vitest projects
+pnpm test:unit            # common, server unit, and web
+pnpm test:integration     # real PostgreSQL and Meilisearch
+pnpm test:coverage        # combined coverage run
+pnpm test:watch           # Vitest watch mode
+
+pnpm build
+pnpm exec playwright install --with-deps chromium
+pnpm test:e2e
+```
+
+Integration and E2E tests require Docker. Testcontainers starts isolated PostgreSQL
+and Meilisearch instances and removes them when the test process exits.
+
+## Vitest projects
+
+| Project | Environment | Coverage |
+| --- | --- | --- |
+| `common` | Node.js | Pure schemas, duration parsing, and recipe helpers |
+| `server-unit` | Node.js | Server libraries without external I/O |
+| `server-integration` | Node.js + Testcontainers | Routes, tenancy, OAuth, MCP, and search |
+| `web` | jsdom + MSW | Hooks, libraries, and product components |
+
+## Integration tests
+
+Use the shared helpers in `apps/server/test/helpers`:
+
+- `setUpClient()` creates the application once per test file.
+- `signup()` and `withHousehold()` exercise real onboarding endpoints.
+- `bearer()` creates a real access token with requested scopes.
+- `make*()` factories create state not under test.
+- `waitForIndexed()` and `waitForRemoved()` poll asynchronous search state.
+
+Never use a fixed sleep after a recipe write before searching. Indexing is
+asynchronous, so polling the expected condition is both faster and more reliable.
+
+## End-to-end tests
+
+Each Playwright specification creates its own uniquely named account through
+`signUpAndOnboard()`. Keep new specs independent so they can run in parallel and in
+any order.
+
+Run `pnpm build` before E2E because Playwright starts the production output rather
+than the development servers.

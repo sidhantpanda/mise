@@ -1,0 +1,18 @@
+---
+title: Operations
+description: Keep a production Mise installation healthy and recoverable.
+---
+
+A reliable Mise installation has four operational properties:
+
+1. A stable `JWT_SECRET` and accurate `WEB_ORIGIN`
+2. Durable PostgreSQL storage with tested backups
+3. HTTPS for any deployment reachable from the internet
+4. Deliberate, reversible upgrades
+
+<Cards>
+  <Card title="Configuration" description="Review every environment variable and default." href="/docs/operations/configuration" />
+  <Card title="Reverse proxy" description="Put Mise behind Caddy, Nginx, or Traefik." href="/docs/operations/reverse-proxy" />
+  <Card title="Backups" description="Back up PostgreSQL and understand what can be rebuilt." href="/docs/operations/backups" />
+  <Card title="Upgrades" description="Pull, verify, and roll back releases safely." href="/docs/operations/upgrading" />
+</Cards>

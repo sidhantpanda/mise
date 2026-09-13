@@ -8,6 +8,8 @@
   "scripts": {
     "dev:db": "docker compose -f compose.dev.yml up",
     "dev": "pnpm --filter common build && concurrently -n common,api,web -c yellow,green,blue \"pnpm --filter common dev\" \"pnpm --filter server dev\" \"pnpm --filter web dev\"",
+    "docs:dev": "pnpm --filter docs dev",
+    "docs:build": "pnpm --filter docs build",
     "build": "pnpm -r build",
     "start": "concurrently -n api,web -c green,blue \"pnpm --filter server start\" \"pnpm --filter web start\"",
     "preview": "pnpm --filter web preview",

@@ -1,0 +1,58 @@
+---
+title: Reverse proxy and HTTPS
+description: Serve Mise safely from a public domain.
+---
+
+Set the public origin first:
+
+```dotenv
+WEB_ORIGIN=https://mise.example.com
+```
+
+Then restart Mise and route HTTPS traffic to its published port. Mise serves both the
+web app and API on port `3000`, so only one upstream is required.
+
+## Caddy
+
+```text
+mise.example.com {
+  reverse_proxy 127.0.0.1:3000
+}
+```
+
+Caddy obtains and renews TLS certificates automatically when DNS points at the
+server and ports 80 and 443 are reachable.
+
+## Nginx
+
+```nginx
+server {
+    listen 443 ssl http2;
+    server_name mise.example.com;
+
+    ssl_certificate /etc/letsencrypt/live/mise.example.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/mise.example.com/privkey.pem;
+
+    location / {
+        proxy_pass http://127.0.0.1:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Authorization $http_authorization;
+        proxy_buffering off;
+    }
+}
+```
+
+Preserving `Authorization` is required for REST API and MCP bearer tokens. Disabling
+proxy buffering avoids interference with MCP's Streamable HTTP transport.
+
+## Verify
+
+```bash
+curl --fail https://mise.example.com/api/health
+curl -I https://mise.example.com/.well-known/oauth-authorization-server
+```
+
+After changing the origin, existing browser sessions may need to sign in again.

@@ -1,0 +1,57 @@
+---
+title: Docker image
+description: Run the Mise container with your own PostgreSQL and Meilisearch services.
+---
+
+Use the standalone image when PostgreSQL and Meilisearch already run elsewhere. The
+image contains both the API and server-rendered frontend and listens on port `3000`.
+
+## Required services
+
+- PostgreSQL 16 or a compatible managed PostgreSQL service
+- Meilisearch 1.11 or compatible; optional if degraded search is acceptable
+- Persistent storage managed outside the Mise container
+
+## Run the image
+
+```bash
+docker run -d \
+  --name mise \
+  --restart unless-stopped \
+  -p 3000:3000 \
+  -e DATABASE_URL='postgresql://mise:password@postgres.example:5432/mise' \
+  -e JWT_SECRET='replace-with-a-long-random-value' \
+  -e WEB_ORIGIN='https://mise.example.com' \
+  -e MEILI_URL='http://meilisearch.example:7700' \
+  -e MEILI_MASTER_KEY='replace-with-your-meilisearch-key' \
+  ghcr.io/sidhantpanda/mise:latest
+```
+
+Use `openssl rand -hex 32` to generate `JWT_SECRET`. Keep it stable across container
+replacements; changing it signs everyone out.
+
+:::warning
+Do not put real secrets directly in shell history on a shared system. Prefer an
+environment file or the secret mechanism provided by your container platform.
+:::
+
+## Database schema
+
+The image synchronizes its schema on startup by default. Set `AUTO_MIGRATE=false`
+when schema changes are managed separately by your platform.
+
+## Search without Meilisearch
+
+If `MEILI_URL` is absent or unreachable, Mise continues to run. Full-text search is
+unavailable or falls back to limited name matching depending on the caller. Restart
+Mise after restoring Meilisearch so the index can reconcile from PostgreSQL.
+
+## Health check
+
+Configure the platform to request:
+
+```text
+GET /api/health
+```
+
+An HTTP `200` response means the process is ready to receive traffic.

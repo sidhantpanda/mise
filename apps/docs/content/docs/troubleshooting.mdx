@@ -1,0 +1,83 @@
+---
+title: Troubleshooting
+description: Diagnose common installation, sign-in, search, and MCP problems.
+---
+
+Start with service state and recent logs:
+
+```bash
+docker compose ps
+docker compose logs --tail=200 mise
+docker compose logs --tail=100 postgres
+docker compose logs --tail=100 meilisearch
+```
+
+## Mise does not start
+
+**`JWT_SECRET` is required**
+
+Create `.env` next to `compose.yml`:
+
+```bash
+echo "JWT_SECRET=$(openssl rand -hex 32)" > .env
+docker compose up -d
+```
+
+**PostgreSQL is unhealthy**
+
+Check disk space, permissions on any bind mount, and PostgreSQL logs. Avoid deleting
+the volume while diagnosing; it contains the source-of-truth data.
+
+## Sign-in loops or cookies disappear
+
+Confirm `WEB_ORIGIN` matches the exact scheme and hostname in the browser. If the
+site uses HTTPS, it should look like:
+
+```dotenv
+WEB_ORIGIN=https://mise.example.com
+```
+
+Restart Mise after changing the environment. Clear stale browser cookies if the
+hostname or scheme changed.
+
+## Recipe search is unavailable
+
+Mise continues to operate when Meilisearch is offline. Check:
+
+```bash
+docker compose logs --tail=100 meilisearch
+docker compose restart meilisearch mise
+```
+
+The application reconciles the index from PostgreSQL after startup. Large libraries
+may take a short time to become fully searchable.
+
+## MCP cannot connect
+
+Verify all of the following:
+
+1. The endpoint is a public HTTPS URL ending in `/mcp`.
+2. `WEB_ORIGIN` is the same public origin without a trailing slash.
+3. The reverse proxy forwards `Authorization`.
+4. The proxy does not buffer streamed responses.
+5. OAuth discovery is reachable:
+
+```bash
+curl -i https://mise.example.com/.well-known/oauth-authorization-server
+```
+
+## Port 3000 is already in use
+
+Set another published port in `.env`:
+
+```dotenv
+APP_PORT=8080
+```
+
+Then run `docker compose up -d` and open `http://localhost:8080`.
+
+## Ask for help
+
+Search existing [GitHub issues](https://github.com/sidhantpanda/mise/issues) before
+opening a new one. Include the Mise image tag, deployment method, relevant logs with
+secrets removed, and steps that reproduce the problem.

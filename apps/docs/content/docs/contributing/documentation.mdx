@@ -1,0 +1,51 @@
+---
+title: Documentation
+description: Develop and review the Fumadocs website locally.
+---
+
+Documentation lives in `apps/docs` and is part of the pnpm workspace. Most pages are
+Markdown or MDX files under `apps/docs/content/docs`.
+
+## Start the docs app
+
+```bash
+pnpm --filter docs dev
+```
+
+Open [http://localhost:3000](http://localhost:3000). If the product application is
+already using that port, choose another one:
+
+```bash
+pnpm --filter docs dev --port 3001
+```
+
+## Add or move pages
+
+Create an `.mdx` file in the relevant folder and update that folder's `meta.json` to
+control sidebar order. Every page should have a concise title and description:
+
+```mdx
+---
+title: Page title
+description: One sentence shown in search and metadata.
+---
+```
+
+Use relative links for neighboring documentation and root-relative paths for public
+assets. Screenshots belong in `apps/docs/public/screenshots`.
+
+## Validate
+
+```bash
+pnpm --filter docs lint
+pnpm --filter docs types:check
+pnpm --filter docs build
+```
+
+The site also publishes `/llms.txt` and `/llms-full.txt` from the same source content.
+
+## Vercel previews
+
+Configure a Vercel project with `apps/docs` as its root directory. Each pull request
+then receives a preview deployment, so documentation changes can be reviewed as a
+real website before merging.

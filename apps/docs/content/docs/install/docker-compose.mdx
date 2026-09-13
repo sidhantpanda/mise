@@ -1,0 +1,72 @@
+---
+title: Docker Compose
+description: Deploy the complete Mise stack with Docker Compose.
+---
+
+The repository's `compose.yml` is the supported production baseline. It starts:
+
+- `mise`: the API and server-rendered web app on one port
+- `postgres`: the source of truth for accounts, kitchens, and application data
+- `meilisearch`: the rebuildable full-text recipe index
+
+## Create the deployment
+
+```bash
+mkdir mise && cd mise
+curl -fsSLO https://raw.githubusercontent.com/sidhantpanda/mise/main/compose.yml
+echo "JWT_SECRET=$(openssl rand -hex 32)" > .env
+docker compose up -d
+```
+
+The named volumes `postgres-data` and `meili-data` survive restarts and
+`docker compose down`.
+
+## Production environment
+
+A typical public deployment needs only:
+
+```dotenv
+JWT_SECRET=replace-with-the-output-of-openssl-rand
+WEB_ORIGIN=https://mise.example.com
+```
+
+You can also change the published port:
+
+```dotenv
+APP_PORT=3000
+```
+
+Do not expose PostgreSQL or Meilisearch ports to the public internet. The reference
+Compose file keeps both services on its private network.
+
+## Verify the deployment
+
+```bash
+docker compose ps
+curl --fail http://localhost:3000/api/health
+docker compose logs --tail=100 mise
+```
+
+The health endpoint returns `{"ok":true}` when the application is accepting
+requests.
+
+## Pin a release
+
+The downloaded Compose file follows the current `latest` image. For controlled
+production rollouts, edit the image field to a published release tag:
+
+```yaml
+services:
+  mise:
+    image: ghcr.io/sidhantpanda/mise:v1.2.0
+```
+
+Use a tag that exists in the project's
+[packages](https://github.com/sidhantpanda/mise/pkgs/container/mise) page.
+
+## Next steps
+
+- [Set every available option](/docs/operations/configuration)
+- [Add HTTPS and a domain](/docs/operations/reverse-proxy)
+- [Create a backup routine](/docs/operations/backups)
+- [Plan safe upgrades](/docs/operations/upgrading)

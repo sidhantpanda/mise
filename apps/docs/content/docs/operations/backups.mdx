@@ -1,0 +1,58 @@
+---
+title: Backups and restore
+description: Protect the PostgreSQL data that makes up a Mise kitchen.
+---
+
+PostgreSQL is the source of truth. Meilisearch contains a derived recipe index that
+Mise can rebuild, so PostgreSQL is the critical backup target.
+
+## Create a logical backup
+
+From the directory containing `compose.yml`:
+
+```bash
+docker compose exec -T postgres \
+  pg_dump -U mise -d mise --format=custom > mise-$(date +%Y-%m-%d).dump
+```
+
+If you changed `POSTGRES_USER` or `POSTGRES_DB`, use those values in the command.
+
+Store the resulting file away from the Mise host. A backup on the same disk is not
+protection against disk failure.
+
+## Verify a backup
+
+At minimum, ask PostgreSQL to list its archive contents:
+
+```bash
+pg_restore --list mise-2026-09-13.dump > /dev/null
+```
+
+The strongest verification is a periodic restore into a temporary PostgreSQL
+instance followed by application-level checks.
+
+## Restore
+
+Stop the application so no writes arrive during the restore:
+
+```bash
+docker compose stop mise
+docker compose exec -T postgres dropdb -U mise --if-exists mise
+docker compose exec -T postgres createdb -U mise mise
+docker compose exec -T postgres pg_restore -U mise -d mise --clean --if-exists < mise.dump
+docker compose start mise
+```
+
+Adjust names for custom PostgreSQL settings. Restarting Mise reconciles the search
+index from the restored database.
+
+:::warning
+Practice the restore procedure before relying on it. A backup is only useful when it
+can be restored within the time your household or team can tolerate.
+:::
+
+## Recipe exports
+
+The household recipe export is useful for portability and a second line of defense,
+but it is not a replacement for a database backup: accounts, plans, pantry, shopping,
+memberships, and settings live outside that export.

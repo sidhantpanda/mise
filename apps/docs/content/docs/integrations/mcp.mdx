@@ -1,0 +1,86 @@
+---
+title: Claude and ChatGPT via MCP
+description: Connect an AI assistant securely to a selected Mise kitchen.
+---
+
+Mise includes a [Model Context Protocol](https://modelcontextprotocol.io) server. A
+compatible assistant can search recipes, plan meals, and manage pantry and shopping
+data in the workspace you approve.
+
+The endpoint is `/mcp` on the same origin as Mise:
+
+```text
+https://mise.example.com/mcp
+```
+
+There is no additional MCP service to deploy.
+
+## Requirements
+
+- Mise must be reachable at a public HTTPS URL.
+- `WEB_ORIGIN` must equal that public origin.
+- The reverse proxy must preserve the `Authorization` header and avoid buffering MCP
+  responses.
+
+## Connect with OAuth
+
+In Claude or ChatGPT, add a custom connector using the MCP URL. The client redirects
+you to Mise to sign in, select a workspace, and approve read and write access. No
+token needs to be copied.
+
+After connecting, try:
+
+- “Send this recipe to Mise.”
+- “What is on the meal plan this week?”
+- “Add the missing ingredients to my shopping list.”
+- “We are out of butter.”
+
+## Available tools
+
+| Tool | Scope | Purpose |
+| --- | --- | --- |
+| `list_households` | read | List available kitchens and the default. |
+| `set_default_household` | read | Change the default kitchen for the connection. |
+| `create_recipe` | write | Save structured recipe data or full JSON-LD. |
+| `search_recipes` | read | Search the recipe library. |
+| `get_recipe` | read | Read one recipe as Schema.org JSON-LD. |
+| `list_recipes` | read | Browse recipes newest first. |
+| `get_meal_plan` | read | Read planned meals for a date range. |
+| `add_meal_to_plan` | write | Schedule a recipe. |
+| `update_planned_meal` | write | Move, replace, or resize a planned meal. |
+| `remove_meal_from_plan` | write | Delete a planned meal. |
+| `get_shopping_list` | read | Read shopping items. |
+| `add_to_shopping_list` | write | Add items or a recipe's ingredients. |
+| `list_pantry` | read | Browse pantry, fridge, or freezer inventory. |
+| `add_pantry_items` | write | Stock or restock inventory. |
+| `remove_pantry_item` | write | Remove inventory by ID or name. |
+| `search` / `fetch` | read | ChatGPT-compatible recipe aliases. |
+
+Every tool is restricted to a workspace the signed-in person belongs to.
+
+## Personal access token
+
+Clients that support a static header can use a token created in **Access Tokens**:
+
+```bash
+claude mcp add --transport http mise https://mise.example.com/mcp \
+  --header "Authorization: Bearer mise_…"
+```
+
+For MCP Inspector, choose **Streamable HTTP**, enter the MCP URL, and add the same
+`Authorization: Bearer mise_…` header.
+
+## OAuth endpoints
+
+Mise acts as both the protected resource and OAuth authorization server:
+
+| Endpoint | Purpose |
+| --- | --- |
+| `/.well-known/oauth-protected-resource` | Advertises the authorization server. |
+| `/.well-known/oauth-authorization-server` | OAuth server metadata. |
+| `/oauth/register` | Dynamic client registration. |
+| `/oauth/authorize` | Sign-in, workspace selection, consent, and PKCE code. |
+| `/oauth/token` | Exchanges codes and refresh tokens. |
+| `/oauth/revoke` | Revokes a token. |
+
+MCP requests are stateless, so multiple Mise replicas do not require session affinity.
