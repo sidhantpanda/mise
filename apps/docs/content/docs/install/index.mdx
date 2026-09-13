@@ -1,0 +1,22 @@
+---
+title: Choose an installation
+description: Compare the supported ways to run Mise.
+---
+
+<Cards>
+  <Card title="Docker Compose" description="The complete supported stack with persistent storage." href="/docs/install/docker-compose" />
+  <Card title="Docker image" description="Run Mise against infrastructure you already operate." href="/docs/install/docker" />
+  <Card title="From source" description="The right setup for development and contributions." href="/docs/install/source" />
+</Cards>
+
+## Comparison
+
+| Method | Best for | PostgreSQL | Meilisearch | Updates |
+| --- | --- | --- | --- | --- |
+| Docker Compose | Most self-hosters | Included | Included | Pull and recreate |
+| Docker image | Existing infrastructure | You provide | You provide | Replace the container |
+| Source | Contributors | Dev Compose | Dev Compose | Git and pnpm |
+
+Docker Compose is the reference production deployment. Other deployment recipes
+should preserve the same runtime contract: persistent PostgreSQL, an optional but
+recommended Meilisearch service, a stable `JWT_SECRET`, and an accurate `WEB_ORIGIN`.

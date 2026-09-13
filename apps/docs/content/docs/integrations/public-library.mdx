@@ -1,0 +1,20 @@
+---
+title: Public recipe library
+description: Configure the catalog Mise uses for community recipe imports.
+---
+
+Mise can browse a public catalog of Schema.org Recipe documents. The default points
+at the official community repository.
+
+To use a different catalog, set:
+
+```dotenv
+PUBLIC_LIBRARY_URL=https://example.com/recipes/list.json
+```
+
+The catalog must be reachable by the Mise server and return a compatible JSON index.
+Recipes remain copies in the active workspace after import; an unavailable public
+catalog does not affect existing recipes.
+
+The official library is maintained separately at
+[sidhantpanda/mise-public](https://github.com/sidhantpanda/mise-public).

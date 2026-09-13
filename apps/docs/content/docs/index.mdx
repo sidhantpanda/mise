@@ -1,0 +1,44 @@
+---
+title: Mise documentation
+description: Run, configure, and contribute to your own Mise kitchen.
+---
+
+Mise is a self-hosted kitchen companion for households and restaurants. It keeps
+recipes, meal plans, pantry inventory, and the shopping list in one place while
+storing recipes in the portable [Schema.org Recipe](https://schema.org/Recipe)
+format.
+
+<Cards>
+  <Card title="Quick start" description="Run the complete stack with Docker Compose." href="/docs/getting-started/quick-start" />
+  <Card title="Choose an installation" description="Compare Compose, Docker, and source installs." href="/docs/install" />
+  <Card title="Connect an assistant" description="Use Mise with Claude or ChatGPT over MCP." href="/docs/integrations/mcp" />
+  <Card title="Contribute" description="Set up a local development environment." href="/docs/contributing/development" />
+</Cards>
+
+## What you get
+
+- A shared recipe library with Schema.org JSON-LD import and export
+- Weekly meal planning with adjustable servings
+- Pantry, fridge, and freezer inventory
+- A household shopping list
+- Typo-tolerant full-text recipe search through Meilisearch
+- Household and restaurant workspaces with multiple members
+- A REST API with OpenAPI documentation
+- An OAuth-protected MCP server for Claude, ChatGPT, and compatible clients
+
+![The Mise dashboard showing meals, recipes, shopping, and pantry](/screenshots/dashboard.webp)
+
+## Pick a path
+
+| Goal | Recommended path |
+| --- | --- |
+| Run Mise on a server or homelab | [Docker Compose](/docs/install/docker-compose) |
+| Use an existing PostgreSQL or Meilisearch service | [Docker image](/docs/install/docker) |
+| Work on Mise itself | [Build from source](/docs/install/source) |
+| Put Mise behind a public domain | [Reverse proxy and HTTPS](/docs/operations/reverse-proxy) |
+| Keep the installation healthy | [Operations](/docs/operations) |
+
+:::note
+Mise itself is self-hosted. This documentation website can be deployed separately;
+it does not need access to your Mise database or server.
+:::

@@ -1,0 +1,39 @@
+---
+title: Product overview
+description: Understand the core concepts that connect a Mise kitchen.
+---
+
+Mise is organized around a **workspace**. A workspace represents a household or
+restaurant and owns its recipes, meal plan, pantry, and shopping list. A person can
+belong to more than one workspace and choose which one is active.
+
+## The workflow
+
+```text
+Recipe library → Meal plan → Shopping list
+       ↕                         ↕
+Schema.org data              Pantry inventory
+```
+
+The features remain useful independently, but connecting them removes repeated work.
+A recipe can become a planned meal; its ingredients can become shopping items; pantry
+inventory records what is already available.
+
+## Open recipe data
+
+Recipes are exchanged as [`Recipe`](https://schema.org/Recipe) JSON-LD. Mise maps
+that open representation across its API and frontend instead of inventing a private
+export format. This makes migration and external integrations substantially easier.
+
+## Workspaces and access
+
+- A **Household** suits families, roommates, and shared home kitchens.
+- A **Restaurant** supports the same workflow with professional terminology and roles.
+- Members can belong to multiple workspaces.
+- API and MCP access tokens are bound to a selected workspace and explicit scopes.
+
+## Search behavior
+
+Meilisearch provides typo-tolerant recipe search. If it is temporarily unavailable,
+the rest of Mise continues to work and recipe search reports that it is unavailable.
+The index reconciles from PostgreSQL when the application starts again.

@@ -1,0 +1,64 @@
+---
+title: Development
+description: Prepare a local Mise workspace and understand the contribution loop.
+---
+
+Thank you for helping improve Mise. Start by reading the repository's open issues and
+roadmap, then keep changes focused enough to review and test confidently.
+
+## Set up
+
+```bash
+git clone https://github.com/sidhantpanda/mise.git
+cd mise
+corepack enable
+pnpm install
+```
+
+Start infrastructure and the application in separate terminals:
+
+```bash
+pnpm dev:db
+```
+
+```bash
+pnpm dev
+```
+
+No `.env` file is needed for the default development setup. Values in `.env.example`
+document optional overrides.
+
+## Repository layout
+
+```text
+apps/server       Express, Prisma, REST, OAuth, MCP
+apps/web          React, TanStack Router, SSR
+apps/docs         Next.js and Fumadocs
+packages/common   Shared schemas and recipe helpers
+e2e               Playwright product flows
+```
+
+## Database changes
+
+Edit `apps/server/prisma/schema.prisma`, then synchronize the development database:
+
+```bash
+pnpm db:push
+```
+
+Prisma 7 keeps its connection configuration in
+`apps/server/prisma.config.ts`, rather than in `schema.prisma`.
+
+## Before opening a pull request
+
+```bash
+pnpm lint
+pnpm test:unit
+pnpm build
+```
+
+Run integration and end-to-end tests when the change touches server behavior,
+persistence, authentication, routing, or a complete user flow.
+
+Keep documentation in the same pull request when configuration, behavior, or public
+interfaces change.

@@ -1,0 +1,14 @@
+{
+  "title": "Mise",
+  "pages": [
+    "index",
+    "getting-started",
+    "product",
+    "install",
+    "operations",
+    "integrations",
+    "reference",
+    "contributing",
+    "troubleshooting"
+  ]
+}

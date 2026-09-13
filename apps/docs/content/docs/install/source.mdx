@@ -1,0 +1,76 @@
+---
+title: Build from source
+description: Run Mise locally with hot reload for development.
+---
+
+The source installation is intended for development and contribution. Use the
+published Docker image for ordinary production deployments.
+
+## Prerequisites
+
+- Node.js 20 or newer; development currently uses Node.js 24
+- pnpm through Corepack
+- Docker Engine or Docker Desktop
+- Git
+
+## Clone and install
+
+```bash
+git clone https://github.com/sidhantpanda/mise.git
+cd mise
+corepack enable
+pnpm install
+```
+
+`pnpm install` also generates the Prisma client.
+
+## Start the development services
+
+In the first terminal:
+
+```bash
+pnpm dev:db
+```
+
+This starts PostgreSQL, Adminer, and Meilisearch using `compose.dev.yml`.
+
+In a second terminal:
+
+```bash
+pnpm dev
+```
+
+Open [http://localhost:3000](http://localhost:3000). The API is the front door and
+proxies the Vite frontend, including hot module replacement, so the entire product
+uses one origin.
+
+## Add demonstration data
+
+```bash
+pnpm db:seed
+```
+
+Sign in with:
+
+```text
+Email:    demo@mise.app
+Password: password
+```
+
+Seeding recreates only the demonstration household and leaves other accounts intact.
+
+## Common commands
+
+| Command | Purpose |
+| --- | --- |
+| `pnpm dev` | Run the API and frontend with hot reload |
+| `pnpm dev:db` | Run development data services |
+| `pnpm build` | Build every workspace application, including documentation |
+| `pnpm lint` | Lint all workspaces |
+| `pnpm test` | Run the complete Vitest suite |
+| `pnpm test:e2e` | Build and run Playwright end-to-end tests |
+| `pnpm db:push` | Synchronize Prisma schema changes |
+| `pnpm db:studio` | Browse development data with Prisma Studio |
+
+Continue with the [development guide](/docs/contributing/development) before opening
+a pull request.

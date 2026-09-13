@@ -32,7 +32,11 @@ COPY apps/web/package.json apps/web/
 COPY packages/common/package.json packages/common/
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 COPY . .
-RUN pnpm build
+# The documentation app is deployed separately to Vercel and is not part of the
+# product container. Build only the packages used by this image.
+RUN pnpm --filter common build \
+ && pnpm --filter server build \
+ && pnpm --filter web build
 
 # --- runtime stage: production deps only ---
 FROM base AS runtime
