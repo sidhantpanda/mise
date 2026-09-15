@@ -40,7 +40,11 @@ def notes(tag, repository):
         for candidate in candidates:
             args.extend(["--match", candidate])
         previous = git(*args, ref)
-    revision = f"refs/tags/{previous}..{ref}" if previous else ref
+    # The first version establishes the baseline; historical development
+    # commits should not become release notes.
+    if previous is None:
+        return ""
+    revision = f"refs/tags/{previous}..{ref}"
     changes = git("log", "--no-merges", "--format=%H%x09%s", revision)
     url = f"https://github.com/{repository}"
     date = git("show", "-s", "--format=%cs", f"{ref}^{{commit}}")
@@ -54,12 +58,14 @@ def notes(tag, repository):
         lines.append(f"- {subject} ([{sha[:7]}]({url}/commit/{sha}))")
     if lines[-1] == "":
         lines.append("- No code changes since the previous release.")
-    compare = f"{url}/compare/{previous}...{tag}" if previous else f"{url}/commits/{tag}"
+    compare = f"{url}/compare/{previous}...{tag}"
     lines.extend(["", f"[Full changelog]({compare})", ""])
     return "\n".join(lines)
 
 
 def update_changelog(path, section):
+    if not section.strip():
+        return
     content = path.read_text()
     if MARKER not in content:
         raise ValueError(f"Missing {MARKER} in {path}")
