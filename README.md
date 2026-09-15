@@ -100,6 +100,32 @@ Your data lives in named Docker volumes (`postgres-data`, `meili-data`) and
 survives updates and `docker compose down`. Only `docker compose down -v`
 deletes it.
 
+## Releases and changelog
+
+Published versions are listed in [GitHub Releases](https://github.com/sidhantpanda/mise/releases)
+and [CHANGELOG.md](CHANGELOG.md).
+
+To publish a version, tag a commit that includes the release workflow and push it:
+
+```bash
+git tag -a v1.0.0 -m "Release v1.0.0"
+git push origin v1.0.0
+```
+
+Use SemVer tags such as `v1.0.0`, `v1.1.0`, or `v1.1.0-rc.1` (the `v` prefix is
+optional). Invalid version tags are skipped. After the tests and multi-platform
+Docker publish succeed, Actions generates notes from commits since the nearest
+ancestor version tag, commits the same notes to `CHANGELOG.md` on the default
+branch, and publishes a GitHub Release. The first release includes all prior
+commits. Prerelease tags create GitHub prereleases.
+
+The workflow uses the built-in `GITHUB_TOKEN` with `contents: write`. Repository
+rules must allow the Actions bot to push the changelog to the default branch.
+If that push fails, release publication stops; fix the permissions and rerun the
+failed job. Reruns do not duplicate changelog entries or existing releases.
+The changelog commit does not trigger another build. Tags stay on the tested
+commit; the changelog update is a subsequent commit on the default branch.
+
 ## Configuration
 
 Everything is optional except `JWT_SECRET`. Set values in the `.env` file next
