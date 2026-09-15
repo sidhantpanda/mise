@@ -116,9 +116,12 @@ Use SemVer tags such as `v1.0.0`, `v1.1.0`, or `v1.1.0-rc.1` (the `v` prefix is
 optional). Invalid version tags are skipped. After the tests and multi-platform
 Docker publish succeed, Actions generates notes from commits since the nearest
 ancestor version tag, commits the same notes to `CHANGELOG.md` on the default
-branch, and publishes a GitHub Release. The first release establishes the baseline with an empty release description
-and no changelog entry; later releases include only changes since the previous
-version. Prerelease tags create GitHub prereleases.
+branch, and publishes a GitHub Release. Each release description includes the
+published Docker image, its version tag, a pull command, supported platforms,
+and a link to the container package.
+The first release establishes the baseline with no commit notes or changelog
+entry; later releases include only changes since the previous version.
+Prerelease tags create GitHub prereleases.
 
 The workflow uses the built-in `GITHUB_TOKEN` with `contents: write`. Repository
 rules must allow the Actions bot to push the changelog to the default branch.
