@@ -152,8 +152,9 @@ and syncs its own schema on boot (disable with `AUTO_MIGRATE=false`).
 
 ### Prerequisites
 
-- **Node.js** 20+ (developed on 24)
-- **pnpm** 9+ (`corepack enable` provides it)
+- **Node.js** 26.13.1+
+- **pnpm** 12, the version pinned in `package.json`. Node 25+ no longer bundles
+  Corepack, so run `npm install -g corepack && corepack enable` to get it
 - **Docker** (for the dev database and search)
 
 ### Setup

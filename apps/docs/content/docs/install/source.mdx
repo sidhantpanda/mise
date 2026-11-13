@@ -8,8 +8,8 @@ published Docker image for ordinary production deployments.
 
 ## Prerequisites
 
-- Node.js 20 or newer; development currently uses Node.js 24
-- pnpm through Corepack
+- Node.js 26.13.1 or newer
+- pnpm through Corepack (Node.js 25+ no longer bundles Corepack, so install it from npm)
 - Docker Engine or Docker Desktop
 - Git
 
@@ -18,6 +18,7 @@ published Docker image for ordinary production deployments.
 ```bash
 git clone https://github.com/sidhantpanda/mise.git
 cd mise
+npm install -g corepack
 corepack enable
 pnpm install
 ```

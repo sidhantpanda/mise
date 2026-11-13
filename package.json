@@ -5,6 +5,9 @@
   "license": "AGPL-3.0-or-later",
   "type": "module",
   "packageManager": "pnpm@12.18.0",
+  "engines": {
+    "node": ">=26.13.1"
+  },
   "scripts": {
     "dev:db": "docker compose -f compose.dev.yml up",
     "dev": "pnpm --filter common build && concurrently -n common,api,web -c yellow,green,blue \"pnpm --filter common dev\" \"pnpm --filter server dev\" \"pnpm --filter web dev\"",

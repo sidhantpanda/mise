@@ -16,12 +16,14 @@
 # Required at runtime (pass with `-e` / compose `environment`):
 #   DATABASE_URL, JWT_SECRET   (optional: WEB_ORIGIN, WEB_URL)
 
-FROM node:24-alpine AS base
+FROM node:26.13.1-alpine AS base
 # OpenSSL + CA certs are needed by Prisma's query/schema engines (musl build).
 RUN apk add --no-cache openssl ca-certificates
 ENV PNPM_HOME=/pnpm
 ENV PATH=$PNPM_HOME:$PATH
-RUN corepack enable
+# Node 25+ no longer bundles Corepack, so install it from npm. It then provides
+# the exact pnpm version pinned by `packageManager` in package.json.
+RUN npm install -g corepack@0.36.0 && corepack enable
 WORKDIR /app
 
 # --- build stage: all deps + compile both apps ---
