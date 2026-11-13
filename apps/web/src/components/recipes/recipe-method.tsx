@@ -4,38 +4,57 @@ import type { HowToStep, RecipeInstruction } from "common";
 // while keeping their section headings. Shared by the household recipe page and
 // the public library preview so both render instructions identically.
 export function RecipeMethod({ instructions }: { instructions: RecipeInstruction[] }) {
-  let stepNumber = 0;
-
   return (
     <div className="space-y-7">
-      {instructions.map((instruction, index) => {
-        if (isHowToSection(instruction)) {
-          if (instruction.itemListElement.length === 0) return null;
+      {numberSteps(instructions).map((block, index) => {
+        if (block.kind === "section") {
+          if (block.steps.length === 0) return null;
 
           return (
-            <section key={`${instruction.name ?? "section"}-${index}`} className="space-y-4">
-              {instruction.name && <h3 className="text-display text-xl">{instruction.name}</h3>}
+            <section key={`${block.name ?? "section"}-${index}`} className="space-y-4">
+              {block.name && <h3 className="text-display text-xl">{block.name}</h3>}
               <div className="space-y-5">
-                {instruction.itemListElement.map((step, stepIndex) => {
-                  stepNumber += 1;
-                  return (
-                    <MethodStep
-                      key={`${instruction.name ?? "section"}-${stepIndex}`}
-                      number={stepNumber}
-                      step={step}
-                    />
-                  );
-                })}
+                {block.steps.map(({ number, step }, stepIndex) => (
+                  <MethodStep
+                    key={`${block.name ?? "section"}-${stepIndex}`}
+                    number={number}
+                    step={step}
+                  />
+                ))}
               </div>
             </section>
           );
         }
 
-        stepNumber += 1;
-        return <MethodStep key={index} number={stepNumber} step={instruction} />;
+        return <MethodStep key={index} number={block.number} step={block.step} />;
       })}
     </div>
   );
+}
+
+type NumberedStep = { number: number; step: HowToStep };
+type MethodBlock =
+  ({ kind: "step" } & NumberedStep) | { kind: "section"; name?: string; steps: NumberedStep[] };
+
+// Assigns continuous step numbers across sections up front, so rendering stays
+// pure (no counter mutated from inside render callbacks).
+function numberSteps(instructions: RecipeInstruction[]): MethodBlock[] {
+  const blocks: MethodBlock[] = [];
+  let number = 0;
+  for (const instruction of instructions) {
+    if (isHowToSection(instruction)) {
+      const steps: NumberedStep[] = [];
+      for (const step of instruction.itemListElement) {
+        number += 1;
+        steps.push({ number, step });
+      }
+      blocks.push({ kind: "section", name: instruction.name, steps });
+    } else {
+      number += 1;
+      blocks.push({ kind: "step", number, step: instruction });
+    }
+  }
+  return blocks;
 }
 
 function MethodStep({ number, step }: { number: number; step: HowToStep }) {

@@ -4,7 +4,7 @@
   "private": true,
   "license": "AGPL-3.0-or-later",
   "type": "module",
-  "packageManager": "pnpm@11.28.11",
+  "packageManager": "pnpm@12.18.0",
   "scripts": {
     "dev:db": "docker compose -f compose.dev.yml up",
     "dev": "pnpm --filter common build && concurrently -n common,api,web -c yellow,green,blue \"pnpm --filter common dev\" \"pnpm --filter server dev\" \"pnpm --filter web dev\"",
@@ -34,10 +34,12 @@
     "@playwright/test": "^1.65.0",
     "@testcontainers/postgresql": "^12.2.1",
     "@types/supertest": "^7.2.1",
-    "@vitest/coverage-v8": "^4.1.12",
+    "@typescript/native": "npm:typescript@^7.0.2",
+    "@vitest/coverage-v8": "^5.1.0",
     "prettier": "^3.10.1",
     "supertest": "^7.3.2",
     "testcontainers": "^12.2.1",
-    "vitest": "^4.1.12"
+    "typescript": "npm:@typescript/typescript6@^6.0.2",
+    "vitest": "^5.1.0"
   }
 }

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -39,18 +39,20 @@ export function ShoppingItemDialog({
   const createItem = useCreateShopping();
   const updateItem = useUpdateShopping();
 
-  useEffect(() => {
-    if (!open) return;
-    if (item) {
-      setName(item.name);
-      setQuantity(item.quantity);
-      setCategory(item.category);
-    } else {
-      setName("");
-      setQuantity("");
-      setCategory("Produce");
+  // Reset the fields whenever the dialog opens (or is pointed at a different
+  // item). Done while rendering rather than in an effect, per
+  // https://react.dev/learn/you-might-not-need-an-effect#adjusting-some-state-when-a-prop-changes
+  const [syncedTo, setSyncedTo] = useState<{ open: boolean; item?: ShoppingItem }>({
+    open: false,
+  });
+  if (open !== syncedTo.open || (open && item !== syncedTo.item)) {
+    setSyncedTo({ open, item });
+    if (open) {
+      setName(item?.name ?? "");
+      setQuantity(item?.quantity ?? "");
+      setCategory(item?.category ?? "Produce");
     }
-  }, [open, item]);
+  }
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();

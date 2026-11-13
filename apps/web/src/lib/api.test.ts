@@ -6,18 +6,24 @@ import { api, ApiError, INTERNAL_API_ORIGIN_HEADER, serverApi } from "./api";
 describe("api.get / post / patch / delete", () => {
   it("GET builds the /api-prefixed URL and sends credentials", async () => {
     let seenUrl = "";
-    let seenCredentials: RequestCredentials | undefined;
     server.use(
       http.get("/api/recipes", ({ request }) => {
         seenUrl = request.url;
-        seenCredentials = request.credentials;
         return HttpResponse.json({ ok: true });
       }),
     );
-    const result = await api.get<{ ok: boolean }>("/recipes");
-    expect(result).toEqual({ ok: true });
-    expect(seenUrl).toContain("/api/recipes");
-    expect(seenCredentials).toBe("include");
+    // msw (v3+) on Node intercepts below fetch and rebuilds the Request from the
+    // wire, so `request.credentials` in a handler is always the default. Assert
+    // the option on the fetch call itself instead.
+    const fetchSpy = vi.spyOn(globalThis, "fetch");
+    try {
+      const result = await api.get<{ ok: boolean }>("/recipes");
+      expect(result).toEqual({ ok: true });
+      expect(seenUrl).toContain("/api/recipes");
+      expect(fetchSpy.mock.calls[0]?.[1]?.credentials).toBe("include");
+    } finally {
+      fetchSpy.mockRestore();
+    }
   });
 
   it("POST sends a JSON body with a Content-Type header", async () => {

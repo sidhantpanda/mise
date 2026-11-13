@@ -15,6 +15,9 @@ test("generate the shopping list from a recipe, check an item off, and clear che
   await expect(page).toHaveURL(/\/recipes\/[^/]+$/);
 
   await page.getByRole("button", { name: "To shopping" }).click();
+  // Wait for the add to land before navigating, or the navigation can abort the
+  // in-flight request under load.
+  await expect(page.getByText("Added 1 ingredient to shopping")).toBeVisible();
 
   await page.goto("/shopping-list");
   const item = page.getByRole("listitem").filter({ hasText: ingredient });

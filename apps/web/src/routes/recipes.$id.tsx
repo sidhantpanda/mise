@@ -27,7 +27,7 @@ import {
   RotateCcw,
   Copy,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { PlanMealDialog } from "@/components/plan-meal-dialog";
 import { toast } from "sonner";
 
@@ -73,9 +73,14 @@ function RecipePage() {
   const baseYield = parseRecipeYield(r?.recipeYield);
   const [previewYield, setPreviewYield] = useState(baseYield.amount);
 
-  useEffect(() => {
+  // Snap the preview back to the recipe's own yield when the recipe (or its
+  // yield) changes, while rendering rather than in an effect.
+  const yieldKey = `${r?.identifier}:${baseYield.amount}`;
+  const [syncedYieldKey, setSyncedYieldKey] = useState(yieldKey);
+  if (yieldKey !== syncedYieldKey) {
+    setSyncedYieldKey(yieldKey);
     setPreviewYield(baseYield.amount);
-  }, [baseYield.amount, r?.identifier]);
+  }
 
   if (!r) {
     return (

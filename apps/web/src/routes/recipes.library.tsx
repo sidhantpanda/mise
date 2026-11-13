@@ -1,10 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { ArrowLeft, HeartHandshake, Loader2 } from "lucide-react";
 import { AppShell, SearchBar } from "@/components/AppShell";
 import { PublicRecipesLayout } from "@/components/recipes/public-recipe-layouts";
-import { isRecipeLayout, RecipeLayout } from "@/components/recipes/recipe-layout";
 import { RecipeLayoutSwitcher } from "@/components/recipes/recipe-layout-switcher";
+import { useStoredRecipeLayout } from "@/hooks/use-stored-recipe-layout";
 import { Button } from "@/components/ui/button";
 import { usePublicLibrary } from "@/hooks";
 
@@ -33,18 +33,8 @@ function PublicLibraryPage() {
   const library = usePublicLibrary();
   const [q, setQ] = useState("");
   const [cuisine, setCuisine] = useState(ALL);
-  const [layout, setLayout] = useState<RecipeLayout>(RecipeLayout.Grid);
+  const [layout, selectLayout] = useStoredRecipeLayout(LAYOUT_STORAGE_KEY);
   const [importedIds, setImportedIds] = useState<Set<string>>(new Set());
-
-  useEffect(() => {
-    const saved = window.localStorage.getItem(LAYOUT_STORAGE_KEY);
-    if (isRecipeLayout(saved)) setLayout(saved);
-  }, []);
-
-  const selectLayout = (next: RecipeLayout) => {
-    setLayout(next);
-    window.localStorage.setItem(LAYOUT_STORAGE_KEY, next);
-  };
 
   const markImported = useCallback((id: string) => {
     setImportedIds((prev) => {

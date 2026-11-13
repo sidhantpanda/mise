@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
@@ -106,23 +106,9 @@ const isoToMinutes = (iso: string) => {
   return (parseInt(m?.[1] || "0") * 60 + parseInt(m?.[2] || "0")).toString();
 };
 
-export function RecipeForm({
-  recipe,
-  onSaved,
-  onCancel,
-}: {
-  recipe?: Recipe;
-  onSaved?: (r: Recipe) => void;
-  onCancel?: () => void;
-}) {
-  const [form, setForm] = useState(blank());
-  const createRecipe = useCreateRecipe();
-  const updateRecipe = useUpdateRecipe();
-  const saving = createRecipe.isPending || updateRecipe.isPending;
-
-  useEffect(() => {
-    if (recipe) {
-      setForm({
+const formFromRecipe = (recipe: Recipe | undefined): RecipeFormState =>
+  recipe
+    ? {
         name: recipe.name,
         description: recipe.description,
         image: recipe.image[0] || "",
@@ -138,11 +124,31 @@ export function RecipeForm({
           : [""],
         structuredInstructions: recipe.recipeInstructions.length ? recipe.recipeInstructions : null,
         schemaJson: recipe,
-      });
-    } else {
-      setForm(blank());
-    }
-  }, [recipe]);
+      }
+    : blank();
+
+export function RecipeForm({
+  recipe,
+  onSaved,
+  onCancel,
+}: {
+  recipe?: Recipe;
+  onSaved?: (r: Recipe) => void;
+  onCancel?: () => void;
+}) {
+  const [form, setForm] = useState(() => formFromRecipe(recipe));
+  const createRecipe = useCreateRecipe();
+  const updateRecipe = useUpdateRecipe();
+  const saving = createRecipe.isPending || updateRecipe.isPending;
+
+  // Re-seed the form when a different recipe is passed in. Done while rendering
+  // rather than in an effect, per
+  // https://react.dev/learn/you-might-not-need-an-effect#adjusting-some-state-when-a-prop-changes
+  const [syncedRecipe, setSyncedRecipe] = useState(recipe);
+  if (recipe !== syncedRecipe) {
+    setSyncedRecipe(recipe);
+    setForm(formFromRecipe(recipe));
+  }
 
   const update = <K extends keyof RecipeFormState>(k: K, v: RecipeFormState[K]) =>
     setForm((f) => ({ ...f, [k]: v }));

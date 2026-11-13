@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -44,23 +44,40 @@ export function PlanMealDialog({
   const [assignee, setAssignee] = useState<string | undefined>(undefined);
   const [q, setQ] = useState("");
 
-  useEffect(() => {
-    if (!open) return;
-    if (meal) {
-      setDate(meal.date);
-      setMealType(meal.mealType);
-      setRecipeId(meal.recipeId);
-      setServings(meal.servings);
-      setAssignee(meal.assignee);
-    } else {
-      setDate(defaultDate || new Date().toISOString().slice(0, 10));
-      setMealType(defaultMealType || "Dinner");
-      setRecipeId(undefined);
-      setServings(2);
-      setAssignee(undefined);
+  // Reset the fields whenever the dialog opens (or is pointed at a different
+  // meal or default slot). Done while rendering rather than in an effect, per
+  // https://react.dev/learn/you-might-not-need-an-effect#adjusting-some-state-when-a-prop-changes
+  const [syncedTo, setSyncedTo] = useState<{
+    open: boolean;
+    meal?: PlannedMeal;
+    defaultDate?: string;
+    defaultMealType?: (typeof mealTypes)[number];
+  }>({ open: false });
+  if (
+    open !== syncedTo.open ||
+    (open &&
+      (meal !== syncedTo.meal ||
+        defaultDate !== syncedTo.defaultDate ||
+        defaultMealType !== syncedTo.defaultMealType))
+  ) {
+    setSyncedTo({ open, meal, defaultDate, defaultMealType });
+    if (open) {
+      if (meal) {
+        setDate(meal.date);
+        setMealType(meal.mealType);
+        setRecipeId(meal.recipeId);
+        setServings(meal.servings);
+        setAssignee(meal.assignee);
+      } else {
+        setDate(defaultDate || new Date().toISOString().slice(0, 10));
+        setMealType(defaultMealType || "Dinner");
+        setRecipeId(undefined);
+        setServings(2);
+        setAssignee(undefined);
+      }
+      setQ("");
     }
-    setQ("");
-  }, [open, meal, defaultDate, defaultMealType]);
+  }
 
   // Search the library server-side (Meilisearch) while typing; show everything
   // when the box is empty.

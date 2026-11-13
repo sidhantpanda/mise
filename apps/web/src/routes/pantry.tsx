@@ -41,6 +41,8 @@ function PantryPage() {
   const [loc, setLoc] = useState<(typeof locations)[number]["key"]>("All");
   const [adding, setAdding] = useState(false);
   const [editing, setEditing] = useState<PantryItem | undefined>();
+  // Reference time for "expires in N days", fixed for the life of the page.
+  const [now] = useState(Date.now);
 
   const filtered = useMemo(
     () =>
@@ -84,7 +86,7 @@ function PantryPage() {
       <div className="md:hidden space-y-3">
         {filtered.map((p) => {
           const days = p.expires
-            ? Math.ceil((new Date(p.expires).getTime() - Date.now()) / 86400000)
+            ? Math.ceil((new Date(p.expires).getTime() - now) / 86400000)
             : null;
           const urgent = days !== null && days <= 5;
           return (
@@ -148,7 +150,7 @@ function PantryPage() {
           <tbody className="divide-y divide-border">
             {filtered.map((p) => {
               const days = p.expires
-                ? Math.ceil((new Date(p.expires).getTime() - Date.now()) / 86400000)
+                ? Math.ceil((new Date(p.expires).getTime() - now) / 86400000)
                 : null;
               const urgent = days !== null && days <= 5;
               return (

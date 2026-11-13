@@ -209,7 +209,7 @@ export function buildMcpServer(ctx: McpAuthContext): McpServer {
         image: z.string().url().optional().describe("URL of a photo of the finished dish."),
         author: z.string().optional().describe("Original recipe author or source name."),
         schemaJson: z
-          .record(z.any())
+          .record(z.string(), z.any())
           .optional()
           .describe(
             "A complete Schema.org Recipe JSON-LD object. When supplied it is used as the " +

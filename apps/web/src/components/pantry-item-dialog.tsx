@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -33,24 +33,23 @@ export function PantryItemDialog({
   const createItem = useCreatePantry();
   const updateItem = useUpdatePantry();
 
-  useEffect(() => {
-    if (!open) return;
-    if (item) {
-      setName(item.name);
-      setCategory(item.category);
-      setValue(String(item.quantity.value));
-      setUnit(item.quantity.unitText);
-      setLocation(item.location);
-      setExpires(item.expires ?? "");
-    } else {
-      setName("");
-      setCategory("");
-      setValue("1");
-      setUnit("");
-      setLocation("Pantry");
-      setExpires("");
+  // Reset the fields whenever the dialog opens (or is pointed at a different
+  // item). Done while rendering rather than in an effect, per
+  // https://react.dev/learn/you-might-not-need-an-effect#adjusting-some-state-when-a-prop-changes
+  const [syncedTo, setSyncedTo] = useState<{ open: boolean; item?: PantryItem }>({
+    open: false,
+  });
+  if (open !== syncedTo.open || (open && item !== syncedTo.item)) {
+    setSyncedTo({ open, item });
+    if (open) {
+      setName(item?.name ?? "");
+      setCategory(item?.category ?? "");
+      setValue(item ? String(item.quantity.value) : "1");
+      setUnit(item?.quantity.unitText ?? "");
+      setLocation(item?.location ?? "Pantry");
+      setExpires(item?.expires ?? "");
     }
-  }, [open, item]);
+  }
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -33,5 +33,14 @@ export default tseslint.config(
       "react-refresh/only-export-components": "off",
     },
   },
+  {
+    // TanStack file routes export `Route` alongside the components it references.
+    // The router's Vite plugin code-splits those components and handles their HMR,
+    // so react-refresh's only-export-components warning doesn't apply.
+    files: ["src/routes/**/*.{ts,tsx}"],
+    rules: {
+      "react-refresh/only-export-components": "off",
+    },
+  },
   eslintPluginPrettier,
 );

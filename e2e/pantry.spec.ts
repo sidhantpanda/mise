@@ -11,6 +11,9 @@ test("add a pantry item and edit it", async ({ page }) => {
   await page.getByLabel("Quantity").fill("1");
   await page.getByLabel("Unit").fill("bottle");
   await page.getByRole("button", { name: "Add", exact: true }).click();
+  // Let the add dialog finish closing (it animates out) before opening the edit
+  // dialog, or both are briefly in the DOM and getByLabel("Quantity") is ambiguous.
+  await expect(page.getByRole("dialog")).toBeHidden();
 
   // The pantry page renders both a mobile card list and a desktop table for the
   // same data (switched by a CSS breakpoint, not conditional rendering), so the

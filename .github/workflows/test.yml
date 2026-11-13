@@ -15,7 +15,7 @@ permissions:
   contents: read
 
 env:
-  PNPM_VERSION: "11.28.11"
+  PNPM_VERSION: "12.18.0"
 
 jobs:
   lint:

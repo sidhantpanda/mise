@@ -1,10 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { Plus } from "lucide-react";
 import { AppShell, PrimaryButton, SearchBar } from "@/components/AppShell";
 import { AddRecipeDialog } from "@/components/recipes/add-recipe-dialog";
-import { isRecipeLayout, RecipeLayout } from "@/components/recipes/recipe-layout";
+import { RecipeLayout } from "@/components/recipes/recipe-layout";
 import { RecipeLayoutSwitcher } from "@/components/recipes/recipe-layout-switcher";
+import { useStoredRecipeLayout } from "@/hooks/use-stored-recipe-layout";
 import { RecipeCtaCard } from "@/components/recipes/recipe-cta-card";
 import { RecipesLayout } from "@/components/recipes/recipe-layouts";
 import { Button } from "@/components/ui/button";
@@ -39,7 +40,7 @@ function RecipesPage() {
   const [q, setQ] = useState("");
   const [cat, setCat] = useState("All");
   const [newRecipeOpen, setNewRecipeOpen] = useState(false);
-  const [layout, setLayout] = useState<RecipeLayout>(RecipeLayout.Grid);
+  const [layout, selectLayout] = useStoredRecipeLayout(LAYOUT_STORAGE_KEY);
 
   // Full-text search runs server-side (Meilisearch) and is paginated. With an
   // empty query we show the whole library and the category chips filter it
@@ -53,18 +54,6 @@ function RecipesPage() {
     [search.data],
   );
   const searchTotal = search.data?.pages[0]?.total ?? 0;
-
-  useEffect(() => {
-    const savedLayout = window.localStorage.getItem(LAYOUT_STORAGE_KEY);
-    if (isRecipeLayout(savedLayout)) {
-      setLayout(savedLayout);
-    }
-  }, []);
-
-  const selectLayout = (nextLayout: RecipeLayout) => {
-    setLayout(nextLayout);
-    window.localStorage.setItem(LAYOUT_STORAGE_KEY, nextLayout);
-  };
 
   const filtered = useMemo(
     () =>
