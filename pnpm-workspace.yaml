@@ -13,3 +13,6 @@ allowBuilds:
   unrs-resolver: true
 minimumReleaseAgeExclude:
   - vite@8.1.1
+  - fumadocs-mdx@15.6.1
+  - prettier@3.10.1
+  - react-resizable-panels@4.22.0

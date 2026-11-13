@@ -9,56 +9,26 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as SignupRouteImport } from './routes/signup'
-import { Route as ShoppingListRouteImport } from './routes/shopping-list'
-import { Route as PantryRouteImport } from './routes/pantry'
-import { Route as OnboardingRouteImport } from './routes/onboarding'
-import { Route as MealPlanRouteImport } from './routes/meal-plan'
-import { Route as LoginRouteImport } from './routes/login'
-import { Route as HouseholdRouteImport } from './routes/household'
-import { Route as AccessTokensRouteImport } from './routes/access-tokens'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AccessTokensRouteImport } from './routes/access-tokens'
+import { Route as HouseholdRouteImport } from './routes/household'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as MealPlanRouteImport } from './routes/meal-plan'
+import { Route as OnboardingRouteImport } from './routes/onboarding'
+import { Route as PantryRouteImport } from './routes/pantry'
+import { Route as ShoppingListRouteImport } from './routes/shopping-list'
+import { Route as SignupRouteImport } from './routes/signup'
 import { Route as RecipesIndexRouteImport } from './routes/recipes.index'
-import { Route as RecipesUploadRouteImport } from './routes/recipes.upload'
-import { Route as RecipesNewRouteImport } from './routes/recipes.new'
-import { Route as RecipesLibraryRouteImport } from './routes/recipes.library'
 import { Route as RecipesIdRouteImport } from './routes/recipes.$id'
-import { Route as RecipesLibraryViewRouteImport } from './routes/recipes.library_.view'
+import { Route as RecipesLibraryRouteImport } from './routes/recipes.library'
+import { Route as RecipesNewRouteImport } from './routes/recipes.new'
+import { Route as RecipesUploadRouteImport } from './routes/recipes.upload'
 import { Route as RecipesEditIdRouteImport } from './routes/recipes.edit.$id'
+import { Route as RecipesLibraryViewRouteImport } from './routes/recipes.library_.view'
 
-const SignupRoute = SignupRouteImport.update({
-  id: '/signup',
-  path: '/signup',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ShoppingListRoute = ShoppingListRouteImport.update({
-  id: '/shopping-list',
-  path: '/shopping-list',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PantryRoute = PantryRouteImport.update({
-  id: '/pantry',
-  path: '/pantry',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const OnboardingRoute = OnboardingRouteImport.update({
-  id: '/onboarding',
-  path: '/onboarding',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MealPlanRoute = MealPlanRouteImport.update({
-  id: '/meal-plan',
-  path: '/meal-plan',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LoginRoute = LoginRouteImport.update({
-  id: '/login',
-  path: '/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const HouseholdRoute = HouseholdRouteImport.update({
-  id: '/household',
-  path: '/household',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AccessTokensRoute = AccessTokensRouteImport.update({
@@ -66,9 +36,39 @@ const AccessTokensRoute = AccessTokensRouteImport.update({
   path: '/access-tokens',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const HouseholdRoute = HouseholdRouteImport.update({
+  id: '/household',
+  path: '/household',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MealPlanRoute = MealPlanRouteImport.update({
+  id: '/meal-plan',
+  path: '/meal-plan',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OnboardingRoute = OnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PantryRoute = PantryRouteImport.update({
+  id: '/pantry',
+  path: '/pantry',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ShoppingListRoute = ShoppingListRouteImport.update({
+  id: '/shopping-list',
+  path: '/shopping-list',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SignupRoute = SignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RecipesIndexRoute = RecipesIndexRouteImport.update({
@@ -76,14 +76,9 @@ const RecipesIndexRoute = RecipesIndexRouteImport.update({
   path: '/recipes/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const RecipesUploadRoute = RecipesUploadRouteImport.update({
-  id: '/recipes/upload',
-  path: '/recipes/upload',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const RecipesNewRoute = RecipesNewRouteImport.update({
-  id: '/recipes/new',
-  path: '/recipes/new',
+const RecipesIdRoute = RecipesIdRouteImport.update({
+  id: '/recipes/$id',
+  path: '/recipes/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RecipesLibraryRoute = RecipesLibraryRouteImport.update({
@@ -91,19 +86,24 @@ const RecipesLibraryRoute = RecipesLibraryRouteImport.update({
   path: '/recipes/library',
   getParentRoute: () => rootRouteImport,
 } as any)
-const RecipesIdRoute = RecipesIdRouteImport.update({
-  id: '/recipes/$id',
-  path: '/recipes/$id',
+const RecipesNewRoute = RecipesNewRouteImport.update({
+  id: '/recipes/new',
+  path: '/recipes/new',
   getParentRoute: () => rootRouteImport,
 } as any)
-const RecipesLibraryViewRoute = RecipesLibraryViewRouteImport.update({
-  id: '/recipes/library_/view',
-  path: '/recipes/library/view',
+const RecipesUploadRoute = RecipesUploadRouteImport.update({
+  id: '/recipes/upload',
+  path: '/recipes/upload',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RecipesEditIdRoute = RecipesEditIdRouteImport.update({
   id: '/recipes/edit/$id',
   path: '/recipes/edit/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RecipesLibraryViewRoute = RecipesLibraryViewRouteImport.update({
+  id: '/recipes/library_/view',
+  path: '/recipes/library/view',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -240,53 +240,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/signup': {
-      id: '/signup'
-      path: '/signup'
-      fullPath: '/signup'
-      preLoaderRoute: typeof SignupRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/shopping-list': {
-      id: '/shopping-list'
-      path: '/shopping-list'
-      fullPath: '/shopping-list'
-      preLoaderRoute: typeof ShoppingListRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/pantry': {
-      id: '/pantry'
-      path: '/pantry'
-      fullPath: '/pantry'
-      preLoaderRoute: typeof PantryRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/onboarding': {
-      id: '/onboarding'
-      path: '/onboarding'
-      fullPath: '/onboarding'
-      preLoaderRoute: typeof OnboardingRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/meal-plan': {
-      id: '/meal-plan'
-      path: '/meal-plan'
-      fullPath: '/meal-plan'
-      preLoaderRoute: typeof MealPlanRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/household': {
-      id: '/household'
-      path: '/household'
-      fullPath: '/household'
-      preLoaderRoute: typeof HouseholdRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/access-tokens': {
@@ -296,11 +254,53 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AccessTokensRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/household': {
+      id: '/household'
+      path: '/household'
+      fullPath: '/household'
+      preLoaderRoute: typeof HouseholdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/meal-plan': {
+      id: '/meal-plan'
+      path: '/meal-plan'
+      fullPath: '/meal-plan'
+      preLoaderRoute: typeof MealPlanRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/onboarding': {
+      id: '/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof OnboardingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pantry': {
+      id: '/pantry'
+      path: '/pantry'
+      fullPath: '/pantry'
+      preLoaderRoute: typeof PantryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/shopping-list': {
+      id: '/shopping-list'
+      path: '/shopping-list'
+      fullPath: '/shopping-list'
+      preLoaderRoute: typeof ShoppingListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/signup': {
+      id: '/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/recipes/': {
@@ -310,18 +310,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RecipesIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/recipes/upload': {
-      id: '/recipes/upload'
-      path: '/recipes/upload'
-      fullPath: '/recipes/upload'
-      preLoaderRoute: typeof RecipesUploadRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/recipes/new': {
-      id: '/recipes/new'
-      path: '/recipes/new'
-      fullPath: '/recipes/new'
-      preLoaderRoute: typeof RecipesNewRouteImport
+    '/recipes/$id': {
+      id: '/recipes/$id'
+      path: '/recipes/$id'
+      fullPath: '/recipes/$id'
+      preLoaderRoute: typeof RecipesIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/recipes/library': {
@@ -331,18 +324,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RecipesLibraryRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/recipes/$id': {
-      id: '/recipes/$id'
-      path: '/recipes/$id'
-      fullPath: '/recipes/$id'
-      preLoaderRoute: typeof RecipesIdRouteImport
+    '/recipes/new': {
+      id: '/recipes/new'
+      path: '/recipes/new'
+      fullPath: '/recipes/new'
+      preLoaderRoute: typeof RecipesNewRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/recipes/library_/view': {
-      id: '/recipes/library_/view'
-      path: '/recipes/library/view'
-      fullPath: '/recipes/library/view'
-      preLoaderRoute: typeof RecipesLibraryViewRouteImport
+    '/recipes/upload': {
+      id: '/recipes/upload'
+      path: '/recipes/upload'
+      fullPath: '/recipes/upload'
+      preLoaderRoute: typeof RecipesUploadRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/recipes/edit/$id': {
@@ -350,6 +343,13 @@ declare module '@tanstack/react-router' {
       path: '/recipes/edit/$id'
       fullPath: '/recipes/edit/$id'
       preLoaderRoute: typeof RecipesEditIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/recipes/library_/view': {
+      id: '/recipes/library_/view'
+      path: '/recipes/library/view'
+      fullPath: '/recipes/library/view'
+      preLoaderRoute: typeof RecipesLibraryViewRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
